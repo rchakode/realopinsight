@@ -37,27 +37,31 @@ class K8sHelper : public QNetworkAccessManager
 
 public:
   K8sHelper(void);
-  std::pair<QString, bool> retrieveAndProcessingK8sData(const SourceT& sinfo);
-
+  std::pair<QString, int> loadNamespaceView(const SourceT& in_sinfo, const QString& in_namespace, CoreDataT& out_cdata);
+  std::pair<QStringList, int> listNamespaces(const SourceT& sinfo);
+  std::pair<QByteArray, int> requestNamespacedItemsData(const SourceT& sinfo, const QString& k8sNamespace, const QString& itemType);
   std::pair<int, QString> parseStateData(const QJsonObject& state);
-  std::pair<QStringList, bool> parseNamespaces(const QByteArray& data);
-  std::pair<QString, bool> parseNamespacedServices(const QByteArray& in_data,
-                                                   const QString& in_macthNamespace,
-                                                   QMap<QString, QMap<QString, QString>>& out_selectorMaps,
-                                                   NodeListT& out_bpnodes);
-  std::pair<QString, bool> parseNamespacedPods(const QByteArray& in_data,
-                                               const QString& in_sacthNamespace,
-                                               const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
-                                               NodeListT& out_bpnodes,
-                                               NodeListT& out_cnodes);
-  std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
-                                               const QMap<QString, QVariant>& podLabels);
+  std::pair<QStringList, int> parseNamespaces(const QByteArray& data);
+
+  std::pair<QString, int> parseNamespacedServices(const QByteArray& in_data,
+                                                  const QString& in_macthNamespace,
+                                                  QMap<QString, QMap<QString, QString>>& out_selectorMaps,
+                                                  NodeListT& out_bpnodes);
+
+  std::pair<QString, int> parseNamespacedPods(const QByteArray& in_data,
+                                              const QString& in_sacthNamespace,
+                                              const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
+                                              NodeListT& out_bpnodes,
+                                              NodeListT& out_cnodes);
+
 
 public Q_SLOTS:
   void exitEventLoop(const QNetworkReply::NetworkError& code) { m_eventLoop.exit(code);}
 
 private:
   QEventLoop m_eventLoop;
+  void setNetworkReplySslOptions(QNetworkReply* reply, int verifyPeerOption);
+  std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos, const QMap<QString, QVariant>& podLabels);
 };
 
 #endif // K8SHELPER_H

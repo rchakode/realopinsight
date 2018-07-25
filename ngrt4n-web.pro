@@ -118,8 +118,7 @@ HEADERS += \
     web/src/WebAuthSettings.hpp \ \
     web/src/WebEditor.hpp \
     web/src/WebInputSelector.hpp \
-    core/src/K8sHelper.hpp \
-    core/src/TestK8sHelper.hpp
+    core/src/K8sHelper.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -175,8 +174,7 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebDataSourceSettings.cpp \
     web/src/WebEditor.cpp \
     web/src/WebInputSelector.cpp \
-    core/src/K8sHelper.cpp \
-    core/src/TestK8sHelper.cpp
+    core/src/K8sHelper.cpp
 
 
 LIBS += -L"$(WT_HOME)/lib" \
@@ -220,8 +218,8 @@ unittests-web {
 unittests-core {
   QT += testlib
   TARGET = unittests-core
-  HEADERS +=
-  SOURCES +=
+  HEADERS += core/src/TestK8sHelper.hpp
+  SOURCES += core/src/TestK8sHelper.cpp
 }
 
 TARGET.files = $${TARGET}

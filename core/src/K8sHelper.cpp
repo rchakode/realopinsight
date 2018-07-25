@@ -35,13 +35,64 @@ K8sHelper::K8sHelper(void)
 }
 
 
-std::pair<QStringList, bool> K8sHelper::parseNamespaces(const QByteArray& data)
+std::pair<QString, int> K8sHelper::loadNamespaceView(const SourceT& in_sinfo, const QString& in_namespace, CoreDataT& out_cdata)
+{
+  // process services
+  auto resultRequestServicesData = requestNamespacedItemsData(in_sinfo, in_namespace, "services");
+  if (resultRequestServicesData.second != ngrt4n::RcSuccess) {
+    return resultRequestServicesData;
+  }
+
+  QMap<QString, QMap<QString, QString>> serviceSelectorMaps;
+  NodeListT serviceBpnodes;
+  auto resultParseServices = parseNamespacedServices(resultRequestServicesData.first, in_namespace, serviceSelectorMaps, serviceBpnodes);
+  if (resultParseServices.second != ngrt4n::RcSuccess) {
+    return resultParseServices;
+  }
+
+  // process pods
+  auto resultRequestPodsData = requestNamespacedItemsData(in_sinfo, in_namespace, "pods");
+  if (resultRequestPodsData.second != ngrt4n::RcSuccess) {
+    return resultRequestPodsData;
+  }
+
+  auto resultParsePods = parseNamespacedPods(resultRequestPodsData.first, in_namespace, serviceSelectorMaps, out_cdata.bpnodes, out_cdata.cnodes);
+  if (resultParsePods.second != ngrt4n::RcSuccess) {
+    out_cdata.clear();
+    return resultParsePods;
+  }
+
+
+  // append service nodes
+  for(auto&& snode: serviceBpnodes) {
+    out_cdata.bpnodes.insert(snode.id, snode);
+  }
+
+  // add namespace as root service node
+  NodeT rnode;
+  rnode.id = ngrt4n::ROOT_ID;
+  rnode.parent = "";
+  rnode.name = in_namespace;
+  rnode.type = NodeType::BusinessService;
+  rnode.sev_prule = PropRules::Unchanged;
+  rnode.sev_crule = CalcRules::Worst;
+  rnode.weight = ngrt4n::WEIGHT_UNIT;
+  rnode.icon = ngrt4n::DEFAULT_ICON;
+  rnode.description = "Namespace node";
+
+  out_cdata.bpnodes.insert(rnode.id, rnode);
+  ngrt4n::fixParentChildrenDependencies(out_cdata);
+
+  return std::make_pair("", ngrt4n::RcSuccess);
+}
+
+std::pair<QStringList, int> K8sHelper::parseNamespaces(const QByteArray& data)
 {
 
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(data, &parserError);
   if (parserError.error != QJsonParseError::NoError) {
-    return std::make_pair(QStringList{parserError.errorString()}, false);
+    return std::make_pair(QStringList{parserError.errorString()}, ngrt4n::RcParseError);
   }
 
   QJsonObject jsonData = jdoc.object();
@@ -54,19 +105,19 @@ std::pair<QStringList, bool> K8sHelper::parseNamespaces(const QByteArray& data)
     nses.push_back(meta["name"].toString());
   }
 
-  return std::make_pair(nses, true);
+  return std::make_pair(nses, ngrt4n::RcSuccess);
 }
 
 
-std::pair<QString, bool> K8sHelper::parseNamespacedServices(const QByteArray& in_data,
-                                                            const QString& in_macthNamespace,
-                                                            QMap<QString, QMap<QString, QString>>& out_selectorMaps,
-                                                            NodeListT& out_bpnodes)
+std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_data,
+                                                           const QString& in_macthNamespace,
+                                                           QMap<QString, QMap<QString, QString>>& out_selectorMaps,
+                                                           NodeListT& out_bpnodes)
 {
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(in_data, &parserError);
   if (parserError.error != QJsonParseError::NoError) {
-    return std::make_pair(parserError.errorString(), false);
+    return std::make_pair(parserError.errorString(), ngrt4n::RcParseError);
   }
 
   QJsonObject jsonData = jdoc.object();
@@ -109,25 +160,26 @@ std::pair<QString, bool> K8sHelper::parseNamespacedServices(const QByteArray& in
   }
 
 
-  return std::make_pair("", true);
+  return std::make_pair("", ngrt4n::RcSuccess);
 }
 
-std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& in_data,
-                                                        const QString& in_macthNamespace,
-                                                        const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
-                                                        NodeListT& out_bpnodes,
-                                                        NodeListT& out_cnodes)
+std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data,
+                                                       const QString& in_macthNamespace,
+                                                       const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
+                                                       NodeListT& out_bpnodes,
+                                                       NodeListT& out_cnodes)
 {
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(in_data, &parserError);
   if (parserError.error != QJsonParseError::NoError) {
-    return std::make_pair(parserError.errorString(), false);
+    return std::make_pair(parserError.errorString(), ngrt4n::RcSuccess);
   }
 
   QSet<QString> k8sNamespaces;
 
   QJsonObject jsonData = jdoc.object();
   QJsonArray items = jsonData["items"].toArray();
+
 
   for (auto item: items) {
     NodeT podNode;
@@ -182,13 +234,14 @@ std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& in_dat
       auto&& containerStatusData = containerStatus.toObject();
       auto&& containerName = containerStatusData["name"].toString();
       auto&& containerId = containerStatusData["containerID"].toString();
+      auto&& restartCount = containerStatusData["restartCount"].toInt();
       auto&& stateData = parseStateData(containerStatusData["state"].toObject());
 
       containerNode.name = containerName;
       containerNode.child_nodes = QString("%1/%2").arg(serviceFqdn, containerName); //FIXME: is it correct ?
       containerNode.id = ngrt4n::md5hash(QString("%1/%2").arg(podFqdn, containerId));
       containerNode.sev = stateData.first;
-      containerNode.description = stateData.second;
+      containerNode.description = QString("state: %1, restartCount: %2").arg(stateData.second).arg(restartCount);
       containerNode.check.host = containerNode.name.toStdString();
       containerNode.check.host_groups = k8sNamespace.toStdString();
       containerNode.check.status = stateData.first;
@@ -202,13 +255,14 @@ std::pair<QString, bool> K8sHelper::parseNamespacedPods(const QByteArray& in_dat
 
   // if data match the given namespace
   if (k8sNamespaces.size() == 1) {
-    return std::make_pair("success", true);
+    return std::make_pair("success", ngrt4n::RcSuccess);
   }
 
-  // otherwise means invalid data
+  // otherwise means no pod data
   out_bpnodes.clear();
   out_cnodes.clear();
-  return std::make_pair(QObject::tr("invalid pod data matching namespace %1").arg(in_macthNamespace), false);
+
+  return std::make_pair(QObject::tr("no pod data matching namespace %1").arg(in_macthNamespace), ngrt4n::RcSuccess);
 }
 
 
@@ -261,8 +315,24 @@ std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap
   return std::make_pair(outMatchedService, outSelectorMatched);
 }
 
+void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, int verifyPeerOption)
+{
+  if (! reply) {
+    return ;
+  }
 
-std::pair<QString, bool> K8sHelper::retrieveAndProcessingK8sData(const SourceT& sinfo)
+  QSslConfiguration sslConfig;
+  if (verifyPeerOption != 0) {
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+  } else {
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    reply->ignoreSslErrors();
+  }
+
+  reply->setSslConfiguration(sslConfig);
+}
+
+std::pair<QStringList, int> K8sHelper::listNamespaces(const SourceT& sinfo)
 {
   //prepare http request
   QNetworkRequest networkRequest;
@@ -274,36 +344,57 @@ std::pair<QString, bool> K8sHelper::retrieveAndProcessingK8sData(const SourceT& 
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
 
-  // set ssl options
-  QSslConfiguration sslConfig;
-  if (sinfo.verify_ssl_peer != 0) {
-    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
-  } else {
-    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
-    reply->ignoreSslErrors();
-  }
-  reply->setSslConfiguration(sslConfig);
+  setNetworkReplySslOptions(reply, sinfo.verify_ssl_peer);
 
   // wait synchronously before continuing
   m_eventLoop.exec();
 
   if (! reply) {
-    return std::make_pair(QObject::tr("Unexpected NULL QNetworkReply"), false);
+    auto&& errorMsg = QObject::tr("Unexpected NULL QNetworkReply");
+    return std::make_pair(QStringList{errorMsg}, ngrt4n::RccRpcError);
   }
 
   reply->deleteLater();
 
   if (reply->error() != QNetworkReply::NoError) {
-    return std::make_pair(QObject::tr("HTTP call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString()), false);
+    auto&& errorMsg = QObject::tr("HTTP call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString());
+    return std::make_pair(QStringList{errorMsg}, ngrt4n::RccRpcError);
   }
 
-  auto outNamespacesParsing = parseNamespaces(reply->readAll());
-  if (! outNamespacesParsing.second || outNamespacesParsing.first.size() == 0) {
-    return std::make_pair(QObject::tr("Get namespaces returned error or empty list at %1").arg(networkRequest.url().toString()), false);
-  }
-
-
-
-  return std::make_pair("", true);
+  return parseNamespaces(reply->readAll());
 }
+
+std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const SourceT& sinfo, const QString& k8sNamespace, const QString& itemType)
+{
+  //prepare http request
+  QNetworkRequest networkRequest;
+  networkRequest.setRawHeader("Accept", "application/json");
+  networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces/%2/%3").arg(sinfo.mon_url, k8sNamespace, itemType)));
+
+  // make request and conncet to the processing handlers
+  QNetworkReply* reply = QNetworkAccessManager::get(networkRequest);
+  connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
+  connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
+
+  setNetworkReplySslOptions(reply, sinfo.verify_ssl_peer);
+
+  // wait synchronously before continuing
+  m_eventLoop.exec();
+
+  if (! reply) {
+    auto&& errorMsg = QByteArray("Unexpected NULL QNetworkReply");
+    return std::make_pair(errorMsg, ngrt4n::RccRpcError);
+  }
+
+  reply->deleteLater();
+
+  if (reply->error() != QNetworkReply::NoError) {
+    auto&& errorMsg = QObject::tr("HTTP call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString()).toLatin1();
+    return std::make_pair(errorMsg, ngrt4n::RccRpcError);
+  }
+
+  return std::make_pair(reply->readAll(), ngrt4n::RcSuccess);
+}
+
+
 

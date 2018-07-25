@@ -48,7 +48,7 @@ void TestK8sHelper::test_parseNamespaces(void)
 
   K8sHelper k8s;
   auto&& out = k8s.parseNamespaces(nsesDataFile.readAll());
-  QCOMPARE(out.second, true);
+  QCOMPARE(out.second, static_cast<int>(ngrt4n::RcSuccess));
   QCOMPARE(out.first.size(), 8);
 }
 
@@ -63,7 +63,7 @@ void TestK8sHelper::test_parseNamespacedServices(void)
   QMap<QString, QMap<QString, QString>> serviceSelectorInfos;
   auto&& out = k8s.parseNamespacedServices(servicesDataFile.readAll(), "project1", serviceSelectorInfos, bpnodes);
 
-  QCOMPARE(out.second, true);
+  QCOMPARE(out.second, static_cast<int>(ngrt4n::RcSuccess));
   QCOMPARE(serviceSelectorInfos.size(), 7);
   QCOMPARE(bpnodes.size(), 7);
 
@@ -79,7 +79,6 @@ void TestK8sHelper::test_parseNamespacedServices(void)
     }
     QCOMPARE(sm.second["app"], sm.first);
   }
-
 }
 
 
@@ -94,7 +93,7 @@ void TestK8sHelper::test_parseNamespacedPods(void)
   QMap<QString, QMap<QString, QString>> serviceSelectorInfos;
   auto&& outServices = k8s.parseNamespacedServices(servicesDataFile.readAll(), "project1", serviceSelectorInfos, serviceBpnodes);
 
-  QCOMPARE(outServices.second, true);
+  QCOMPARE(outServices.second, static_cast<int>(ngrt4n::RcSuccess));
 
   QFile podsDataFile(m_TEST_DATA_DIR + "/list-pods.json");
 
@@ -104,31 +103,25 @@ void TestK8sHelper::test_parseNamespacedPods(void)
   NodeListT podCnodes;
   auto&& outPods = k8s.parseNamespacedPods(podsDataFile.readAll(), "project1", serviceSelectorInfos, podBpnodes, podCnodes);
 
-  //    NodeT rnode;
-  //    rnode.id =ngrt4n::ROOT_ID;
-  //    rnode.parent = "";
-  //    rnode.name = *k8sNamespaces.begin();
-  //    rnode.type = NodeType::BusinessService;
-  //    rnode.sev_prule = PropRules::Unchanged;
-  //    rnode.sev_crule = CalcRules::Worst;
-  //    rnode.weight = ngrt4n::WEIGHT_UNIT;
-  //    rnode.icon = ngrt4n::DEFAULT_ICON;
-  //    rnode.description = "";
-  //ngrt4n::saveDataAsDescriptionFile("/tmp/real.xml", cdata);
-
-  QCOMPARE(outPods.second, true);
+  QCOMPARE(outPods.second, static_cast<int>(ngrt4n::RcSuccess));
 }
 
 
 void TestK8sHelper::test_httpDataRetrieving(void)
 {
   K8sHelper k8s;
-  SourceT src;
-  src.mon_url = m_PROXY_URL;
-  src.verify_ssl_peer = 1;
-  auto&& out = k8s.retrieveAndProcessingK8sData(src);
-  QCOMPARE(out.first, QString(""));
-  QCOMPARE(out.second, true);
+  SourceT sinfo;
+  sinfo.mon_url = m_PROXY_URL;
+  sinfo.verify_ssl_peer = 1;
+  auto&& outNs = k8s.listNamespaces(sinfo);
+  QCOMPARE(outNs.second, static_cast<int>(ngrt4n::RcSuccess));
+  QCOMPARE(outNs.first.size() > 0, true);
+  for (auto&& ns: outNs.first) {
+    CoreDataT cdata;
+    auto nsViewOut = k8s.loadNamespaceView(sinfo, ns, cdata);
+    QVERIFY(nsViewOut.second == static_cast<int>(ngrt4n::RcSuccess));
+    ngrt4n::saveDataAsDescriptionFile("/tmp/roi_"+ns+".xml", cdata);
+  }
 }
 
 QTEST_MAIN(TestK8sHelper)
