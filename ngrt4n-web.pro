@@ -32,7 +32,7 @@ PACKAGE_VERSION=2018r1
 OBJECTS_DIR = generated/obj
 MOC_DIR = generated/moc
 RCC_DIR = generated/rcc
-QMAKE_CXXFLAGS += -std=c++0x -Werror -Wno-literal-suffix -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs
+QMAKE_CXXFLAGS += -std=c++14 -Werror -Wno-literal-suffix -Wno-unused-variable -Wno-unused-parameter -Wno-unused-local-typedefs
 
 
 DISTFILES += README.md \
