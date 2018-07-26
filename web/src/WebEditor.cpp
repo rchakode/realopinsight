@@ -45,11 +45,6 @@
 #include <Wt/WPoint>
 
 
-
-namespace {
-  const IconMapT ICONS = ngrt4n::nodeIcons();
-}
-
 const QMap<int, std::string> WebEditor::MENU_LABELS = {
   {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add sub service")},
   {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete sub service")}
@@ -141,7 +136,6 @@ void WebEditor::unbindWidgets(void)
 }
 
 
-
 void WebEditor::bindFormWidgets(void)
 {
   m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
@@ -219,7 +213,7 @@ void WebEditor::bindFormWidgets(void)
   m_typeExternalServiceNameField.setHidden(true);
 
   // set icon type values
-  for (const auto& icon: ngrt4n::nodeIcons().keys()) {
+  for (const auto& icon: ngrt4n::NodeIcons.keys()) {
     int index = m_iconBox.count();
     m_iconBox.addItem(icon.toStdString());
     m_iconIndexMap[icon] =index;

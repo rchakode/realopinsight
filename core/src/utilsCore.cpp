@@ -239,18 +239,9 @@ void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidChec
 }
 
 
-QStringList ngrt4n::sourceTypes(void)
-{
-  return QStringList() << "Nagios-like"
-                       << "Zabbix"
-                       << "Zenoss"
-                       << "Pandora FMS"
-                       << "ManageEngine OpManager";
-}
-
 qint32 ngrt4n::convertToSourceType(const QString& str)
 {
-  QStringList types = sourceTypes();
+  QStringList types = SourceTypes;
   int type;
   if (str == types[MonitorT::Nagios])
     type = MonitorT::Nagios;
@@ -262,25 +253,12 @@ qint32 ngrt4n::convertToSourceType(const QString& str)
     type = MonitorT::Pandora;
   else if (str == types[MonitorT::OpManager])
     type = MonitorT::OpManager;
+  else if (str == types[MonitorT::Kubernetes])
+    type = MonitorT::Kubernetes;
   else
     type = MonitorT::Auto;
 
   return type;
-}
-
-
-QStringList ngrt4n::sourceIndexes(void)
-{
-  return QStringList() << "0"
-                       << "1"
-                       << "2"
-                       << "3"
-                       << "4"
-                       << "5"
-                       << "6"
-                       << "7"
-                       << "8"
-                       << "9";
 }
 
 
@@ -289,7 +267,6 @@ StringPairT ngrt4n::splitDataPointInfo(const QString& info)
 {
   int pos = info.indexOf("/");
   QString second = ((pos == -1)? "ping" : info.mid(pos+1));
-
   return QPair<QString, QString>(info.left(pos), second);
 }
 
@@ -332,46 +309,7 @@ QPair<bool, int> ngrt4n::checkSourceId(const QString &id)
   return QPair<bool, int>(valid, index);
 }
 
-IconMapT ngrt4n::nodeIcons() {
-  IconMapT icons;
-  icons[DEFAULT_ICON]= "images/business-process.png";
-  icons["Other Check"] = "images/check.png";
-  icons["Server"] = "images/server.png";
-  icons["Firewall"] = "images/firewall.png";
-  icons["Router"] = "images/router.png";
-  icons["Network"] = "images/network.png";
-  icons["Switch"] = "images/switch.png";
-  icons["Filer"] = "images/filer.png";
-  icons["Hard disk"] = "images/harddisk.png";
-  icons["Storage Area"] = "images/storage.png";
-  icons["Linux"] = "images/linux.png";
-  icons["Windows OS"] = "images/windows.png";
-  icons["Solaris"] = "images/solaris.png";
-  icons["Cloud"] = "images/cloud.png";
-  icons["Hypervisor"] = "images/hypervisor.png";
-  icons["Application"] = "images/application.png";
-  icons["Web Accessibility"] = "images/web.png";
-  icons["Web server"] = "images/web-server.png";
-  icons["Database Engine"] = "images/db.png";
-  icons["Database Server"] = "images/db-server.png";
-  icons["Process"] = "images/process.png";
-  icons["Logfile"] = "images/log.png";
-  icons["Network Bandwith"] = "images/network-usage.png";
-  icons["CPU"] = "images/cpu.png";
-  icons["CPU Load"] = "images/performance-level.png";
-  icons["Memory"] = "images/memory.png";
-  icons["Memory Usage"] = "images/memory-usage.png";
-  icons["Resource Utilization"] = "images/resource-usage.png";
-  icons["Performance"] = "images/performance.png";
-  icons[PLUS] = "images/built-in/nav-plus.png";
-  icons[MINUS] = "images/built-in/nav-minus.png";
-  icons["Nagios Basic Logo"] = "images/nagios-logo-n.png";
-  icons["Zabbix Basic Logo"] = "images/zabbix-logo-z.png";
-  icons["Zenoss Basic Logo"] = "images/zenoss-logo-o.png";
-  icons["Hierarchy"] = "images/hierarchy.png";
-  icons[CONTAINER_ICON] = "images/docker-container.png";
-  return icons;
-}
+
 
 
 QStringList ngrt4n::getAuthInfo(const QString& authString)

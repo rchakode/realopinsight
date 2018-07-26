@@ -41,10 +41,6 @@
 
 
 
-namespace {
-  const IconMapT ICONS = ngrt4n::nodeIcons();
-}
-
 WebDashboard::WebDashboard(const QString& descriptionFile)
   : DashboardBase(descriptionFile)
 {
@@ -203,7 +199,7 @@ Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
   //FIXME: clear widget
   tpl->bindWidget("event-feed-title", anchor);
   tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
-  tpl->bindString("event-feed-icon", ICONS[node.icon]);
+  tpl->bindString("event-feed-icon", ngrt4n::NodeIcons[node.icon]);
   tpl->bindString("event-feed-details", node.check.alarm_msg);
   tpl->bindString("platform", viewName);
   tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));

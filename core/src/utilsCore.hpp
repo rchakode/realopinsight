@@ -45,10 +45,57 @@ namespace ngrt4n
   const QString DEFAULT_ICON = "Business Process";
   const QString CONTAINER_ICON = "Container";
   const QString APPLICATION_ICON = "Application";
+  const QString K8S_POD = "Kubernetes Pod";
+  const QString K8S_SVC = "Kubernetes Service";
+  const QString K8S_NS = "Kubernetes Namespace";
   const double SCALIN_FACTOR = 1.1;
   const double SCALOUT_FACTOR = 1/SCALIN_FACTOR;
   const qint32 CHART_WIDTH=200;
   const qint32 CHART_HEIGHT=150;
+
+  const IconMapT NodeIcons = {
+    {DEFAULT_ICON, "images/business-process.png"},
+    {CONTAINER_ICON, "images/docker-container.png"},
+    {K8S_POD, "images/k8s-pod.png"},
+    {K8S_NS, "images/k8s-ns.png"},
+    {K8S_SVC, "images/k8s-svc.png"},
+    {PLUS, "images/built-in/nav-plus.png"},
+    {MINUS, "images/built-in/nav-minus.png"},
+    {"Other Check", "images/check.png"},
+    {"Server", "images/server.png"},
+    {"Firewall", "images/firewall.png"},
+    {"Router", "images/network.png"},
+    {"Network", "images/network.png"},
+    {"Switch", "images/switch.png"},
+    {"Filer", "images/filer.png"},
+    {"Hard disk", "images/harddisk.png"},
+    {"Storage Area", "images/storage.png"},
+    {"Linux", "images/linux.png"},
+    {"Cloud", "images/cloud.png"},
+    {"Hypervisor", "images/hypervisor.png"},
+    {"Application", "images/application.png"},
+    {"Web Access", "images/web.png"},
+    {"Web server", "images/web-server.png"},
+    {"Database Engine", "images/db.png"},
+    {"Database Server", "images/db-server.png"},
+    {"Process", "images/process.png"},
+    {"Logfile", "images/log.png"},
+    {"Network Bandwith", "images/network-usage.png"},
+    {"CPU", "images/cpu.png"},
+    {"CPU Load", "images/performance-level.png"},
+    {"Memory", "images/memory.png"},
+    {"Memory Usage", "images/memory-usage.png"},
+    {"Resource Utilization", "images/resource-usage.png"},
+    {"Performance", "images/performance.png"},
+    {"Nagios", "images/nagios-logo-n.png"},
+    {"Zabbix", "images/zabbix-logo-z.png"},
+    {"Zenoss", "images/zenoss-logo-o.png"},
+    {"Tree", "images/hierarchy.png"}
+  };
+
+  const QStringList SourceIndexes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+  const QStringList SourceTypes = {"Kubernetes", "ManageEngine OpManager", "Pandora FMS", "Nagios & alike", "Zabbix", "Zenoss"};
+
 
   inline void delay(const qint32& d)
   { sleep(d); }
@@ -106,10 +153,6 @@ namespace ngrt4n
 
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
 
-  QStringList sourceTypes(void);
-
-  QStringList sourceIndexes(void);
-
   StringPairT splitDataPointInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
 
   StringPairT splitSourceDataPointInfo(const QString& info); /* return <source, hostaddr> */
@@ -117,8 +160,6 @@ namespace ngrt4n
   QString getSourceIdFromStr(const QString& str);
 
   QPair<bool, int> checkSourceId(const QString& id);
-
-  IconMapT nodeIcons();
 
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
 

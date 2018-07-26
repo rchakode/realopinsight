@@ -52,7 +52,7 @@ void WebDataSourceSettings::createFormWidgets(void)
   renderSourceIndexSelector();
 
   m_monitorTypeField.addItem(Q_TR("-- Select a type --"));
-  for (const auto& srcid: ngrt4n::sourceTypes()) {
+  for (const auto& srcid: ngrt4n::SourceTypes) {
     m_monitorTypeField.addItem(srcid.toStdString());
   }
 
@@ -81,7 +81,6 @@ void WebDataSourceSettings::createFormWidgets(void)
   m_authStringField.setEchoMode(Wt::WLineEdit::Password);
   m_authStringField.setEmptyText( Q_TR("Set the authentication string") );
   m_showAuthStringField.setText( Q_TR("Show in clear") );
-
 
   // buttons
   m_applyChangeBtn.setText( Q_TR("Apply changes") );
@@ -291,7 +290,9 @@ void WebDataSourceSettings::renderSourceIndexSelector(void)
 
   //FIXME: check if this cause memory leak ?
   Wt::WComboBox* inputField = new Wt::WComboBox(m_sourceIndexSelector.contents());
-  for (const auto& src : ngrt4n::sourceIndexes()) inputField->addItem(src.toStdString());
+  for (const auto& src : ngrt4n::SourceIndexes) {
+    inputField->addItem(src.toStdString());
+  }
 
   //FIXME: check if this cause memory leak ?
   Wt::WPushButton *ok = new Wt::WPushButton("OK", m_sourceIndexSelector.footer());

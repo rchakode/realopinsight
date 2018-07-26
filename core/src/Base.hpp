@@ -73,6 +73,7 @@ class MonitorT {
       Zenoss  = 2,
       Pandora = 3,
       OpManager = 4,
+      Kubernetes = 5,
       Auto    = 99
     };
 
@@ -396,9 +397,13 @@ class ScaleFactors {
 };
 
 
+
 typedef QHash<int, SourceT> SourceListT;
 typedef QMap<QString, std::string> IconMapT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;
 typedef QPair<QString, QString> StringPairT;
+
+
+
 #endif /* BASE_HPP */

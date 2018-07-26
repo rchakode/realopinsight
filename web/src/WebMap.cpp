@@ -38,7 +38,6 @@
 #include <boost/filesystem/operations.hpp>
 
 namespace {
-  const IconMapT ICONS = ngrt4n::nodeIcons();
   const double THUMB_BANNER_FONT_SIZE = 32;
   typedef Wt::WPainter::Image GImage;
   const double THUMBNAIL_WIDTH = 120;
@@ -148,14 +147,14 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
                         ICON_SIDE + COLOR_BORDER_DOUBLE_SIZE);
 
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(ICONS[node.icon], ICON_SIDE, ICON_SIDE));
+      m_painter->drawImage(iconPos, GImage(ngrt4n::NodeIcons[node.icon], ICON_SIDE, ICON_SIDE));
     } else { /* thumbnail: do nothing*/ }
 
     if( node.type == NodeType::BusinessService) {
       if (node.visibility & ngrt4n::Expanded) {
-        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::MINUS], 19, 18));
+        m_painter->drawImage(expIconPos,GImage(ngrt4n::NodeIcons[ngrt4n::MINUS], 19, 18));
       } else {
-        m_painter->drawImage(expIconPos,GImage(ICONS[ngrt4n::PLUS], 19, 18));
+        m_painter->drawImage(expIconPos,GImage(ngrt4n::NodeIcons[ngrt4n::PLUS], 19, 18));
       }
       createExpIconLink(node, expIconPos);
     }
