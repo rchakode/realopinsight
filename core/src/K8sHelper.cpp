@@ -77,7 +77,7 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const SourceT& in_sinfo, co
   rnode.sev_prule = PropRules::Unchanged;
   rnode.sev_crule = CalcRules::Worst;
   rnode.weight = ngrt4n::WEIGHT_UNIT;
-  rnode.icon = ngrt4n::DEFAULT_ICON;
+  rnode.icon = ngrt4n::APPLICATION_ICON;
   rnode.description = "Namespace node";
 
   out_cdata.bpnodes.insert(rnode.id, rnode);
@@ -128,7 +128,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
     serviceNode.sev_prule = PropRules::Unchanged;
     serviceNode.sev_crule = CalcRules::Average;
     serviceNode.weight = ngrt4n::WEIGHT_UNIT;
-    serviceNode.icon = ngrt4n::DEFAULT_ICON;
+    serviceNode.icon = ngrt4n::APPLICATION_ICON;
 
     auto&& serviceData = item.toObject();
     auto&& metaData = serviceData["metadata"].toObject();
@@ -187,7 +187,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     podNode.sev_prule = PropRules::Unchanged;
     podNode.sev_crule = CalcRules::Average; // pods imply a notion of high availability ?
     podNode.weight = ngrt4n::WEIGHT_UNIT;
-    podNode.icon = ngrt4n::DEFAULT_ICON;
+    podNode.icon = ngrt4n::APPLICATION_ICON;
 
     auto&& podData = item.toObject();
     auto&& metaData = podData["metadata"].toObject();
