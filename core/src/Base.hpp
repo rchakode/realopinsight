@@ -55,52 +55,56 @@ const QString ID_PATTERN("%1/%2");
 const qint32 MAX_SRCS = 10;
 
 struct CheckT {
-    std::string id;
-    std::string host;
-    std::string check_command;
-    std::string last_state_change;
-    std::string alarm_msg;
-    std::string host_groups;
-    int status;
+  std::string id;
+  std::string host;
+  std::string check_command;
+  std::string last_state_change;
+  std::string alarm_msg;
+  std::string host_groups;
+  int status;
 };
 typedef QMap<std::string, CheckT> ChecksT;
 
 class MonitorT {
-  public:
-    enum {
-      Nagios  = 0,
-      Zabbix  = 1,
-      Zenoss  = 2,
-      Pandora = 3,
-      OpManager = 4,
-      Kubernetes = 5,
-      Any   = 99
-    };
+public:
+  enum {
+    Nagios  = 0,
+    Zabbix  = 1,
+    Zenoss  = 2,
+    Pandora = 3,
+    OpManager = 4,
+    Kubernetes = 5,
+    Any   = 99
+  };
 
-    static QString toString(int type) {
-      QString value = QObject::tr("Undefined");
-      switch (type) {
-        case Nagios:
-          value = QObject::tr("Nagios");
-          break;
-        case Zabbix:
-          value = QObject::tr("Zabbix");
-          break;
-        case Zenoss:
-          value = QObject::tr("Zenoss");
-          break;
-        case Pandora:
-          value = QObject::tr("Pandora FMS");
-          break;
-        case OpManager:
-          value = QObject::tr("ManageEngine OpManager");
-          break;
-        case Any:
-        default:
-          break;
-      }
-      return value;
+  static QString toString(int type) {
+    QString value = "";
+    switch (type) {
+      case Nagios:
+        value = QObject::tr("Nagios");
+        break;
+      case Zabbix:
+        value = QObject::tr("Zabbix");
+        break;
+      case Zenoss:
+        value = QObject::tr("Zenoss");
+        break;
+      case Pandora:
+        value = QObject::tr("Pandora FMS");
+        break;
+      case OpManager:
+        value = QObject::tr("ManageEngine OpManager");
+        break;
+      case Kubernetes:
+        value = QObject::tr("Kubernetes");
+        break;
+      case Any:
+      default:
+        value = QObject::tr("Undefined");
+        break;
     }
+    return value;
+  }
 };
 
 
@@ -115,8 +119,8 @@ namespace ngrt4n {
   };
 
   struct AggregatedSeverityT {
-      int sev;
-      double weight;
+    int sev;
+    double weight;
   };
 
   enum NagiosStatusT {
@@ -209,123 +213,123 @@ namespace ngrt4n {
 } // namespace ngrt4n
 
 class PropRules {
-  public:
-    enum PropRulesT{
-      Unchanged = 0,
-      Decreased = 1,
-      Increased = 2
-    };
-    PropRules(int rule) : m_rule(rule) {}
-    QString data(void) { return QString::number(m_rule); }
-    QString toString(void) const;
-  private:
-    int m_rule;
+public:
+  enum PropRulesT{
+    Unchanged = 0,
+    Decreased = 1,
+    Increased = 2
+  };
+  PropRules(int rule) : m_rule(rule) {}
+  QString data(void) { return QString::number(m_rule); }
+  QString toString(void) const;
+private:
+  int m_rule;
 };
 
 
 class CalcRules {
-  public:
-    enum CalcRulesT{
-      Worst = 0,
-      Average = 1,
-      WeightedAverageWithThresholds = 2
-    };
-    CalcRules(int rule) : m_rule(rule) {}
-    QString data(void) { return QString::number(m_rule);}
-    QString toString(void) const;
-  private:
-    int m_rule;
+public:
+  enum CalcRulesT{
+    Worst = 0,
+    Average = 1,
+    WeightedAverageWithThresholds = 2
+  };
+  CalcRules(int rule) : m_rule(rule) {}
+  QString data(void) { return QString::number(m_rule);}
+  QString toString(void) const;
+private:
+  int m_rule;
 };
 
 class NodeType {
-  public:
-    enum {
-      BusinessService = 0,
-      ITService = 1,
-      ExternalService = 2,
-      K8sNamespaceService = 3
-    };
-    static QString toString(int _type);
-    static int toInt(const QString& strType);
-  private:
-    static const QString ITServiceText;
-    static const QString BusinessServiceText;
-    static const QString ExternalServiceText;
-    static const QString K8sNamespaceServiceText;
+public:
+  enum {
+    BusinessService = 0,
+    ITService = 1,
+    ExternalService = 2,
+    K8sNamespaceService = 3
+  };
+  static QString toString(int _type);
+  static int toInt(const QString& strType);
+private:
+  static const QString ITServiceText;
+  static const QString BusinessServiceText;
+  static const QString ExternalServiceText;
+  static const QString K8sNamespaceServiceText;
 };
 
 
 class Severity {
-  public:
-    Severity(int sev): m_sev(sev) {}
-    void setValue(int _value) {m_sev = _value;}
-    int value() const {return m_sev;}
-    QString valueString(void) const {return QString::number(m_sev);}
-    bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
-    QString toString(void) const;
-    std::string toStdString(void) const;
-    Severity operator *(Severity& sev) const;
-    Severity operator / (Severity& st) const;
-    Severity operator ++();
-    Severity operator--();
+public:
+  Severity(int sev): m_sev(sev) {}
+  void setValue(int _value) {m_sev = _value;}
+  int value() const {return m_sev;}
+  QString valueString(void) const {return QString::number(m_sev);}
+  bool isValid() { return m_sev >= static_cast<int>(ngrt4n::Normal) && m_sev <= static_cast<int>(ngrt4n::Unknown);}
+  QString toString(void) const;
+  std::string toStdString(void) const;
+  Severity operator *(Severity& sev) const;
+  Severity operator / (Severity& st) const;
+  Severity operator ++();
+  Severity operator--();
 
-  private:
-    int m_sev;
+private:
+  int m_sev;
 };
 
 struct ThresholdT {
-    double weight;
-    int sev_in;
-    int sev_out;
+  double weight;
+  int sev_in;
+  int sev_out;
 };
 
 struct ThresholdLessthanFnt {
-    bool operator () (const ThresholdT& th1, const ThresholdT& th2)
-    {
-      if (th1.sev_out < th2.sev_out)
+  bool operator () (const ThresholdT& th1, const ThresholdT& th2)
+  {
+    if (th1.sev_out < th2.sev_out)
+      return true;
+
+    if (th1.sev_out == th2.sev_out) {
+      if (th1.sev_in < th2.sev_in)
         return true;
 
-      if (th1.sev_out == th2.sev_out) {
-        if (th1.sev_in < th2.sev_in)
-          return true;
+      if (th1.sev_in == th2.sev_in)
+        return th1.weight < th2.weight;
 
-        if (th1.sev_in == th2.sev_in)
-          return th1.weight < th2.weight;
-
-        return false;
-      }
       return false;
     }
+    return false;
+  }
 };
 
 
 struct NodeT {
-    QString id;
-    QString name;
-    qint32 type;
-    qint32 sev;
-    qint32 sev_crule;
-    qint32 sev_prule;
-    qint32 sev_prop;
-    QString icon;
-    QString description;
-    QString parent;
-    QString alarm_msg;
-    QString notification_msg;
-    QString actual_msg;
-    double weight;
-    QString child_nodes;
-    CheckT check;
-    QVector<ThresholdT> thresholdLimits;
-    bool monitored;
-    qint8 visibility;
-    double pos_x;
-    double pos_y;
-    double text_w;
-    double text_h;
+  QString id;
+  QString name;
+  qint32 type;
+  qint32 sev;
+  qint32 sev_crule;
+  qint32 sev_prule;
+  qint32 sev_prop;
+  QString icon;
+  QString description;
+  QString parent;
+  QString alarm_msg;
+  QString notification_msg;
+  QString actual_msg;
+  double weight;
+  QString child_nodes;
+  CheckT check;
+  QVector<ThresholdT> thresholdLimits;
+  bool monitored;
+  qint8 visibility;
+  double pos_x;
+  double pos_y;
+  double text_w;
+  double text_h;
 
-    QString toThresholdsString(void) const;
-    QString toString(void) const;
+  QString toThresholdsString(void) const;
+  QString toString(void) const;
 };
 
 typedef QHash<QString, NodeT> NodeListT;
@@ -334,67 +338,67 @@ typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, QStringList> HostListT;
 
 struct CoreDataT {
-    qint8 graph_mode;
-    double min_x;
-    double min_y;
-    qint8 monitor;
-    double format_version;
-    NodeListT bpnodes;
-    NodeListT cnodes;
-    CheckStatusCountT check_status_count;
-    HostListT hosts;
-    QSet<QString> sources;
-    QMultiMap<QString, QString>  edges;
-    double map_height;
-    double map_width;
+  qint8 graph_mode;
+  double min_x;
+  double min_y;
+  qint8 monitor;
+  double format_version;
+  NodeListT bpnodes;
+  NodeListT cnodes;
+  CheckStatusCountT check_status_count;
+  HostListT hosts;
+  QSet<QString> sources;
+  QMultiMap<QString, QString>  edges;
+  double map_height;
+  double map_width;
 
-    void clear(void) {
-      cnodes.clear();
-      bpnodes.clear();
-      edges.clear();
-      monitor = MonitorT::Any;
-    }
+  void clear(void) {
+    cnodes.clear();
+    bpnodes.clear();
+    edges.clear();
+    monitor = MonitorT::Any;
+  }
 };
 
 
 struct SourceT {
-    QString id;
-    qint8 mon_type;
-    QString mon_url;
-    QString ls_addr;
-    qint32 ls_port;
-    QString auth;
-    qint8 verify_ssl_peer;
-    QString icon;
+  QString id;
+  qint8 mon_type;
+  QString mon_url;
+  QString ls_addr;
+  qint32 ls_port;
+  QString auth;
+  qint8 verify_ssl_peer;
+  QString icon;
 };
 
 
 
 class ScaleFactors {
-  public:
-    struct Coordinates {
-        double x;
-        double y;
-    };
-    ScaleFactors (int graphLayout) {
-      const double LESS_SCALE_FACTOR = 72;
-      const double GREAT_SCALE_FACTOR = 100;
-      switch (graphLayout) {
-        case ngrt4n::NeatoLayout:
-          m_factors = {5 * GREAT_SCALE_FACTOR, 5 * GREAT_SCALE_FACTOR};
-          break;
-        case ngrt4n::DotLayout:
-        default:
-          m_factors = {LESS_SCALE_FACTOR, GREAT_SCALE_FACTOR};
-          break;
-      }
+public:
+  struct Coordinates {
+    double x;
+    double y;
+  };
+  ScaleFactors (int graphLayout) {
+    const double LESS_SCALE_FACTOR = 72;
+    const double GREAT_SCALE_FACTOR = 100;
+    switch (graphLayout) {
+      case ngrt4n::NeatoLayout:
+        m_factors = {5 * GREAT_SCALE_FACTOR, 5 * GREAT_SCALE_FACTOR};
+        break;
+      case ngrt4n::DotLayout:
+      default:
+        m_factors = {LESS_SCALE_FACTOR, GREAT_SCALE_FACTOR};
+        break;
     }
+  }
 
-    double x() const {return m_factors.x;}
-    double y() const {return m_factors.y;}
+  double x() const {return m_factors.x;}
+  double y() const {return m_factors.y;}
 
-  private:
-    Coordinates m_factors;
+private:
+  Coordinates m_factors;
 };
 
 

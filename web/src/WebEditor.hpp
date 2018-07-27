@@ -1,8 +1,8 @@
 /*
  * WebEditor.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2018 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)        #
-# Last Update : 03-01-2018                                                 #
+# Copyright (c) 2018 Rodrigue Chakode                                      #
+# Creation : 03-01-2018                                                    #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -89,7 +89,8 @@ private:
 
   // node type-related field and widgets
   Wt::WComboBox m_typeField;
-  Wt::WComboBox m_typeExternalServiceNameField;
+  Wt::WComboBox m_typeExternalServiceSelectorField;
+  Wt::WComboBox m_typeK8sNamespaceServiceSelectorField;
   Wt::WContainerWidget m_typeItemsContainer;
   Wt::WHBoxLayout* m_typeItemsLayout;
 

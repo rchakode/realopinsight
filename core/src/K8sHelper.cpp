@@ -337,7 +337,12 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(const SourceT& sinfo)
   //prepare http request
   QNetworkRequest networkRequest;
   networkRequest.setRawHeader("Accept", "application/json");
-  networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces").arg(sinfo.mon_url)) );
+
+  if (sinfo.mon_url.endsWith("/")) {
+    networkRequest.setUrl( QUrl(QString("%1api/v1/namespaces").arg(sinfo.mon_url)) );
+  } else {
+    networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces").arg(sinfo.mon_url)) );
+  }
 
   // make request and conncet to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(networkRequest);
@@ -369,7 +374,12 @@ std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const SourceT& 
   //prepare http request
   QNetworkRequest networkRequest;
   networkRequest.setRawHeader("Accept", "application/json");
-  networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces/%2/%3").arg(sinfo.mon_url, k8sNamespace, itemType)));
+
+  if (sinfo.mon_url.endsWith("/")) {
+    networkRequest.setUrl( QUrl(QString("%1api/v1/namespaces/%2/%3").arg(sinfo.mon_url, k8sNamespace, itemType)));
+  } else {
+    networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces/%2/%3").arg(sinfo.mon_url, k8sNamespace, itemType)));
+  }
 
   // make request and conncet to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(networkRequest);

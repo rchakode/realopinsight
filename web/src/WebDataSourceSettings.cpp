@@ -1,7 +1,7 @@
 /*
- # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Change: 17-12-2017                                                  #
+ # ------------------------------------------------------------------------#
+# Copyright (c) 2018 Rodrigue Chakode                                      #
+# Creation : 17-12-2017                                                    #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -70,7 +70,6 @@ void WebDataSourceSettings::createFormWidgets(void)
   m_livestatusPortField.setMaxLength(5);
 
   // other fields
-  m_useNgrt4ndField.setText( Q_TR("Use ngrt4nd") );
   m_dontVerifyCertificateField.setText( Q_TR("Don't verify SSL certificate") );
 
   // update interval field
@@ -103,7 +102,6 @@ void WebDataSourceSettings::bindFormWidgets(void)
   bindWidget("update-interval", &m_updateIntervalField);
   bindWidget("livestatus-server", &m_livestatusHostField);
   bindWidget("livestatus-port", &m_livestatusPortField);
-  bindWidget("use-ngrt4nd", &m_useNgrt4ndField);
   bindWidget("apply-change-button", &m_applyChangeBtn);
   bindWidget("add-as-source-button", &m_addAsSourceBtn);
   bindWidget("delete-button", &m_deleteSourceBtn);
@@ -133,7 +131,7 @@ void WebDataSourceSettings::addEvent(void)
   m_applyChangeBtn.clicked().connect(this, &WebDataSourceSettings::applyChanges);
   m_addAsSourceBtn.clicked().connect(this, &WebDataSourceSettings::addAsSource);
   m_deleteSourceBtn.clicked().connect(this, &WebDataSourceSettings::deleteSource);
-  m_monitorTypeField.activated().connect(this, &WebDataSourceSettings::showLivestatusSettings);
+  m_monitorTypeField.activated().connect(this, &WebDataSourceSettings::updateComponentsVisibiliy);
   m_sourceSelectionBox.changed().connect(this, &WebDataSourceSettings::handleSourceBoxChanged);
   m_showAuthStringField.changed().connect(this, &WebDataSourceSettings::handleShowAuthStringChanged);
 }
@@ -226,26 +224,38 @@ void WebDataSourceSettings::updateFields(void)
 }
 
 
-void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& type)
+void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& sourceLabel)
 {
   // global settings
   setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
 
-  // source-specific settings
-  SourceT src;
-  src.id = ngrt4n::sourceId(index);
-  src.mon_type = ngrt4n::convertToSourceType(type);
-  src.mon_url = m_monitorUrlField.text().toUTF8().c_str();
-  src.ls_addr = m_livestatusHostField.text().toUTF8().c_str();
-  src.ls_port = QString( m_livestatusPortField.text().toUTF8().c_str() ).toInt();
-  src.auth = QString( m_authStringField.text().toUTF8().c_str() );
-  src.use_ngrt4nd = m_useNgrt4ndField.checkState();
-  src.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
-  setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(src));
-  setSourceState(index, true);
-  setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
+  // extract settings from  UI
+  SourceT srcInfo;
+  srcInfo.id = ngrt4n::sourceId(index);
+  srcInfo.mon_url = m_monitorUrlField.text().toUTF8().c_str();
+  srcInfo.ls_addr = m_livestatusHostField.text().toUTF8().c_str();
+  srcInfo.ls_port = QString( m_livestatusPortField.text().toUTF8().c_str() ).toInt();
+  srcInfo.auth = QString( m_authStringField.text().toUTF8().c_str() );
+  srcInfo.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
+
+  if (sourceLabel.contains("Nagios")) {
+    srcInfo.mon_type = MonitorT::Nagios;
+  } else if (sourceLabel.contains("Zabbix")) {
+    srcInfo.mon_type = MonitorT::Zabbix;
+  } else if (sourceLabel.contains("Zenoss")) {
+    srcInfo.mon_type = MonitorT::Zenoss;
+  } else if (sourceLabel.contains("OpManager")) {
+    srcInfo.mon_type = MonitorT::OpManager;
+  } else if (sourceLabel.contains("Kubernetes")) {
+    srcInfo.mon_type = MonitorT::Kubernetes;
+  } else {
+    srcInfo.mon_type = MonitorT::Any;
+  }
 
   // save changes
+  setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(srcInfo));
+  setSourceState(index, true);
+  setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
   sync();
 
   // emit signal a finilize
@@ -255,26 +265,27 @@ void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& typ
 }
 
 
-void WebDataSourceSettings::fillFromSource(int _index)
+void WebDataSourceSettings::fillFromSource(int _configIndex)
 {
-  if (_index >= 0 && _index < MAX_SRCS) {
+  if (_configIndex >= 0 && _configIndex < MAX_SRCS) {
     SourceT src;
-    loadSource(_index, src);
+    loadSource(_configIndex, src);
 
-    m_sourceSelectionBox.setValueText(ngrt4n::sourceId(_index).toStdString());
+    m_sourceSelectionBox.setValueText(ngrt4n::sourceId(_configIndex).toStdString());
     m_monitorUrlField.setText(src.mon_url.toStdString());
     m_livestatusHostField.setText(src.ls_addr.toStdString());
     m_livestatusPortField.setText(QString::number(src.ls_port).toStdString());
     m_authStringField.setText(src.auth.toStdString());
-    m_monitorTypeField.setCurrentIndex(src.mon_type+1);
-    m_useNgrt4ndField.setCheckState(static_cast<Wt::CheckState>(src.use_ngrt4nd));
+    //FIXME m_monitorTypeField.setCurrentIndex(src.mon_type+1);
+    qDebug() << MonitorT::toString(src.mon_type);
+    m_monitorTypeField.setCurrentIndex( m_monitorTypeField.findText( MonitorT::toString(src.mon_type).toStdString() ) );
     m_dontVerifyCertificateField.setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
     m_updateIntervalField.setValue(updateInterval());
 
-    showLivestatusSettings(m_monitorTypeField.currentIndex());
+    updateComponentsVisibiliy(m_monitorTypeField.currentIndex());
 
     // this triggers a signal
-    setCurrentSourceIndex(_index);
+    setCurrentSourceIndex(_configIndex);
   }
 }
 
@@ -324,9 +335,7 @@ void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
 
 int WebDataSourceSettings::getSourceGlobalIndex(int sourceBoxIndex)
 {
-  boost::any value =
-      static_cast<Wt::WAbstractItemModel*>(
-        &m_sourceBoxModel)->data(sourceBoxIndex, 0, Wt::UserRole);
+  boost::any value = static_cast<Wt::WAbstractItemModel*>(&m_sourceBoxModel)->data(sourceBoxIndex, 0, Wt::UserRole);
 
   return boost::any_cast<int>(value);
 }
@@ -359,7 +368,6 @@ void WebDataSourceSettings::setEnabledInputs(bool enable)
   m_livestatusPortField.setEnabled(enable);
   m_monitorTypeField.setEnabled(enable);
   m_showAuthStringField.setEnabled(enable);
-  m_useNgrt4ndField.setEnabled(enable);
   m_dontVerifyCertificateField.setEnabled(enable);
   m_updateIntervalField.setEnabled(enable);
   m_applyChangeBtn.setEnabled(enable);
@@ -375,16 +383,23 @@ void WebDataSourceSettings::handleSourceBoxChanged(void)
 }
 
 
-void WebDataSourceSettings::showLivestatusSettings(int monitorTypeIndex)
+void WebDataSourceSettings::updateComponentsVisibiliy(int monitorTypeCurrentIndex)
 {
-  switch (monitorTypeIndex) {
-    case 1:
-      wApp->doJavaScript("$('#livetstatus-section').show();");
-      break;
-    default:
-      wApp->doJavaScript("$('#livetstatus-section').hide();");
-      break;
+  const auto monitorText = QString::fromStdString(m_monitorTypeField.itemText(monitorTypeCurrentIndex).toUTF8());
+
+  auto NagiosSelected = monitorText.contains("Nagios");
+  if (NagiosSelected) {
+    m_livestatusHostField.setHidden(false);
+    m_livestatusPortField.setHidden(false);
+    wApp->doJavaScript("$('#livetstatus-section').show();");
+  } else {
+    m_livestatusHostField.setHidden(true);
+    m_livestatusPortField.setHidden(true);
+    wApp->doJavaScript("$('#livetstatus-section').hide();");
   }
+
+  auto KubernetesNotSelected = ! monitorText.contains("Kubernetes");
+  m_authStringField.setEnabled(KubernetesNotSelected);
 }
 
 

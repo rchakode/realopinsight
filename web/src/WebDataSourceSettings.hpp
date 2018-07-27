@@ -1,7 +1,7 @@
 /*
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Last Change: 17-12-2017                                                  #
+# Copyright (c) 2018 Rodrigue Chakode                                      #
+# Creation : 17-12-2017                                                    #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -49,10 +49,10 @@ public:
 protected:
   virtual void applyChanges(void);
   void handleCancel(void) {return;}
-  virtual void fillFromSource(int _index);
+  virtual void fillFromSource(int _configIndex);
   virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
-  virtual void saveAsSource(const qint32& index, const QString& type);
+  virtual void saveAsSource(const qint32& index, const QString& sourceLabel);
   virtual void addAsSource(void);
   virtual void deleteSource(void);
 
@@ -70,7 +70,6 @@ private:
   Wt::WLineEdit m_livestatusHostField;
   Wt::WLineEdit m_livestatusPortField;
   Wt::WCheckBox m_showAuthStringField;
-  Wt::WCheckBox m_useNgrt4ndField;
   Wt::WCheckBox m_dontVerifyCertificateField;
   Wt::WSpinBox m_updateIntervalField;
   Wt::WPushButton m_applyChangeBtn;
@@ -90,7 +89,7 @@ private:
   int findSourceIndexInBox(int sourceGlobalIndex);
   void addToSourceBox(int sourceGlobalIndex);
   void handleSourceBoxChanged(void);
-  void showLivestatusSettings(int monitorTypeIndex);
+  void updateComponentsVisibiliy(int monitorTypeCurrentIndex);
   void handleShowAuthStringChanged(void);
 };
 

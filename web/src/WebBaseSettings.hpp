@@ -82,7 +82,7 @@ protected :
   virtual void fillFromSource(int srcIndex) {}
   virtual void updateAllSourceWidgetStates(void) {}
   virtual void updateFields(void) {}
-  virtual void saveAsSource(const qint32& idx, const QString& type){}
+  virtual void saveAsSource(const qint32& idx, const QString& sourceLabel){}
 
 protected Q_SLOTS:
   virtual void applyChanges(void) {}

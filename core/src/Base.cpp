@@ -27,7 +27,7 @@
 const QString NodeType::ITServiceText = QObject::tr("IT Service");
 const QString NodeType::BusinessServiceText = QObject::tr("Business Service");
 const QString NodeType::ExternalServiceText = QObject::tr("External Service");
-const QString NodeType::K8sNamespaceServiceText = QObject::tr("Kubernetes Namespace Service");
+const QString NodeType::K8sNamespaceServiceText = QObject::tr("Kubernetes Namespace");
 
 QString PropRules::toString(void) const
 {

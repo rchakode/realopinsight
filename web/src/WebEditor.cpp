@@ -1,8 +1,8 @@
 /*
  * WebEditor.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2018 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)        #
-# Last Update : 03-01-2018                                                 #
+# Copyright (c) 2018 Rodrigue Chakode                                      #
+# Creation : 03-01-2018                                                    #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -30,6 +30,7 @@
 #include "WebBaseSettings.hpp"
 #include "WebInputSelector.hpp"
 #include "ZbxHelper.hpp"
+#include "K8sHelper.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -131,7 +132,8 @@ void WebEditor::unbindWidgets(void)
   m_dataPointItemsLayout->removeWidget(&m_dataPointSourceField);
   m_dataPointItemsLayout->removeWidget(&m_dataPointGroupField);
   m_typeItemsLayout->removeWidget(&m_typeField);
-  m_typeItemsLayout->removeWidget(&m_typeExternalServiceNameField);
+  m_typeItemsLayout->removeWidget(&m_typeExternalServiceSelectorField);
+  m_typeItemsLayout->removeWidget(&m_typeK8sNamespaceServiceSelectorField);
   clear();
 }
 
@@ -195,6 +197,7 @@ void WebEditor::bindFormWidgets(void)
 
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);
+  m_nameField.setPlaceholderText(Q_TR("Set service name"));
   m_nameField.blurred().connect(this, &WebEditor::handleNodeLabelChanged);
 
 
@@ -203,14 +206,17 @@ void WebEditor::bindFormWidgets(void)
 
   m_typeItemsContainer.setLayout(m_typeItemsLayout = new Wt::WHBoxLayout());
   m_typeItemsLayout->addWidget(&m_typeField);
-  m_typeItemsLayout->addWidget(&m_typeExternalServiceNameField);
+  m_typeItemsLayout->addWidget(&m_typeExternalServiceSelectorField);
+  m_typeItemsLayout->addWidget(&m_typeK8sNamespaceServiceSelectorField);
 
   m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
+  m_typeField.addItem(NodeType::toString(NodeType::K8sNamespaceService).toStdString());
 
   m_typeField.changed().connect(this, &WebEditor::handleNodeTypeChanged);
-  m_typeExternalServiceNameField.setHidden(true);
+  m_typeExternalServiceSelectorField.setHidden(true);
+  m_typeK8sNamespaceServiceSelectorField.setHidden(true);
 
   // set icon type values
   for (const auto& icon: ngrt4n::NodeIcons.keys()) {
@@ -558,39 +564,61 @@ void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
   m_calcRuleBox.setCurrentIndex(ninfo.sev_crule);
   m_propRuleBox.setCurrentIndex(ninfo.sev_prule);
 
-  if (ninfo.type ==  NodeType::ITService) {
-    m_dataPointField.setText(ninfo.child_nodes.toStdString());
-  } else if (NodeType::ExternalService) {
-    m_typeExternalServiceNameField.setValueText(ninfo.child_nodes.toStdString());
+  switch (ninfo.type) {
+    case NodeType::ITService:
+      m_dataPointField.setText(ninfo.child_nodes.toStdString());
+      break;
+    case NodeType::ExternalService:
+      m_typeExternalServiceSelectorField.setValueText(ninfo.child_nodes.toStdString());
+      break;
+    case NodeType::K8sNamespaceService:
+      m_typeK8sNamespaceServiceSelectorField.setValueText(ninfo.child_nodes.toStdString());
+      break;
+    default:
+      break;
   }
 
-  m_typeExternalServiceNameField.setHidden(ninfo.type != NodeType::ExternalService);
+  m_typeExternalServiceSelectorField.setHidden(NodeType::ExternalService != ninfo.type);
+  m_typeK8sNamespaceServiceSelectorField.setHidden(NodeType::K8sNamespaceService != ninfo.type);
   m_dataPointItemsContainer.setDisabled(ninfo.type != NodeType::ITService);
 }
 
 
 void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
 {
-  NodeListT::iterator node_it;
-  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_it);
+  NodeListT::iterator nodeIt;
+  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, nodeIt);
   if (! success) {
     return ;
   }
 
-  node_it->name =  QString::fromStdString(m_nameField.text().toUTF8());
-  node_it->description =  QString::fromStdString(m_descField.text().toUTF8());
-  node_it->type =  m_typeField.currentIndex();
-  node_it->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
-  node_it->sev_crule  = m_calcRuleBox.currentIndex();
-  node_it->sev_prule  = m_propRuleBox.currentIndex();
+  nodeIt->name =  QString::fromStdString(m_nameField.text().toUTF8());
+  nodeIt->description =  QString::fromStdString(m_descField.text().toUTF8());
+  nodeIt->type =  m_typeField.currentIndex();
+  nodeIt->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
+  nodeIt->sev_crule  = m_calcRuleBox.currentIndex();
+  nodeIt->sev_prule  = m_propRuleBox.currentIndex();
 
-  if (node_it->type ==  NodeType::ITService) {
-    node_it->child_nodes = QString::fromStdString( m_dataPointField.text().toUTF8() );
-  } else if (NodeType::ExternalService && m_typeExternalServiceNameField.currentIndex() != 0) {
-    node_it->child_nodes = QString::fromStdString( m_typeExternalServiceNameField.currentText().toUTF8() );
+  switch (nodeIt->type) {
+    case NodeType::ITService:
+      nodeIt->child_nodes = QString::fromStdString( m_dataPointField.text().toUTF8() );
+      break;
+    case NodeType::ExternalService:
+      if (m_typeExternalServiceSelectorField.currentIndex() != 0) {
+        nodeIt->child_nodes = QString::fromStdString( m_typeExternalServiceSelectorField.currentText().toUTF8() );
+      }
+      break;
+    case NodeType::K8sNamespaceService:
+      if (m_typeK8sNamespaceServiceSelectorField.currentIndex() != 0) {
+        nodeIt->child_nodes = QString::fromStdString( m_typeK8sNamespaceServiceSelectorField.currentText().toUTF8() );
+      }
+      break;
+    default:
+      break;
   }
 
-  m_tree.updateItemLabel(nodeId, node_it->name.toStdString());
+
+  m_tree.updateItemLabel(nodeId, nodeIt->name.toStdString());
 }
 
 void WebEditor::refreshDynamicContents(void)
@@ -598,15 +626,26 @@ void WebEditor::refreshDynamicContents(void)
   m_dataPointSourceField.clear();
 
   m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
-  for (const auto& sinfo: WebBaseSettings().fetchSourceList(MonitorT::Auto)) {
+  for (auto&& sinfo: WebBaseSettings().fetchSourceList(MonitorT::Any)) {
     m_dataPointSourceField.addItem(sinfo.id.toStdString());
   }
 
-  m_typeExternalServiceNameField.clear();
+  m_typeExternalServiceSelectorField.clear();
+  m_typeExternalServiceSelectorField.addItem(Q_TR("Select an external service"));
+  for (auto&& v: m_dbSession->listViews()) {
+    m_typeExternalServiceSelectorField.addItem(v.name);
+  }
 
-  m_typeExternalServiceNameField.addItem(Q_TR("Please select an external service"));
-  for (const auto& v: m_dbSession->listViews()) {
-    m_typeExternalServiceNameField.addItem(v.name);
+  m_typeK8sNamespaceServiceSelectorField.clear();
+  m_typeK8sNamespaceServiceSelectorField.addItem(Q_TR("Select a namespace"));
+  for (auto&& src: WebBaseSettings().fetchSourceList(MonitorT::Kubernetes)) {
+    K8sHelper k8s;
+    auto outListNamespaces = k8s.listNamespaces(src);
+    if (outListNamespaces.second == ngrt4n::RcSuccess) {
+      for (auto&& ns: outListNamespaces.first) {
+        m_typeK8sNamespaceServiceSelectorField.addItem(QString("%1:%2").arg(src.id).arg(ns).toStdString());
+      }
+    }
   }
 }
 
@@ -629,20 +668,20 @@ void WebEditor::handleDataPointChanged(void)
 
 void WebEditor::handleNodeTypeChanged(void)
 {
-  const int type = m_typeField.currentIndex();
+  const int newNodeType = m_typeField.currentIndex();
 
-  bool isItService = (type == NodeType::ITService);
-  bool isExternalService = (type == NodeType::ExternalService);
-
-
+  bool isItService = (newNodeType == NodeType::ITService);
   m_nameField.setDisabled(isItService);
   m_dataPointItemsContainer.setDisabled(! isItService);
 
-  m_typeExternalServiceNameField.setHidden(! isExternalService);
+  m_typeExternalServiceSelectorField.setHidden(newNodeType != NodeType::ExternalService);
+  m_typeK8sNamespaceServiceSelectorField.setHidden(newNodeType != NodeType::K8sNamespaceService);
 
   if (isItService) {
     m_nameField.setText("");
-    m_nameField.setPlaceholderText(Q_TR("Value automatically computed from data point field"));
+    m_nameField.setPlaceholderText(Q_TR("Service name will be automatically computed from the selected data point"));
+  } else {
+    m_nameField.setPlaceholderText(Q_TR("Set service name"));
   }
 
   QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
@@ -652,7 +691,7 @@ void WebEditor::handleNodeTypeChanged(void)
     return ;
   }
 
-  if (type == NodeType::ITService || type == NodeType::ExternalService) {
+  if ( QSet<int>{NodeType::ITService, NodeType::ExternalService, NodeType::K8sNamespaceService}.contains(newNodeType) ) {
     if (! findDescendantNodes(nodeId).empty()) {
       m_typeField.setCurrentIndex(ninfoIt->type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
@@ -660,39 +699,39 @@ void WebEditor::handleNodeTypeChanged(void)
     }
   }
 
-  if (type == ninfoIt->type) {
-    return ;
+  if (newNodeType == ninfoIt->type) {
+    return ; // nothing to do
   }
 
-  // backup node info before processing that implies to remove it and thus invalidate its iterator
-  NodeT ninfo = *ninfoIt;
-  ninfo.child_nodes.clear();
+  // Before anything, backup the node info before processing that implies to remove it and thus, invalidate its iterator
+  NodeT ninfoCopy = *ninfoIt;
+  const int oldNodeType = ninfoCopy.type;
+  ninfoCopy.child_nodes.clear();
 
-  switch (type) {
+  switch (newNodeType) {
     case NodeType::ITService:
-      if (m_cdata.bpnodes.remove(ninfo.id) > 0) {
-        m_cdata.cnodes.insert(ninfo.id, ninfo);
+      if (m_cdata.bpnodes.remove(ninfoCopy.id) > 0) {
+        m_cdata.cnodes.insert(ninfoCopy.id, ninfoCopy);
       } else {
         m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in parent list"));
       }
       break;
-
-    case NodeType::ExternalService:
-    case NodeType::BusinessService:
     default:
-      if (ninfo.type == NodeType::ExternalService || ninfo.type == NodeType::BusinessService) {
+      //case NodeType::ExternalService:
+      //case NodeType::BusinessService:
+      //case NodeType::K8sNamespaceService:
+      if ( QSet<int>{NodeType::ExternalService, NodeType::BusinessService, NodeType::K8sNamespaceService}.contains(oldNodeType) ) {
         m_cdata.bpnodes[nodeId].child_nodes.clear(); // typically for external service child_nodes is not empty
         break;
       }
-
-      if (m_cdata.cnodes.remove(ninfo.id) > 0) {
-        m_cdata.bpnodes.insert(ninfo.id, ninfo);
+      if (m_cdata.cnodes.remove(ninfoCopy.id) > 0) {
+        m_cdata.bpnodes.insert(ninfoCopy.id, ninfoCopy);
       } else {
         m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in child list"));
       }
       break;
-  }
 
+  }
   updateNodeDataFromEditor(ninfoIt->id);
 }
 
@@ -766,7 +805,7 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
 void WebEditor::handleImportMonitoringConfigButton(void)
 {
   WebBaseSettings settings;
-  auto sources = settings.fetchSourceList(MonitorT::Auto);
+  auto sources = settings.fetchSourceList(MonitorT::Any);
   m_importMonitoringConfigDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithTextFilter);
   m_importMonitoringConfigDialog.show();
 }
@@ -801,7 +840,7 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
   }
 
   auto q_srcId = QString::fromStdString(srcId);
-  auto sources = settings.fetchSourceList(MonitorT::Auto);
+  auto sources = settings.fetchSourceList(MonitorT::Any);
   auto src = sources.constFind(q_srcId);
   if (src == sources.cend()) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No source with id: %1").arg(q_srcId).toStdString());

@@ -237,29 +237,6 @@ void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidChec
 }
 
 
-qint8 ngrt4n::convertToSourceType(const QString& str)
-{
-  QStringList types = SourceTypes;
-  qint8 type;
-  if (str == types[MonitorT::Nagios])
-    type = MonitorT::Nagios;
-  else if (str == types[MonitorT::Zabbix])
-    type = MonitorT::Zabbix;
-  else if (str == types[MonitorT::Zenoss])
-    type = MonitorT::Zenoss;
-  else if (str == types[MonitorT::Pandora])
-    type = MonitorT::Pandora;
-  else if (str == types[MonitorT::OpManager])
-    type = MonitorT::OpManager;
-  else if (str == types[MonitorT::Kubernetes])
-    type = MonitorT::Kubernetes;
-  else
-    type = MonitorT::Any;
-
-  return type;
-}
-
-
 /* return <[SourceId:]hostaddr, checkid> */
 StringPairT ngrt4n::splitDataPointInfo(const QString& info)
 {

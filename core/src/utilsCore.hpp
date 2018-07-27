@@ -94,10 +94,15 @@ namespace ngrt4n
   };
 
   const QStringList SourceIndexes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-  const QStringList SourceTypes = {"Kubernetes", "ManageEngine OpManager", "Pandora FMS", "Nagios & alike", "Zabbix", "Zenoss"};
+  const QStringList SourceTypes = {MonitorT::toString(MonitorT::Kubernetes),
+                                   MonitorT::toString(MonitorT::OpManager),
+                                   MonitorT::toString(MonitorT::Pandora),
+                                   MonitorT::toString(MonitorT::Nagios),
+                                   MonitorT::toString(MonitorT::Zabbix),
+                                   MonitorT::toString(MonitorT::Zenoss)};
 
 
-  inline void delay(const qint32& d)
+  inline void delay(unsigned int d)
   { sleep(d); }
 
   inline std::string convertToTimet(const QString& dt, const QString& format)
@@ -148,8 +153,6 @@ namespace ngrt4n
   bool findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node);
 
   QString sourceData2Json(const SourceT& src);
-
-  qint8 convertToSourceType(const QString& str);
 
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
 
