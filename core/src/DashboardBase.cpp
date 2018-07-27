@@ -115,7 +115,7 @@ void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
   Q_EMIT updateInprogress();
   resetStatData();
 
-  if (m_cdata.monitor == MonitorT::Auto) {
+  if (m_cdata.monitor == MonitorT::Any) {
     for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src) { runMonitor(*src);}
   } else {
     SourceListT::Iterator src = m_sources.find(0);
@@ -135,12 +135,7 @@ void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
 void DashboardBase::runMonitor(SourceT& src)
 {
   prepareUpdate(src);
-  if (src.mon_type == MonitorT::Nagios && src.use_ngrt4nd) {
-    updateDashboardOnError(src, QObject::tr("This version is compiled without ngrt4nd support"));
-  } else {
-    runDataSourceUpdate(src);
-  }
-
+  runDataSourceUpdate(src);
   finalizeUpdate(src);
 }
 
@@ -331,7 +326,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
 
   StatusAggregator severityAggregator;
   
-  for (const auto childId: node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+  for (auto&& childId: node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
     status2Propagate = computeBpNodeStatus(childId, p_dbSession);
     severityAggregator.addSeverity(status2Propagate.sev, status2Propagate.weight);
   }
@@ -407,7 +402,7 @@ void DashboardBase::initSettings(BaseSettings* p_settings)
 
 void DashboardBase::checkStandaloneSourceType(SourceT& src)
 {
-  if (m_cdata.monitor != MonitorT::Auto) {
+  if (m_cdata.monitor != MonitorT::Any) {
     src.mon_type = m_cdata.monitor;
   }
 }

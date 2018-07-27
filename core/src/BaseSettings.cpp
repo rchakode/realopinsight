@@ -112,7 +112,7 @@ BaseSettings::fetchSourceList(int type)
   updateSourceStates();
   for (int i = 0; i< MAX_SRCS; ++i) {
     if (loadSource(i, srcInfo)) {
-      if (srcInfo.mon_type == type || type == MonitorT::Auto) {
+      if (srcInfo.mon_type == type || type == MonitorT::Any) {
         sourceList.insert(srcInfo.id, srcInfo);
       }
     }

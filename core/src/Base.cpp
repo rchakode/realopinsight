@@ -27,6 +27,7 @@
 const QString NodeType::ITServiceText = QObject::tr("IT Service");
 const QString NodeType::BusinessServiceText = QObject::tr("Business Service");
 const QString NodeType::ExternalServiceText = QObject::tr("External Service");
+const QString NodeType::K8sNamespaceServiceText = QObject::tr("Kubernetes Namespace Service");
 
 QString PropRules::toString(void) const
 {
@@ -60,7 +61,7 @@ QString CalcRules::toString(void) const
 
 QString NodeType::toString(int type)
 {
-  QString result = QObject::tr("Undefined Service Type");
+  QString result = "";
   switch (type) {
     case ITService:
       result = ITServiceText;
@@ -71,7 +72,11 @@ QString NodeType::toString(int type)
     case ExternalService:
       result = ExternalServiceText;
       break;
+    case K8sNamespaceService:
+      result = K8sNamespaceServiceText;
+      break;
     default:
+      result = QObject::tr("Undefined Service Type");
       break;
   }
 

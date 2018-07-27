@@ -149,7 +149,7 @@ namespace ngrt4n
 
   QString sourceData2Json(const SourceT& src);
 
-  qint32 convertToSourceType(const QString& str);
+  qint8 convertToSourceType(const QString& str);
 
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
 

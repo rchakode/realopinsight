@@ -156,13 +156,12 @@ bool SettingFactory::setSource(const QString& _info, SourceT& _src)
 
   JsonHelper jsHelper(_info);
   _src.id = jsHelper.getProperty("sid").toString();
-  _src.mon_type = jsHelper.getProperty("mon_type").toInt32();
+  _src.mon_type = static_cast<qint8>(jsHelper.getProperty("mon_type").toInt32());
   _src.mon_url = jsHelper.getProperty("mon_url").toString();
   _src.auth = jsHelper.getProperty("auth").toString();
-  _src.use_ngrt4nd = jsHelper.getProperty("use_ngrt4nd").toInt32();
   _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
   _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
-  _src.verify_ssl_peer = jsHelper.getProperty("verify_ssl_peer").toInt32();
+  _src.verify_ssl_peer = static_cast<qint8>(jsHelper.getProperty("verify_ssl_peer").toInt32());
 
   return true;
 }

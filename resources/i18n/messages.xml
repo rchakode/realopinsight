@@ -492,6 +492,18 @@
        </div>
      </fieldset>
 
+
+    <fieldset id="livetstatus-section">
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Livestatus Host&nbsp;</label>
+        <span>${livestatus-server}</span>
+      </div>
+      <div class="col-sm-12 form-group">
+        <label class="control-label">Livestatus Port&nbsp;</label>
+        <span>${livestatus-port}</span>
+      </div>
+    </fieldset>  <!-- id="livetstatus-section" -->
+
      <fieldset>
        <div class="col-sm-12 form-group">
          <label class="control-label">Web URL&nbsp;</label>
@@ -511,20 +523,6 @@
        </div>
      </fieldset>
 
-    <fieldset id="livetstatus-section">
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Livestatus Host&nbsp;</label>
-        <span>${livestatus-server}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Livestatus Port&nbsp;</label>
-        <span>${livestatus-port}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Use ngrt4nd instead of Livestatus&nbsp;</label>
-        <span>${use-ngrt4nd}</span>
-      </div>
-    </fieldset>  <!-- id="livetstatus-section" -->
   </div>  <!-- id="monitoring-settings-section" -->
 
 

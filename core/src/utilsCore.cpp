@@ -211,15 +211,13 @@ QString ngrt4n::sourceData2Json(const SourceT& src)
 {
   return QString("{\"sid\":\"%1\","
                  "\"mon_type\":\"%2\","
-                 "\"use_ngrt4nd\":\"%3\","
-                 "\"mon_url\":\"%4\","
-                 "\"ls_addr\":\"%5\","
-                 "\"ls_port\":\"%6\","
-                 "\"auth\":\"%7\","
-                 "\"verify_ssl_peer\":\"%8\""
+                 "\"mon_url\":\"%3\","
+                 "\"ls_addr\":\"%4\","
+                 "\"ls_port\":\"%5\","
+                 "\"auth\":\"%6\","
+                 "\"verify_ssl_peer\":\"%7\""
                  "}").arg(src.id,
                           QString::number(src.mon_type),
-                          QString::number(src.use_ngrt4nd),
                           src.mon_url,
                           src.ls_addr,
                           QString::number(src.ls_port),
@@ -239,10 +237,10 @@ void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidChec
 }
 
 
-qint32 ngrt4n::convertToSourceType(const QString& str)
+qint8 ngrt4n::convertToSourceType(const QString& str)
 {
   QStringList types = SourceTypes;
-  int type;
+  qint8 type;
   if (str == types[MonitorT::Nagios])
     type = MonitorT::Nagios;
   else if (str == types[MonitorT::Zabbix])
@@ -256,7 +254,7 @@ qint32 ngrt4n::convertToSourceType(const QString& str)
   else if (str == types[MonitorT::Kubernetes])
     type = MonitorT::Kubernetes;
   else
-    type = MonitorT::Auto;
+    type = MonitorT::Any;
 
   return type;
 }
@@ -352,7 +350,7 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
   }
 
   cdata.clear();
-  cdata.monitor = MonitorT::Auto;
+  cdata.monitor = MonitorT::Any;
 
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;

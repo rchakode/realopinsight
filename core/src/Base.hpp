@@ -74,7 +74,7 @@ class MonitorT {
       Pandora = 3,
       OpManager = 4,
       Kubernetes = 5,
-      Auto    = 99
+      Any   = 99
     };
 
     static QString toString(int type) {
@@ -95,7 +95,7 @@ class MonitorT {
         case OpManager:
           value = QObject::tr("ManageEngine OpManager");
           break;
-        case Auto:
+        case Any:
         default:
           break;
       }
@@ -242,7 +242,8 @@ class NodeType {
     enum {
       BusinessService = 0,
       ITService = 1,
-      ExternalService = 2
+      ExternalService = 2,
+      K8sNamespaceService = 3
     };
     static QString toString(int _type);
     static int toInt(const QString& strType);
@@ -250,6 +251,7 @@ class NodeType {
     static const QString ITServiceText;
     static const QString BusinessServiceText;
     static const QString ExternalServiceText;
+    static const QString K8sNamespaceServiceText;
 };
 
 
@@ -350,7 +352,7 @@ struct CoreDataT {
       cnodes.clear();
       bpnodes.clear();
       edges.clear();
-      monitor = MonitorT::Auto;
+      monitor = MonitorT::Any;
     }
 };
 
@@ -359,7 +361,6 @@ struct SourceT {
     QString id;
     qint8 mon_type;
     QString mon_url;
-    qint8 use_ngrt4nd;
     QString ls_addr;
     qint32 ls_port;
     QString auth;

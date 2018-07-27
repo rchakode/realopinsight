@@ -366,7 +366,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
 {
   m_sourceInfo = srcInfo;
   cdata.clear();
-  cdata.monitor = MonitorT::Auto;
+  cdata.monitor = MonitorT::Any;
 
   if (! checkLogin()) {
     return std::make_pair(-1, QObject::tr("login failed: %s").arg(m_lastError));
