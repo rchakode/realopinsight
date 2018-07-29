@@ -250,12 +250,6 @@ public:
     K8sNamespaceService = 3
   };
   static QString toString(int _type);
-  static int toInt(const QString& strType);
-private:
-  static const QString ITServiceText;
-  static const QString BusinessServiceText;
-  static const QString ExternalServiceText;
-  static const QString K8sNamespaceServiceText;
 };
 
 

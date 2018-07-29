@@ -24,11 +24,6 @@
 
 #include "Base.hpp"
 
-const QString NodeType::ITServiceText = QObject::tr("IT Service");
-const QString NodeType::BusinessServiceText = QObject::tr("Business Service");
-const QString NodeType::ExternalServiceText = QObject::tr("External Service");
-const QString NodeType::K8sNamespaceServiceText = QObject::tr("Kubernetes Namespace");
-
 QString PropRules::toString(void) const
 {
   switch( static_cast<PropRulesT>(m_rule) ) {
@@ -64,16 +59,16 @@ QString NodeType::toString(int type)
   QString result = "";
   switch (type) {
     case ITService:
-      result = ITServiceText;
+      result = QObject::tr("IT Service");
       break;
     case BusinessService:
-      result = BusinessServiceText;
+      result = QObject::tr("Business Service");
       break;
     case ExternalService:
-      result = ExternalServiceText;
+      result = QObject::tr("External Service");
       break;
     case K8sNamespaceService:
-      result = K8sNamespaceServiceText;
+      result = QObject::tr("Kubernetes Namespace");
       break;
     default:
       result = QObject::tr("Undefined Service Type");
@@ -84,19 +79,6 @@ QString NodeType::toString(int type)
 }
 
 
-int NodeType::toInt(const QString& strType)
-{
-
-  int result = -1;
-  if (strType == ITServiceText)
-    result = ITService;
-  else if (strType == ExternalServiceText)
-    result = ExternalService;
-  else if (strType == BusinessServiceText)
-    result = BusinessService;
-
-  return result;
-}
 
 
 QString Severity::toString(void) const
