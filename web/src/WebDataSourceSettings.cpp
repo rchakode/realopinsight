@@ -172,9 +172,10 @@ void WebDataSourceSettings::applyChanges(void)
   bool sourceCheckedSuccessfully = false;
   QString validationErrorMsg = "";
   if (selectedMonitor == MonitorT::toString(MonitorT::Kubernetes)) {
-    auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
     K8sHelper k8s;
-    auto outListNamespaces = k8s.listNamespaces(k8sProxyUrl, m_dontVerifyCertificateField.checkState() == Wt::Checked);
+    auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
+    auto&& verifySslPeer = m_dontVerifyCertificateField.checkState() == Wt::Checked;
+    auto outListNamespaces = k8s.listNamespaces(k8sProxyUrl, verifySslPeer);
     sourceCheckedSuccessfully = outListNamespaces.second == ngrt4n::RcSuccess;
     validationErrorMsg = outListNamespaces.first.isEmpty()? "" : outListNamespaces.first.at(0);
   } else {
