@@ -93,8 +93,8 @@ namespace ngrt4n
     {"Tree", "images/hierarchy.png"}
   };
 
-  const QStringList SourceIndexes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-  const QStringList SourceTypes = {MonitorT::toString(MonitorT::Kubernetes),
+  const QStringList MonitorSourceIndexes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+  const QStringList MonitorSourceTypes = {MonitorT::toString(MonitorT::Kubernetes),
                                    MonitorT::toString(MonitorT::OpManager),
                                    MonitorT::toString(MonitorT::Pandora),
                                    MonitorT::toString(MonitorT::Nagios),

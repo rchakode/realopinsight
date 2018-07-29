@@ -52,7 +52,7 @@ void WebDataSourceSettings::createFormWidgets(void)
   renderSourceIndexSelector();
 
   m_monitorTypeField.addItem(Q_TR("-- Select a type --"));
-  for (const auto& srcid: ngrt4n::SourceTypes) {
+  for (const auto& srcid: ngrt4n::MonitorSourceTypes) {
     m_monitorTypeField.addItem(srcid.toStdString());
   }
 
@@ -140,6 +140,7 @@ void WebDataSourceSettings::addEvent(void)
 
 bool WebDataSourceSettings::validateSourceSettingsFields(void)
 {
+  if (ngrt4n::)
   if (m_monitorTypeField.currentIndex() == 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Monitor type not set"));
     return false;
@@ -299,7 +300,7 @@ void WebDataSourceSettings::renderSourceIndexSelector(void)
 
   //FIXME: check if this cause memory leak ?
   Wt::WComboBox* inputField = new Wt::WComboBox(m_sourceIndexSelector.contents());
-  for (const auto& src : ngrt4n::SourceIndexes) {
+  for (const auto& src : ngrt4n::MonitorSourceIndexes) {
     inputField->addItem(src.toStdString());
   }
 
