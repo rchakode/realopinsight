@@ -120,7 +120,7 @@ namespace ngrt4n
   }
 
 
-  inline QString md5hash(const QString& str)
+  inline QString md5IdFromString(const QString& str)
   { return QString("roi_%1").arg(QString(QCryptographicHash::hash((str.toUtf8()), QCryptographicHash::Md5).toHex())); }
 
   inline QString sourceId(const qint32& idx)

@@ -276,8 +276,6 @@ void WebDataSourceSettings::fillFromSource(int _configIndex)
     m_livestatusHostField.setText(src.ls_addr.toStdString());
     m_livestatusPortField.setText(QString::number(src.ls_port).toStdString());
     m_authStringField.setText(src.auth.toStdString());
-    //FIXME m_monitorTypeField.setCurrentIndex(src.mon_type+1);
-    qDebug() << MonitorT::toString(src.mon_type);
     m_monitorTypeField.setCurrentIndex( m_monitorTypeField.findText( MonitorT::toString(src.mon_type).toStdString() ) );
     m_dontVerifyCertificateField.setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
     m_updateIntervalField.setValue(updateInterval());

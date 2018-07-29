@@ -152,7 +152,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
     out_selectorMaps.insert(serviceName, curSelectorMap);
 
     serviceNode.name = serviceName;
-    serviceNode.id = ngrt4n::md5hash(k8sServiceFqdn);
+    serviceNode.id = ngrt4n::md5IdFromString(k8sServiceFqdn);
     serviceNode.parent = ngrt4n::ROOT_ID; // by convention the root node will be created and labeled with the namespace
     serviceNode.description = serviceSpecItem.toString();
 
@@ -166,8 +166,8 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
 std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data,
                                                        const QString& in_macthNamespace,
                                                        const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
-                                                       NodeListT& out_bpnodes,
-                                                       NodeListT& out_cnodes)
+                                                       NodeListT& outPodNodes,
+                                                       NodeListT& outContainerNodes)
 {
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(in_data, &parserError);
@@ -180,12 +180,11 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
   QJsonObject jsonData = jdoc.object();
   QJsonArray items = jsonData["items"].toArray();
 
-
   for (auto item: items) {
     NodeT podNode;
     podNode.type = NodeType::BusinessService;
     podNode.sev_prule = PropRules::Unchanged;
-    podNode.sev_crule = CalcRules::Average; // pods imply a notion of high availability ?
+    podNode.sev_crule = CalcRules::Average; // pods induce a notion of high availability
     podNode.weight = ngrt4n::WEIGHT_UNIT;
     podNode.icon = ngrt4n::K8S_POD;
 
@@ -208,18 +207,18 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     // start processing pod matching a service selector
     k8sNamespaces.insert(k8sNamespace);
     auto&& serviceFqdn = QString("%1.%2").arg(serviceMatch.first, k8sNamespace);
-    auto&& podName = metaData["name"].toString();
+    auto podName = metaData["name"].toString();
     auto&& podUid = metaData["uid"].toString();
     auto&& podCreationTime = metaData["creationTimestamp"].toString();
     auto&& podFqdn = QString("%1.%2").arg(podName, k8sNamespace);
 
     podNode.name = podName;
-    podNode.id = ngrt4n::md5hash(podFqdn);
+    podNode.id = ngrt4n::md5IdFromString(podFqdn);
     podNode.description = QString("uid: %1, creationTimestamp: %2").arg(std::move(podUid), std::move(podCreationTime));
-    podNode.parent = ngrt4n::md5hash(serviceFqdn); // match what is set for node in method parseNamespacedServices
+    podNode.parent = ngrt4n::md5IdFromString(serviceFqdn); // shall match what is set for node in method parseNamespacedServices
 
     // add pod node as business process service
-    out_bpnodes.insert(podNode.id, podNode);
+    outPodNodes.insert(podNode.id, podNode);
 
     auto&& containerStatuses = podData["status"].toObject()["containerStatuses"].toArray();
     for (auto containerStatus: containerStatuses) {
@@ -227,7 +226,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
       containerNode.parent =  podNode.id ;
       containerNode.type = NodeType::ITService;
       containerNode.sev_prule = PropRules::Unchanged;
-      containerNode.sev_crule = CalcRules::Worst;
+      containerNode.sev_crule = CalcRules::Worst; // all items composing a pod are typically required to have the pod operational
       containerNode.weight = ngrt4n::WEIGHT_UNIT;
       containerNode.icon = ngrt4n::CONTAINER_ICON;
 
@@ -237,30 +236,32 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
       auto&& restartCount = containerStatusData["restartCount"].toInt();
       auto&& stateData = parseStateData(containerStatusData["state"].toObject());
 
+      containerNode.id = ngrt4n::md5IdFromString(QString("%1/%2").arg(podFqdn, containerId));
       containerNode.name = containerName;
-      containerNode.child_nodes = QString("%1/%2").arg(serviceFqdn, containerName); //FIXME: is it correct ?
-      containerNode.id = ngrt4n::md5hash(QString("%1/%2").arg(podFqdn, containerId));
-      containerNode.sev = stateData.first;
-      containerNode.description = QString("state: %1, restartCount: %2").arg(stateData.second).arg(restartCount);
+      containerNode.description = QString("containerID: %1, restartCount: %2").arg(containerId, restartCount);
+      containerNode.child_nodes = QString("%1/%2").arg(podFqdn, containerName); //FIXME: is it a good as assumption ?
+      containerNode.check.id = containerNode.child_nodes.toStdString();
       containerNode.check.host = containerNode.name.toStdString();
-      containerNode.check.host_groups = k8sNamespace.toStdString();
+      containerNode.check.host_groups = podName.toStdString();
+
       containerNode.check.status = stateData.first;
-      containerNode.check.id = QString("%1/%2").arg(serviceFqdn, containerName).toStdString(); //FIXME: is it correct ?
-      containerNode.check.last_state_change = "-1"; // FIXME set current time ?
+      containerNode.check.last_state_change = ngrt4n::convertToTimet(
+                                                (stateData.second.isEmpty()? podCreationTime : stateData.second),
+                                                "yyyy-MM-ddThh:mm:ssZ");
 
       // add container node as IT service
-      out_cnodes.insert(containerNode.id, containerNode);
+      outContainerNodes.insert(containerNode.id, containerNode);
     }
   }
 
   // if data match the given namespace
   if (k8sNamespaces.size() == 1) {
-    return std::make_pair("success", ngrt4n::RcSuccess);
+    return std::make_pair("", ngrt4n::RcSuccess);
   }
 
   // otherwise means no pod data
-  out_bpnodes.clear();
-  out_cnodes.clear();
+  outPodNodes.clear();
+  outContainerNodes.clear();
 
   return std::make_pair(QObject::tr("no pod data matching namespace %1").arg(in_macthNamespace), ngrt4n::RcSuccess);
 }
@@ -269,22 +270,28 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
 std::pair<int, QString> K8sHelper::parseStateData(const QJsonObject& state)
 {
   QJsonDocument stateDoc(state);
-  QString stateString(stateDoc.toJson(QJsonDocument::Compact));
 
-  auto&& keys = state.keys();
-
-  QString key = "running";
-  if (keys.contains(key)) {
-    return std::make_pair(ngrt4n::Normal, stateString);
+  auto&& stateKeys = state.keys();
+  QString&& runningKey = "running";
+  if (stateKeys.contains(runningKey)) {
+    auto && stateTimestamp = state[runningKey].toObject()["startedAt"].toString();
+    return std::make_pair(ngrt4n::Normal, stateTimestamp);
   }
 
-  key = "terminated";
-  if (keys.contains(key)) {
-    return std::make_pair(ngrt4n::Critical, stateString);
+  QString&& terminatedKey  = "terminated";
+  if (stateKeys.contains(terminatedKey)) {
+    auto&& stateTerminated = state[terminatedKey].toObject();
+    auto&& stateTimestamp = stateTerminated["finishedAt"].toString();
+    int severity = ngrt4n::Normal;
+    if (stateTerminated["exitCode"].toInt() != 0) {
+      severity = ngrt4n::Critical;
+    }
+    return std::make_pair(severity, stateTimestamp);
   }
 
-  // default state is "waiting" => https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core
-  return std::make_pair(ngrt4n::Unknown, stateString);
+  // default state is "waiting"
+  // See Kubernetes documentation: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core
+  return std::make_pair(ngrt4n::Unknown, "");
 }
 
 
