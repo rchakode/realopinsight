@@ -42,11 +42,11 @@ namespace {
   typedef Wt::WPainter::Image GImage;
   const double THUMBNAIL_WIDTH = 120;
   const double THUMBNAIL_HEIGHT = 60;
-  const double ICON_SIDE = 40.0;
+  const double ICON_SIZE = 40.0;
 }
 
 WebMap::WebMap(void)
-  : WPaintedWidget(0),
+  : WPaintedWidget(),
     m_scaleX(1),
     m_scaleY(1),
     m_initialLoading(true),
@@ -114,9 +114,8 @@ void WebMap::layoutSizeChanged(int width, int height)
 
 void WebMap::drawMap(void)
 {
-  Wt::WPaintedWidget::update(); //this call paintEvent
+  Wt::WPaintedWidget::update(); //this calls paintEvent
   Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX, m_cdata->map_height * m_scaleY);
-  qDebug()<<m_cdata->map_width * m_scaleX << m_cdata->map_height * m_scaleY  << m_cdata->map_width << m_cdata->map_height;
   updateThumbnail();
 }
 
@@ -127,7 +126,7 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
 
     const double COLOR_BORDER_SIZE = 5.0;
     const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
-    const double MAX_LABEL_LENGTH = 20;
+    const int MAX_LABEL_LENGTH = 20;
 
     double base_x = node.pos_x + m_cdata->min_x;
     double base_y = node.pos_y + m_cdata->min_y;
@@ -143,11 +142,11 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
 
     m_painter->drawRect(iconPos.x() - COLOR_BORDER_SIZE,
                         iconPos.y() - COLOR_BORDER_SIZE,
-                        ICON_SIDE + COLOR_BORDER_DOUBLE_SIZE,
-                        ICON_SIDE + COLOR_BORDER_DOUBLE_SIZE);
+                        ICON_SIZE + COLOR_BORDER_DOUBLE_SIZE,
+                        ICON_SIZE + COLOR_BORDER_DOUBLE_SIZE);
 
     if (drawIcon) {
-      m_painter->drawImage(iconPos, GImage(ngrt4n::NodeIcons[node.icon], ICON_SIDE, ICON_SIDE));
+      m_painter->drawImage(iconPos, GImage(ngrt4n::NodeIcons[node.icon], static_cast<int>(ICON_SIZE), static_cast<int>(ICON_SIZE)));
     } else { /* thumbnail: do nothing*/ }
 
     if( node.type == NodeType::BusinessService) {
@@ -198,8 +197,8 @@ void WebMap::createNodeLink(const NodeT& node, const Wt::WPointF& pos)
 {
   Wt::WRectArea* area = new Wt::WRectArea(pos.x() * m_scaleX,
                                           pos.y() * m_scaleY,
-                                          ICON_SIDE * m_scaleX,
-                                          ICON_SIDE * m_scaleY);
+                                          ICON_SIZE * m_scaleX,
+                                          ICON_SIZE * m_scaleY);
   area->setToolTip(Wt::WString::fromUTF8(node.toString().toStdString()));
   addArea(area);
 }
