@@ -201,7 +201,7 @@ QString NodeT::toThresholdsString(void) const
   QString result = "";
   if (sev_crule == CalcRules::WeightedAverageWithThresholds) {
     Q_FOREACH(const ThresholdT& th, thresholdLimits) {
-      result.append(QString("%1\% of %2 => %3; ").arg(QString::number(100 * th.weight),
+      result.append(QString("%1 % of %2 => %3; ").arg(QString::number(100 * th.weight),
                                                       Severity(th.sev_in).toString(),
                                                       Severity(th.sev_out).toString()));
     }
@@ -213,18 +213,18 @@ QString NodeT::toThresholdsString(void) const
 QString NodeT::toString(void) const
 {
   QString result = QObject::tr("Service: %1"
-                               "\nDescription: %2"
-                               "\nSeverity: %3"
-                               "\nProp. Rule: %4"
-                               "\nWeight: %5"
-                               "\nCalc. Rule: %6"
+                               "\nSeverity: %2"
+                               "\nProp. Rule: %3"
+                               "\nWeight: %4"
+                               "\nCalc. Rule: %5"
+                               "\nDescription: %6"
                                "\nThresholds: %9"   // the param  %9 will be filled if details required
                                ).arg(name,
-                                     description.isEmpty()? "-" : const_cast<QString&>(description).replace("\n", " "),
                                      Severity(sev).toString(),
                                      PropRules(sev_prule).toString(),
                                      (weight == ngrt4n::WEIGHT_MAX)? QObject::tr("Essential") : QString::number(weight),
                                      CalcRules(sev_crule).toString(),
+                                     description.isEmpty()? "-" : const_cast<QString&>(description).replace("\n", " "),
                                      toThresholdsString());
 
   if (type == NodeType::ITService) {
