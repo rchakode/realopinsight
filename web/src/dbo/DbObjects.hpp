@@ -64,14 +64,14 @@ namespace Wt {
     struct dbo_traits<DboView> : public dbo_default_traits {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
-      static const char* surrogateIdField() { return 0; }
+      static const char* surrogateIdField() { return nullptr; }
     };
 
     template<>
     struct dbo_traits<DboUser> : public dbo_default_traits {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
-      static const char* surrogateIdField() { return 0; }
+      static const char* surrogateIdField() { return nullptr; }
     };
   }
 }
@@ -104,10 +104,10 @@ struct DboUserT {
   std::string lastname;
   std::string email;
   int role;
-  std::string registrationDate;
   int authsystem;
   int dashboardDisplayMode;
   int dashboardTilesPerRow;
+  std::string registrationDate;
 };
 
 class DboUser {
@@ -224,11 +224,11 @@ struct QosDataT {
         .arg(QString::number(timestamp),
              view_name.c_str(),
              QString::number(status),
-             QString::number(normal),
-             QString::number(minor),
-             QString::number(major),
-             QString::number(critical),
-             QString::number(unknown)).toStdString();
+             QString::number(static_cast<double>(normal)),
+             QString::number(static_cast<double>(minor)),
+             QString::number(static_cast<double>(major)),
+             QString::number(static_cast<double>(critical)),
+             QString::number(static_cast<double>(unknown))).toStdString();
   }
 };
 
@@ -287,11 +287,11 @@ public:
         .arg(QString::number(timestamp),
              view->name.c_str(),
              QString::number(status),
-             QString::number(normal),
-             QString::number(minor),
-             QString::number(major),
-             QString::number(critical),
-             QString::number(unknown)).toStdString();
+             QString::number(static_cast<double>(normal)),
+             QString::number(static_cast<double>(minor)),
+             QString::number(static_cast<double>(major)),
+             QString::number(static_cast<double>(critical)),
+             QString::number(static_cast<double>(unknown))).toStdString();
   }
 };
 
@@ -323,9 +323,9 @@ public:
 /** holds notification info without wt::dbo specific properties (e.g dbo pointers)*/
 struct NotificationT {
   long timestamp;
-  int view_status;
   long last_change;
   long ack_status;
+  int view_status;
   std::string view_name;
   std::string ack_username;
   NotificationT(): view_status(-1) { }
