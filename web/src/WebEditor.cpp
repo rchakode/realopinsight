@@ -640,7 +640,7 @@ void WebEditor::refreshDynamicContents(void)
   m_typeK8sNamespaceServiceSelectorField.addItem(Q_TR("Select a namespace"));
   for (auto&& src: WebBaseSettings().fetchSourceList(MonitorT::Kubernetes)) {
     K8sHelper k8s;
-    auto outListNamespaces = k8s.listNamespaces(src);
+    auto outListNamespaces = k8s.listNamespaces(src.mon_url, src.verify_ssl_peer == Wt::Checked);
     if (outListNamespaces.second == ngrt4n::RcSuccess) {
       for (auto&& ns: outListNamespaces.first) {
         m_typeK8sNamespaceServiceSelectorField.addItem(QString("%1:%2").arg(src.id).arg(ns).toStdString());

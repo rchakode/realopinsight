@@ -111,15 +111,13 @@ void TestK8sHelper::test_httpDataRetrieving(void)
 {
     K8sHelper k8s;
     SourceT sinfo;
-    sinfo.mon_url = m_PROXY_URL;
-    sinfo.verify_ssl_peer = 1;
-    auto&& outNs = k8s.listNamespaces(sinfo);
+    auto&& outNs = k8s.listNamespaces(m_PROXY_URL, true);
     qDebug() << outNs.first;
     QCOMPARE(outNs.second, static_cast<int>(ngrt4n::RcSuccess));
     QCOMPARE(outNs.first.size() > 0, true);
     for (auto&& ns: outNs.first) {
         CoreDataT cdata;
-        auto nsViewOut = k8s.loadNamespaceView(sinfo, ns, cdata);
+        auto nsViewOut = k8s.loadNamespaceView(m_PROXY_URL, true, ns, cdata);
         QVERIFY(nsViewOut.second == static_cast<int>(ngrt4n::RcSuccess));
         ngrt4n::saveDataAsDescriptionFile("/tmp/roi_"+ns+".xml", cdata);
     }

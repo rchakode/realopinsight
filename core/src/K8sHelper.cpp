@@ -35,10 +35,10 @@ K8sHelper::K8sHelper(void)
 }
 
 
-std::pair<QString, int> K8sHelper::loadNamespaceView(const SourceT& in_sinfo, const QString& in_namespace, CoreDataT& out_cdata)
+std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_k8sProxyUrl, bool in_verifySslPeer, const QString& in_namespace, CoreDataT& out_cdata)
 {
   // process services
-  auto resultRequestServicesData = requestNamespacedItemsData(in_sinfo, in_namespace, "services");
+  auto resultRequestServicesData = requestNamespacedItemsData(in_k8sProxyUrl, in_verifySslPeer, in_namespace, "services");
   if (resultRequestServicesData.second != ngrt4n::RcSuccess) {
     return resultRequestServicesData;
   }
@@ -51,7 +51,7 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const SourceT& in_sinfo, co
   }
 
   // process pods
-  auto resultRequestPodsData = requestNamespacedItemsData(in_sinfo, in_namespace, "pods");
+  auto resultRequestPodsData = requestNamespacedItemsData(in_k8sProxyUrl, in_verifySslPeer, in_namespace, "pods");
   if (resultRequestPodsData.second != ngrt4n::RcSuccess) {
     return resultRequestPodsData;
   }
@@ -322,33 +322,33 @@ std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap
   return std::make_pair(outMatchedService, outSelectorMatched);
 }
 
-void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, int verifyPeerOption)
+void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption)
 {
   if (! reply) {
     return ;
   }
 
   QSslConfiguration sslConfig;
-  if (verifyPeerOption != 0) {
+  if (verifyPeerOption) {
     sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
   } else {
-    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
     reply->ignoreSslErrors();
   }
 
   reply->setSslConfiguration(sslConfig);
 }
 
-std::pair<QStringList, int> K8sHelper::listNamespaces(const SourceT& sinfo)
+std::pair<QStringList, int> K8sHelper::listNamespaces(const QString& in_k8sProxyUrl, bool in_verifySslPeer)
 {
   //prepare http request
   QNetworkRequest networkRequest;
   networkRequest.setRawHeader("Accept", "application/json");
 
-  if (sinfo.mon_url.endsWith("/")) {
-    networkRequest.setUrl( QUrl(QString("%1api/v1/namespaces").arg(sinfo.mon_url)) );
+  if (in_k8sProxyUrl.endsWith("/")) {
+    networkRequest.setUrl( QUrl(QString("%1api/v1/namespaces").arg(in_k8sProxyUrl)) );
   } else {
-    networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces").arg(sinfo.mon_url)) );
+    networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces").arg(in_k8sProxyUrl)) );
   }
 
   // make request and conncet to the processing handlers
@@ -356,7 +356,7 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(const SourceT& sinfo)
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
 
-  setNetworkReplySslOptions(reply, sinfo.verify_ssl_peer);
+  setNetworkReplySslOptions(reply, in_verifySslPeer);
 
   // wait synchronously before continuing
   m_eventLoop.exec();
@@ -376,16 +376,16 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(const SourceT& sinfo)
   return parseNamespaces(reply->readAll());
 }
 
-std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const SourceT& sinfo, const QString& k8sNamespace, const QString& itemType)
+std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const QString& in_k8sProxyUrl, bool in_verifySslPeer, const QString& k8sNamespace, const QString& itemType)
 {
   //prepare http request
   QNetworkRequest networkRequest;
   networkRequest.setRawHeader("Accept", "application/json");
 
-  if (sinfo.mon_url.endsWith("/")) {
-    networkRequest.setUrl( QUrl(QString("%1api/v1/namespaces/%2/%3").arg(sinfo.mon_url, k8sNamespace, itemType)));
+  if (in_k8sProxyUrl.endsWith("/")) {
+    networkRequest.setUrl( QUrl(QString("%1api/v1/namespaces/%2/%3").arg(in_k8sProxyUrl, k8sNamespace, itemType)));
   } else {
-    networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces/%2/%3").arg(sinfo.mon_url, k8sNamespace, itemType)));
+    networkRequest.setUrl( QUrl(QString("%1/api/v1/namespaces/%2/%3").arg(in_k8sProxyUrl, k8sNamespace, itemType)));
   }
 
   // make request and conncet to the processing handlers
@@ -393,7 +393,7 @@ std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const SourceT& 
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
 
-  setNetworkReplySslOptions(reply, sinfo.verify_ssl_peer);
+  setNetworkReplySslOptions(reply, in_verifySslPeer);
 
   // wait synchronously before continuing
   m_eventLoop.exec();

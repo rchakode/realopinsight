@@ -37,9 +37,9 @@ class K8sHelper : public QNetworkAccessManager
 
 public:
   K8sHelper(void);
-  std::pair<QString, int> loadNamespaceView(const SourceT& in_sinfo, const QString& in_namespace, CoreDataT& out_cdata);
-  std::pair<QStringList, int> listNamespaces(const SourceT& sinfo);
-  std::pair<QByteArray, int> requestNamespacedItemsData(const SourceT& sinfo, const QString& k8sNamespace, const QString& itemType);
+  std::pair<QString, int> loadNamespaceView(const QString& in_k8sProxyUrl, bool in_verifySslPeer, const QString& in_namespace, CoreDataT& out_cdata);
+  std::pair<QStringList, int> listNamespaces(const QString& in_k8sProxyUrl, bool in_verifySslPeer);
+  std::pair<QByteArray, int> requestNamespacedItemsData(const QString& in_k8sProxyUrl, bool in_verifySslPeer, const QString& k8sNamespace, const QString& itemType);
   std::pair<int, QString> parseStateData(const QJsonObject& state);
   std::pair<QStringList, int> parseNamespaces(const QByteArray& data);
 
@@ -60,7 +60,7 @@ public Q_SLOTS:
 
 private:
   QEventLoop m_eventLoop;
-  void setNetworkReplySslOptions(QNetworkReply* reply, int verifyPeerOption);
+  void setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption);
   std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos, const QMap<QString, QVariant>& podLabels);
 };
 

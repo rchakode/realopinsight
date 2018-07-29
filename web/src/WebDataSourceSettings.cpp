@@ -23,6 +23,7 @@
 
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
+#include "K8sHelper.hpp"
 #include "WebDataSourceSettings.hpp"
 #include <Wt/WSpinBox>
 #include <Wt/WApplication>
@@ -140,35 +141,51 @@ void WebDataSourceSettings::addEvent(void)
 
 bool WebDataSourceSettings::validateSourceSettingsFields(void)
 {
-  if (ngrt4n::)
-  if (m_monitorTypeField.currentIndex() == 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Monitor type not set"));
+  bool monitorSourceIsSet = ngrt4n::MonitorSourceTypes.contains( QString::fromStdString(m_monitorTypeField.currentText().toUTF8()));
+  if (! monitorSourceIsSet ) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No monitor source type set"));
     return false;
   }
-  if (m_monitorTypeField.currentIndex() > 1 && m_monitorUrlField.validate() != Wt::WValidator::Valid) {
+
+  if (monitorSourceIsSet && m_monitorUrlField.validate() != Wt::WValidator::Valid) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Please fix field(s) in red"));
     return false;
   }
+
   return true;
 }
 
 
 void WebDataSourceSettings::applyChanges(void)
 {
-  if (! validateSourceSettingsFields())
+  if (! validateSourceSettingsFields()) {
     return ;
+  }
 
-  if ( m_monitorTypeField.currentIndex() <= 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Invalid monitor type"));
+  auto curIndex = currentSourceIndex();
+  if (! ngrt4n::MonitorSourceIndexes.contains(QString::number(curIndex)) ) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Invalid monitor source index"));
     return;
   }
 
-  if (currentSourceIndex() < 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Invalid data source index (%1)").arg(currentSourceIndex()).toStdString());
-    return;
+  auto&& selectedMonitor = QString::fromStdString(m_monitorTypeField.currentText().toUTF8());
+  bool sourceCheckedSuccessfully = false;
+  QString validationErrorMsg = "";
+  if (selectedMonitor == MonitorT::toString(MonitorT::Kubernetes)) {
+    auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
+    K8sHelper k8s;
+    auto outListNamespaces = k8s.listNamespaces(k8sProxyUrl, m_dontVerifyCertificateField.checkState() == Wt::Checked);
+    sourceCheckedSuccessfully = outListNamespaces.second == ngrt4n::RcSuccess;
+    validationErrorMsg = outListNamespaces.first.isEmpty()? "" : outListNamespaces.first.at(0);
+  } else {
+    selectedMonitor = true;
   }
 
-  saveAsSource(currentSourceIndex(), m_monitorTypeField.currentText().toUTF8().c_str());
+  if (sourceCheckedSuccessfully) {
+    saveAsSource(curIndex, selectedMonitor);
+  } else {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Failed when connecting to source (%1)").arg(validationErrorMsg).toStdString());
+  }
 }
 
 
@@ -183,10 +200,10 @@ void WebDataSourceSettings::addAsSource(void)
 
 void WebDataSourceSettings::deleteSource(void)
 {
-  int curIndex = currentSourceIndex();
-  if (curIndex >= 0 && curIndex < MAX_SRCS) {
-    m_sourceBoxModel.removeRow(currentSourceIndex());
-    setSourceState(currentSourceIndex(), false);
+  auto currentIndex = currentSourceIndex();
+  if ( ngrt4n::MonitorSourceIndexes.contains(QString::number(currentIndex)) ) {
+    m_sourceBoxModel.removeRow(currentIndex);
+    setSourceState(currentIndex, false);
     setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
     sync();
     updateFields();
@@ -218,7 +235,7 @@ void WebDataSourceSettings::updateFields(void)
 {
   setCurrentSourceIndex(firstSourceSet());
   int curIndex = currentSourceIndex();
-  if (curIndex >= 0) {
+  if ( ngrt4n::MonitorSourceIndexes.contains(QString::number(curIndex)) ) {
     m_sourceSelectionBox.setCurrentIndex(curIndex);
     fillFromSource(curIndex);
   }
@@ -263,6 +280,7 @@ void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& sou
   emitTimerIntervalChanged(1000 * QString(m_updateIntervalField.text().toUTF8().c_str()).toInt());
   addToSourceBox(index);
   m_sourceSelectionBox.setCurrentIndex(findSourceIndexInBox(index));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
 }
 
 
