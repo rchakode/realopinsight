@@ -117,7 +117,7 @@ void WebDatabaseSettings::applySettings(void)
     m_settingFactory->setEntry(SettingFactory::DB_NAME, m_dbNameField.text().toUTF8().c_str());
   }
 
-  // initialize the database if needed
+  // test connection and initialize the database if needed
   if (m_dbEmptyState.checkState() == Wt::Checked) {
     DbSession dbSession(getDbType(), getDbConnectionString());
     if (dbSession.isConnected() && dbSession.initDb() == 0) {
