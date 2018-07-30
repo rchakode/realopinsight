@@ -133,7 +133,6 @@ void WebEditor::unbindWidgets(void)
   m_dataPointItemsLayout->removeWidget(&m_dataPointGroupField);
   m_typeItemsLayout->removeWidget(&m_typeField);
   m_typeItemsLayout->removeWidget(&m_typeExternalServiceSelectorField);
-  m_typeItemsLayout->removeWidget(&m_typeK8sNamespaceServiceSelectorField);
   clear();
 }
 
@@ -198,6 +197,7 @@ void WebEditor::bindFormWidgets(void)
   // name field
   m_fieldEditionPane.bindWidget("name-field", &m_nameField);
   m_nameField.setPlaceholderText(Q_TR("Set service name"));
+  // bind signal
   m_nameField.blurred().connect(this, &WebEditor::handleNodeLabelChanged);
 
 
@@ -207,16 +207,13 @@ void WebEditor::bindFormWidgets(void)
   m_typeItemsContainer.setLayout(m_typeItemsLayout = new Wt::WHBoxLayout());
   m_typeItemsLayout->addWidget(&m_typeField);
   m_typeItemsLayout->addWidget(&m_typeExternalServiceSelectorField);
-  m_typeItemsLayout->addWidget(&m_typeK8sNamespaceServiceSelectorField);
+  m_typeExternalServiceSelectorField.setHidden(true);
 
   m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
-  m_typeField.addItem(NodeType::toString(NodeType::K8sNamespaceService).toStdString());
-
+  // bind signal
   m_typeField.changed().connect(this, &WebEditor::handleNodeTypeChanged);
-  m_typeExternalServiceSelectorField.setHidden(true);
-  m_typeK8sNamespaceServiceSelectorField.setHidden(true);
 
   // set icon type values
   for (const auto& icon: ngrt4n::NodeIcons.keys()) {
@@ -231,7 +228,6 @@ void WebEditor::bindFormWidgets(void)
 
   // propagation rule field
   m_fieldEditionPane.bindWidget("prop-rule-field", &m_propRuleBox);
-
   m_propRuleBox.addItem(PropRules(PropRules::Unchanged).toString().toStdString());
   m_propRuleBox.addItem(PropRules(PropRules::Decreased).toString().toStdString());
   m_propRuleBox.addItem(PropRules(PropRules::Increased).toString().toStdString());
@@ -247,7 +243,6 @@ void WebEditor::bindFormWidgets(void)
 
   // data point-related field and widgets
   m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointItemsContainer);
-
   m_dataPointItemsContainer.setLayout(m_dataPointItemsLayout = new Wt::WHBoxLayout());
   m_dataPointItemsLayout->addWidget(&m_dataPointSourceField, 1);
   m_dataPointItemsLayout->addWidget(&m_dataPointGroupField, 1);
@@ -571,15 +566,11 @@ void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
     case NodeType::ExternalService:
       m_typeExternalServiceSelectorField.setValueText(ninfo.child_nodes.toStdString());
       break;
-    case NodeType::K8sNamespaceService:
-      m_typeK8sNamespaceServiceSelectorField.setValueText(ninfo.child_nodes.toStdString());
-      break;
     default:
       break;
   }
 
   m_typeExternalServiceSelectorField.setHidden(NodeType::ExternalService != ninfo.type);
-  m_typeK8sNamespaceServiceSelectorField.setHidden(NodeType::K8sNamespaceService != ninfo.type);
   m_dataPointItemsContainer.setDisabled(ninfo.type != NodeType::ITService);
 }
 
@@ -608,11 +599,6 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
         nodeIt->child_nodes = QString::fromStdString( m_typeExternalServiceSelectorField.currentText().toUTF8() );
       }
       break;
-    case NodeType::K8sNamespaceService:
-      if (m_typeK8sNamespaceServiceSelectorField.currentIndex() != 0) {
-        nodeIt->child_nodes = QString::fromStdString( m_typeK8sNamespaceServiceSelectorField.currentText().toUTF8() );
-      }
-      break;
     default:
       break;
   }
@@ -634,18 +620,6 @@ void WebEditor::refreshDynamicContents(void)
   m_typeExternalServiceSelectorField.addItem(Q_TR("Select an external service"));
   for (auto&& v: m_dbSession->listViews()) {
     m_typeExternalServiceSelectorField.addItem(v.name);
-  }
-
-  m_typeK8sNamespaceServiceSelectorField.clear();
-  m_typeK8sNamespaceServiceSelectorField.addItem(Q_TR("Select a namespace"));
-  for (auto&& src: WebBaseSettings().fetchSourceList(MonitorT::Kubernetes)) {
-    K8sHelper k8s;
-    auto outListNamespaces = k8s.listNamespaces(src.mon_url, src.verify_ssl_peer == Wt::Checked);
-    if (outListNamespaces.second == ngrt4n::RcSuccess) {
-      for (auto&& ns: outListNamespaces.first) {
-        m_typeK8sNamespaceServiceSelectorField.addItem(QString("%1:%2").arg(src.id).arg(ns).toStdString());
-      }
-    }
   }
 }
 
@@ -675,7 +649,6 @@ void WebEditor::handleNodeTypeChanged(void)
   m_dataPointItemsContainer.setDisabled(! isItService);
 
   m_typeExternalServiceSelectorField.setHidden(newNodeType != NodeType::ExternalService);
-  m_typeK8sNamespaceServiceSelectorField.setHidden(newNodeType != NodeType::K8sNamespaceService);
 
   if (isItService) {
     m_nameField.setText("");
@@ -691,7 +664,7 @@ void WebEditor::handleNodeTypeChanged(void)
     return ;
   }
 
-  if ( QSet<int>{NodeType::ITService, NodeType::ExternalService, NodeType::K8sNamespaceService}.contains(newNodeType) ) {
+  if ( QSet<int>{NodeType::ITService, NodeType::ExternalService}.contains(newNodeType) ) {
     if (! findDescendantNodes(nodeId).empty()) {
       m_typeField.setCurrentIndex(ninfoIt->type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
@@ -719,8 +692,7 @@ void WebEditor::handleNodeTypeChanged(void)
     default:
       //case NodeType::ExternalService:
       //case NodeType::BusinessService:
-      //case NodeType::K8sNamespaceService:
-      if ( QSet<int>{NodeType::ExternalService, NodeType::BusinessService, NodeType::K8sNamespaceService}.contains(oldNodeType) ) {
+      if ( QSet<int>{NodeType::ExternalService, NodeType::BusinessService}.contains(oldNodeType) ) {
         m_cdata.bpnodes[nodeId].child_nodes.clear(); // typically for external service child_nodes is not empty
         break;
       }

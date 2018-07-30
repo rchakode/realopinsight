@@ -67,9 +67,6 @@ QString NodeType::toString(int type)
     case ExternalService:
       result = QObject::tr("External Service");
       break;
-    case K8sNamespaceService:
-      result = QObject::tr("Kubernetes Namespace");
-      break;
     default:
       result = QObject::tr("Undefined Service Type");
       break;

@@ -247,8 +247,7 @@ public:
     BusinessService = 0,
     ITService = 1,
     ExternalService = 2,
-    K8sNamespaceService = 3,
-    K8sClusterService = 4
+    K8sClusterService = 3
   };
   static QString toString(int _type);
 };

@@ -90,7 +90,6 @@ private:
   // node type-related field and widgets
   Wt::WComboBox m_typeField;
   Wt::WComboBox m_typeExternalServiceSelectorField;
-  Wt::WComboBox m_typeK8sNamespaceServiceSelectorField;
   Wt::WContainerWidget m_typeItemsContainer;
   Wt::WHBoxLayout* m_typeItemsLayout;
 
