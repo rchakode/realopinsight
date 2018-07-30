@@ -21,6 +21,7 @@
 # ------------------------------------------------------------------------ #
 */
 
+#include "dbo/DbSession.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "K8sHelper.hpp"
@@ -162,8 +163,8 @@ void WebDataSourceSettings::applyChanges(void)
     return ;
   }
 
-  auto curIndex = currentSourceIndex();
-  if (! ngrt4n::MonitorSourceIndexes.contains(QString::number(curIndex)) ) {
+  auto sourceIndex = currentSourceIndex();
+  if (! ngrt4n::MonitorSourceIndexes.contains(QString::number(sourceIndex)) ) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Invalid monitor source index"));
     return;
   }
@@ -177,13 +178,48 @@ void WebDataSourceSettings::applyChanges(void)
     auto&& verifySslPeer = m_dontVerifyCertificateField.checkState() == Wt::Checked;
     auto outListNamespaces = k8s.listNamespaces(k8sProxyUrl, verifySslPeer);
     sourceCheckedSuccessfully = outListNamespaces.second == ngrt4n::RcSuccess;
+
+    WebBaseSettings settings;
+    DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
+    for (auto&& ns: outListNamespaces.first) {
+
+      auto destPath = QString("%1/%2_k8s_ns_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"), ns, ngrt4n::generateId());
+
+      NodeT nsNode;
+      nsNode.id = ngrt4n::ROOT_ID;
+      nsNode.type = NodeType::K8sClusterService;
+      nsNode.child_nodes = QString("Source%1:%2").arg(sourceIndex).arg(ns);
+      nsNode.name = ns;
+      nsNode.sev_prule = PropRules::Unchanged;
+      nsNode.sev_crule = CalcRules::Worst;
+      nsNode.weight = ngrt4n::WEIGHT_UNIT;
+      nsNode.icon = ngrt4n::K8S_NS;
+      nsNode.description = QString("Namespace %1").arg(ns);
+
+      CoreDataT cdata;
+      cdata.monitor = MonitorT::Kubernetes;
+      cdata.bpnodes.insert(nsNode.id, nsNode);
+
+      std::pair<int, QString> saveResult = ngrt4n::saveDataAsDescriptionFile(destPath, cdata);
+      if (saveResult.first != ngrt4n::RcSuccess) {
+        CORE_LOG("error", saveResult.second.toStdString());
+      } else {
+        DboView vinfo;
+        vinfo.name = nsNode.name.toStdString();
+        vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+        vinfo.path = destPath.toStdString();
+        if (dbSession.addView(vinfo) != ngrt4n::RcSuccess) {
+          CORE_LOG("error", dbSession.lastError());
+        }
+      }
+    }
     validationErrorMsg = outListNamespaces.first.isEmpty()? "" : outListNamespaces.first.at(0);
   } else {
     selectedMonitor = true;
   }
 
   if (sourceCheckedSuccessfully) {
-    saveAsSource(curIndex, selectedMonitor);
+    saveAsSource(sourceIndex, selectedMonitor);
   } else {
     m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Failed when connecting to source (%1)").arg(validationErrorMsg).toStdString());
   }
@@ -225,7 +261,7 @@ void WebDataSourceSettings::updateAllSourceWidgetStates(void)
 
   m_sourceBoxModel.setStringList( activeSourceLabels );
   for (size_t i = 0; i < activeSourceLabels.size(); ++i) {
-    m_sourceBoxModel.setData(i, 0, activeSourceIndexes[i], Wt::UserRole);
+    m_sourceBoxModel.setData(static_cast<int>(i), 0, activeSourceIndexes[i], Wt::UserRole);
   }
 
   m_sourceBoxModel.sort(0);

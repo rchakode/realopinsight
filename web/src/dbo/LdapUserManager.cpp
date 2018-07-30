@@ -137,7 +137,7 @@ void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
           updateUserList();
         }
       } else { // disable LDAP authentication
-        if (m_dbSession->deleteUser(username) == 0) {
+        if (m_dbSession->deleteUser(username) == ngrt4n::RcSuccess) {
           m_userEnableStatusChanged.emit(DisableAuthSuccess, username);
         } else {
           m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
@@ -168,7 +168,7 @@ int LdapUserManager::insertIntoDatabase(const LdapUserAttrsT& userInfo)
   dbUser.role = DboUser::OpRole;
   dbUser.authsystem = WebBaseSettings::LDAP;
 
-  if (m_dbSession->addUser(dbUser) == 0) {
+  if (m_dbSession->addUser(dbUser) == ngrt4n::RcSuccess) {
     m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
     retCode = 0;
   } else {

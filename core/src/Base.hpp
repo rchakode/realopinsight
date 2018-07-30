@@ -193,6 +193,8 @@ namespace ngrt4n {
     RccRpcError = 1,
     RcUnexpectedFailure = 2,
     RcParseError = 3,
+    RcDbError = 10,
+    RcDbDuplicationError = 11,
     RcFailed = 255
   };
 

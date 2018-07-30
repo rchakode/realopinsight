@@ -23,7 +23,6 @@
  */
 
 #include <QCoreApplication>
-#include "dbo/DbSession.hpp"
 #include "utils/wtwithqt/WQApplication"
 #include <Wt/WServer>
 #include "WebUtils.hpp"

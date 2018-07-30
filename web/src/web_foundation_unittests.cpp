@@ -44,7 +44,7 @@ void NotificationTest::testFecthAssignedUserEmails(void)
 
 void NotificationTest::testAddNotification(void)
 {
-  QCOMPARE(0, m_dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
+  QCOMPARE(ngrt4n::RcSuccess, m_dbSession.addNotification(TEST_VIEW1, ngrt4n::Minor));
 
   NotificationT notification;
 	QCOMPARE(true, m_dbSession.getLastNotificationInfo(notification, TEST_VIEW1));

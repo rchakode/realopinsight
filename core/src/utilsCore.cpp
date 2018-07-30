@@ -449,13 +449,13 @@ std::pair<int, QString> ngrt4n::saveDataAsDescriptionFile(const QString& path, c
 {
   QFile file(path);
   if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    return std::make_pair(-1, QObject::tr("Cannot open file: %1").arg(path));
+    return std::make_pair(ngrt4n::RcFailed, QObject::tr("Cannot open file: %1").arg(path));
   }
 
   NodeListT::ConstIterator rootNode = cdata.bpnodes.find(ngrt4n::ROOT_ID);
   if (rootNode == cdata.bpnodes.end()) {
     file.close();
-    return std::make_pair(-1, QObject::tr("The hierarchy does not have root"));
+    return std::make_pair(ngrt4n::RcFailed, QObject::tr("The hierarchy does not have root"));
   }
 
   QTextStream outStream(&file);
@@ -478,7 +478,7 @@ std::pair<int, QString> ngrt4n::saveDataAsDescriptionFile(const QString& path, c
   outStream << "</ServiceView>\n";
 
   file.close();
-  return std::make_pair(0, "");;
+  return std::make_pair(ngrt4n::RcSuccess, "");;
 }
 
 

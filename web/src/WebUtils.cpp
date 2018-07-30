@@ -37,8 +37,11 @@
 #include <fcntl.h>
 
 
-Logger* coreLogger = NULL;
-Logger* reportdLogger = NULL;
+namespace {
+  Logger* coreLogger = nullptr;
+  Logger* reportdLogger = nullptr;
+}
+
 void ngrt4n::initCoreLogger(void)
 {
   coreLogger = new Logger(Logger::CoreLogger, "/opt/realopinsight/log/");
@@ -352,13 +355,13 @@ sem_t* ngrt4n::createSemaphoreOrDie(const std::string& sem_name)
     switch (errno) {
       case EACCES:
         errorMsg += QObject::tr("permission denied to access to the semaphore %1")
-            .arg(sem_name.c_str())
-            .toStdString();
+                    .arg(sem_name.c_str())
+                    .toStdString();
         break;
       default:
         errorMsg += QObject::tr("sem_open returned errno %1")
-            .arg(QString::number(errno))
-            .toStdString();
+                    .arg(QString::number(errno))
+                    .toStdString();
         break;
     }
     CORE_LOG("fatal", errorMsg);
@@ -380,3 +383,4 @@ Wt::WFont ngrt4n::chartTitleFont(void)
   Wt::WFont ft;
   return ft;
 }
+

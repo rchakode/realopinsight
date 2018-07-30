@@ -57,13 +57,18 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_configDir(m_rootDir.append("/data")),
     m_authManager(authManager),
     m_dbSession(m_authManager->session()),
-    m_currentDashboard(NULL),
-    m_fileUploader(NULL),
-    m_thumbsLayout(NULL),
-    m_notificationManager(NULL),
-    m_notificationSection(NULL),
-    m_eventFeedLayout(NULL)
+    m_currentDashboard(nullptr),
+    m_fileUploader(nullptr),
+    m_thumbsLayout(nullptr),
+    m_notificationManager(nullptr),
+    m_notificationSection(nullptr),
+    m_eventFeedLayout(nullptr)
 {
+  // export configuration environment variables
+  qputenv("REALOPINSIGHT_ROOT_DIR", m_rootDir.toUtf8());
+  qputenv("REALOPINSIGHT_CONFIG_DIR", m_configDir.toUtf8());
+  qDebug() <<  qgetenv("REALOPINSIGHT_CONFIG_DIR");
+
   m_breadcrumbsBar = createBreadCrumbsBarTpl();
   m_userAccountForm = createAccountPanel();
   m_changePasswordPanel = createPasswordPanel();
@@ -547,7 +552,7 @@ void WebMainUI::handleNewViewSelected(void)
     setDashboardAsFrontStackedWidget(*dashboardIter);
     m_displayOnlyTroubleEventsBox->setHidden(false);
   } else {
-    m_currentDashboard = NULL;
+    m_currentDashboard = nullptr;
     m_displayOnlyTroubleEventsBox->setHidden(true);
     if (! m_dbSession->isLoggedAdmin()) {
       setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
@@ -642,23 +647,23 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
 {
   if (path.empty()) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Empty path"));
-    return NULL;
+    return nullptr;
   }
 
-  WebDashboard* dashboardItem = NULL;
+  WebDashboard* dashboardItem = nullptr;
   try {
     //FIXME: check that the pointer is properly deleted
     dashboardItem = new WebDashboard(path.c_str());
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
-      return NULL;
+      return nullptr;
     }
 
     dashboardItem->initialize(& m_dataSourceSettingsForm);
     if (dashboardItem->lastErrorState()) {
       showMessage(ngrt4n::OperationFailed, dashboardItem->lastErrorMsg().toStdString());
       delete dashboardItem;
-      return NULL;
+      return nullptr;
     }
 
     QString platformName = dashboardItem->rootNode().name;
@@ -666,7 +671,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     if (result != m_dashboardMap.end()) {
       showMessage(ngrt4n::OperationFailed, tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
       delete dashboardItem;
-      return NULL;
+      return nullptr;
     }
 
     m_dashboardMap.insert(platformName, dashboardItem);
@@ -682,7 +687,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     CORE_LOG("error", errorMsg);
     showMessage(ngrt4n::OperationFailed, errorMsg);
-    return NULL;
+    return nullptr;
   }
 
   return dashboardItem;
@@ -701,7 +706,7 @@ void WebMainUI::setupSettingsPage(void)
   m_settingsMainPageTpl.bindWidget("title", &m_adminPanelTitle);
   m_settingsMainPageTpl.bindWidget("contents", &m_adminStackedContents);
 
-  Wt::WAnchor* link = NULL;
+  Wt::WAnchor* link = nullptr;
   switch (m_dbSession->loggedUser().role) {
     case DboUser::AdmRole: {
       m_settingsMainPageTpl.bindWidget("info-box", &m_infoBox);
@@ -866,7 +871,7 @@ UserFormView* WebMainUI::createPasswordPanel(void)
 
 void WebMainUI::handleErrcode(int errcode)
 {
-  if (errcode != 0) {
+  if (errcode != ngrt4n::RcSuccess) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Updated failed"));
   } else {
     showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
@@ -1254,7 +1259,7 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
   view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
   view.path = path.toStdString();
 
-  if (m_dbSession->addView(view) != 0){
+  if (m_dbSession->addView(view) != ngrt4n::RcSuccess){
     showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
   } else {
     QString viewName(view.name.c_str());

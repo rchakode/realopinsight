@@ -120,7 +120,7 @@ void WebDatabaseSettings::applySettings(void)
   // test connection and initialize the database if needed
   if (m_dbEmptyState.checkState() == Wt::Checked) {
     DbSession dbSession(getDbType(), getDbConnectionString());
-    if (dbSession.isConnected() && dbSession.initDb() == 0) {
+    if (dbSession.isConnected() && dbSession.initDb() == ngrt4n::RcSuccess) {
       m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Changes applied: Please *disconnect* and *reconnect* to have the changes take effect"));
     } else {
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Failed to initialize the database. Check logs for more details"));

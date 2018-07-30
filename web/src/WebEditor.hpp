@@ -165,7 +165,7 @@ private:
   void importNagiosBpi(const std::string& sourceId, const std::string& bpiConfigPath);
   void importZabbixITServices(const std::string& srcId);
 
-  std::pair<int, QString> saveContentToFile(const CoreDataT& cdata, const QString& destPath);
+  std::pair<int, QString> registerViewWithPath(const CoreDataT& cdata, const QString& destPath);
 
   void attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root);
   std::pair<int, std::string> extractNagiosBpiGroupMembers(const QString& parentServiceId,

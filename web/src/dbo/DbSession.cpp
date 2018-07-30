@@ -101,14 +101,14 @@ void DbSession::setupDbMapping(void)
 
 int DbSession::addUser(const DboUserT& userInfo)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     DboUserCollectionT users = find<DboUser>().where("name=?").bind(userInfo.username);
     if (users.size() > 0) {
       m_lastError = "a user with the same username already exist.";
       CORE_LOG("error", m_lastError);
-      rc = 1;
+      rc = ngrt4n::RcDbDuplicationError;
     } else {
       Wt::Auth::User dbuser = m_dboUserDb->registerNew();
       dbo::ptr<AuthInfo> info = m_dboUserDb->find(dbuser);
@@ -118,7 +118,7 @@ int DbSession::addUser(const DboUserT& userInfo)
       userTmpPtr->setData(userInfo);
       info.modify()->setUser( add(userTmpPtr) );
       dbuser.addIdentity(Wt::Auth::Identity::LoginName, userInfo.username);
-      rc = 0;
+      rc = ngrt4n::RcSuccess;
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add the user.";
@@ -130,7 +130,7 @@ int DbSession::addUser(const DboUserT& userInfo)
 
 int DbSession::updateUser(const DboUserT& userInfo)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<AuthInfo> authInfo = find<AuthInfo>().where("user_name=?").bind(userInfo.username);
@@ -143,7 +143,7 @@ int DbSession::updateUser(const DboUserT& userInfo)
     userPtr.modify()->dashboardDisplayMode = userInfo.dashboardDisplayMode;
     userPtr.modify()->dashboardTilesPerRow = userInfo.dashboardTilesPerRow;
     authInfo.modify()->setEmail(userInfo.email);
-    rc = 0;
+    rc = ngrt4n::RcSuccess;
     transaction.commit();
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to update user";
@@ -155,14 +155,14 @@ int DbSession::updateUser(const DboUserT& userInfo)
 
 int DbSession::updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newpass)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     Wt::Auth::User dbuser = m_dboUserDb->findWithIdentity(Wt::Auth::Identity::LoginName, uname);
     switch (m_passAuthService->verifyPassword(dbuser, currentPass)) {
       case Wt::Auth::PasswordValid:
         m_passAuthService->updatePassword(dbuser, newpass);
-        rc = 0;
+        rc = ngrt4n::RcSuccess;
         break;
       case Wt::Auth::PasswordInvalid:
         m_lastError = "Your current password doesn't match";
@@ -170,11 +170,12 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
       case Wt::Auth::LoginThrottling:
         m_lastError = "The account has been blocked. Retry later or contact your administrator";
         break;
-      default:m_lastError = "Unknown error concerning your current password";
+      default:
+        m_lastError = "Unknown error concerning your current password";
         break;
     }
   } catch (const dbo::Exception& ex) {
-    rc = -1;
+    rc = ngrt4n::RcDbError;
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -184,14 +185,14 @@ int DbSession::updatePassword(const std::string& uname, const std::string& curre
 
 int DbSession::deleteUser(const std::string& username)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> usr = find<DboUser>().where("name=?").bind(username);
     usr.remove();
-    rc = 0;
+    rc = ngrt4n::RcSuccess;
   } catch (const dbo::Exception& ex) {
-    rc = 1;
+    rc = ngrt4n::RcDbError;
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -201,14 +202,14 @@ int DbSession::deleteUser(const std::string& username)
 
 int DbSession::deleteAuthSystemUsers(int authSystem)
 {
-  int retValue = -1;
+  int retValue = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> usr = find<DboUser>().where("authsystem=?").bind(authSystem);
     usr.remove();
-    retValue = 0;
+    retValue = ngrt4n::RcSuccess;
   } catch (const dbo::Exception& ex) {
-    retValue = 1;
+    retValue = ngrt4n::RcDbError;
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -281,8 +282,10 @@ DbUsersT DbSession::listUsers(void)
   dbo::Transaction transaction(*this);
   try {
     DboUserCollectionT users = find<DboUser>();
-    for (auto &user : users) {
-      ulist.push_back(*user);
+    for (auto& user : users) {
+      if (user.get()) {
+        ulist.push_back(*user);
+      }
     }
   } catch (const dbo::Exception& ex) {
     ulist.clear();
@@ -299,7 +302,9 @@ DbViewsT DbSession::listViews(void)
   try {
     DboViewCollectionT views = find<DboView>();
     for (auto& view : views) {
-      vlist.push_back(*view);
+      if (view.get()) {
+        vlist.push_back(*view);
+      }
     }
   } catch (const dbo::Exception& ex) {
     vlist.clear();
@@ -317,7 +322,9 @@ DbViewsT DbSession::listViewListByAssignedUser(const std::string& uname)
   try {
     dbo::ptr<DboUser> userDboPtr = find<DboUser>().where("name=?").bind(uname);
     for (auto& view : userDboPtr.modify()->views) {
-      vlist.push_back(*view);
+      if (view.get()) {
+        vlist.push_back(*view);
+      }
     }
   } catch (const dbo::Exception& ex) {
     vlist.clear();
@@ -344,7 +351,7 @@ bool DbSession::findView(const std::string& vname, DboView& view)
 
 int DbSession::initDb(void)
 {
-  int  rc = -1;
+  int  rc = ngrt4n::RcDbError;
   try {
     createTables();
     DboUserT adm;
@@ -356,7 +363,7 @@ int DbSession::initDb(void)
     adm.registrationDate = QDateTime::currentDateTime().toString().toStdString();
 
     rc = addUser(adm);
-    if (rc == 0) {
+    if (rc == ngrt4n::RcSuccess) {
       CORE_LOG("info", Q_TR("Database initialized successfully"));
     }
 
@@ -370,19 +377,19 @@ int DbSession::initDb(void)
 
 int DbSession::addView(const DboView& vInfo)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     DboViewCollectionT views = find<DboView>().where("name=?").bind(vInfo.name);
     if (views.size() > 0) {
       m_lastError = QObject::tr("a view with name '%1' already exists").arg(vInfo.name.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
-      rc = 1;
+      rc = ngrt4n::RcDbDuplicationError;
     } else {
       DboView* viewTmpPtr(new DboView());
       *viewTmpPtr =  vInfo;
       add(viewTmpPtr);
-      rc = 0;
+      rc = ngrt4n::RcSuccess;
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Add view failed, please check the log file";
@@ -398,14 +405,14 @@ int DbSession::addView(const DboView& vInfo)
 
 int DbSession::updateViewWithPath(const DboView& vinfo, const std::string& vpath)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboView> viewDbo = find<DboView>().where("path=?").bind(vpath);
     viewDbo.modify()->name = vinfo.name;
     viewDbo.modify()->service_count = vinfo.service_count;
     transaction.commit();
-    rc = 0;
+    rc = ngrt4n::RcSuccess;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to update view";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
@@ -417,11 +424,11 @@ int DbSession::updateViewWithPath(const DboView& vinfo, const std::string& vpath
 
 int DbSession::deleteViewWithName(const std::string& vname)
 {
-  int rc = -1;
+  int rc = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     execute("DELETE FROM view WHERE name = ?;").bind(vname);
-    rc = 0;
+    rc = ngrt4n::RcSuccess;
   } catch (const Wt::Dbo::backend::Sqlite3Exception& ex) {
     m_lastError = ex.what();
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
@@ -454,13 +461,13 @@ UserViewsT DbSession::updateUserViewList(void)
 
 int DbSession::assignView(const std::string& userId, const std::string& vname)
 {
-  int retValue = -1;
+  int retValue = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> dboUserPtr = find<DboUser>().where("name=?").bind(userId);
     dbo::ptr<DboView> dboViewPtr = find<DboView>().where("name=?").bind(vname);
     dboUserPtr.modify()->views.insert(dboViewPtr);
-    retValue = 0;
+    retValue = ngrt4n::RcSuccess;
   } catch (const dbo::Exception& ex) {
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   } catch(const std::exception& ex) {
@@ -474,13 +481,13 @@ int DbSession::assignView(const std::string& userId, const std::string& vname)
 
 int DbSession::revokeView(const std::string& userId, const std::string& viewId)
 {
-  int retValue = -1;
+  int retValue = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> userPtr = find<DboUser>().where("name=?").bind(userId);
     dbo::ptr<DboView> viewPtr = find<DboView>().where("name=?").bind(viewId);
     userPtr.modify()->views.erase(viewPtr);
-    retValue = 0;
+    retValue =  ngrt4n::RcSuccess;
   } catch (const dbo::Exception& ex) {
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   } catch(const std::exception& ex) {
@@ -641,7 +648,7 @@ int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewI
 
 int DbSession::getLastQosData(QosDataT& qosData, const std::string& viewId)
 {
-  int retValue = -1;
+  int count = -1;
   dbo::Transaction transaction(*this);
   try {
     DboQosDataCollectionT queryResults;
@@ -656,7 +663,7 @@ int DbSession::getLastQosData(QosDataT& qosData, const std::string& viewId)
     }
 
     if (queryResults.size() == 1) {
-      retValue = 0;
+      count = 0;
       qosData =  queryResults.begin()->modify()->data();
     }
   } catch (const dbo::Exception& ex) {
@@ -664,24 +671,24 @@ int DbSession::getLastQosData(QosDataT& qosData, const std::string& viewId)
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  return retValue;
+  return count;
 }
 
 
 int DbSession::addNotification(const std::string& viewId, int viewStatus)
 {
-  int retValue = -1;
+  int retValue = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     DboNotification* entryPtr = new DboNotification();
-    entryPtr->timestamp = time(NULL);
+    entryPtr->timestamp = time(nullptr);
     entryPtr->last_change = entryPtr->timestamp;
     entryPtr->view = find<DboView>().where("name=?").bind(viewId);
     entryPtr->view_status = viewStatus;
     entryPtr->ack_status = DboNotification::Open;
     add(entryPtr);
 
-    retValue = 0;
+    retValue = ngrt4n::RcSuccess;
   } catch (const dbo::Exception& ex) {
     m_lastError = "Failed to add notification entry into database.";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
@@ -693,7 +700,7 @@ int DbSession::addNotification(const std::string& viewId, int viewStatus)
 
 int DbSession::updateNotificationAckStatusForUser(const std::string& userId, const std::string& viewId, int newAckStatus)
 {
-  int retValue = -1;
+  int retValue = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userId);
@@ -701,7 +708,7 @@ int DbSession::updateNotificationAckStatusForUser(const std::string& userId, con
       m_lastError = QObject::tr("No user with username %1)").arg(userId.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
     } else {
-      long lastChange = time(NULL);
+      long lastChange = time(nullptr);
       DboViewCollectionT dboViews;
       if (dboUser->role == DboUser::AdmRole) {
         dboViews = find<DboView>();
@@ -724,7 +731,7 @@ int DbSession::updateNotificationAckStatusForUser(const std::string& userId, con
         notifDbPtr->timestamp   = notifDbEntry->timestamp;
         add(notifDbPtr);
       }
-      retValue = 0;
+      retValue =  ngrt4n::RcSuccess;
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed changing notification state.";
@@ -737,7 +744,7 @@ int DbSession::updateNotificationAckStatusForUser(const std::string& userId, con
 
 int DbSession::updateNotificationAckStatusForView(const std::string& userId, const std::string& viewId, int newAckStatus)
 {
-  int retValue = -1;
+  int retValue = ngrt4n::RcDbError;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userId);
@@ -745,7 +752,7 @@ int DbSession::updateNotificationAckStatusForView(const std::string& userId, con
       m_lastError = QObject::tr("No user with username %1)").arg(userId.c_str()).toStdString();
       CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, m_lastError.c_str()).toStdString());
     } else {
-      long lastChange = time(NULL);
+      long lastChange = time(nullptr);
       dbo::ptr<DboNotification> notifDbEntry = find<DboNotification>()
                                                .where("view_name = ?").bind(viewId)
                                                .orderBy("timestamp DESC")
@@ -758,7 +765,7 @@ int DbSession::updateNotificationAckStatusForView(const std::string& userId, con
       notifDbPtr->timestamp   = notifDbEntry->timestamp;
       notifDbPtr->view_status = notifDbEntry->view_status;
       add(notifDbPtr);
-      retValue = 0;
+      retValue =  ngrt4n::RcSuccess;
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Database error: failed changing notification state.";
@@ -794,7 +801,7 @@ void DbSession::getLastNotificationInfo(NotificationT& lastNotifInfo, const std:
 
 int DbSession::listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId)
 {
-  int retValue = -1;
+  int count = -1;
   dbo::Transaction transaction(*this);
   try {
     dbo::ptr<DboUser> dboUser = find<DboUser>().where("name = ?").bind(userId);
@@ -831,12 +838,12 @@ int DbSession::listViewRelatedNotifications(NotificationMapT& notifications, con
           notifications.insert(data.view_name, data);
         }
       }
-      retValue = notifications.size();
+      count = notifications.size();
     }
   } catch (const dbo::Exception& ex) {
     m_lastError = "Query failed when fetching notification data";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
-  return retValue;
+  return count;
 }

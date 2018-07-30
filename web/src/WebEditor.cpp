@@ -721,7 +721,7 @@ void WebEditor::handleSaveViewButton(void)
 
   ngrt4n::fixParentChildrenDependencies(m_cdata);
 
-  auto saveStatus = saveContentToFile(m_cdata, destPath.c_str());
+  auto saveStatus = registerViewWithPath(m_cdata, destPath.c_str());
 
   if (saveStatus.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
@@ -733,7 +733,7 @@ void WebEditor::handleSaveViewButton(void)
 }
 
 
-std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, const QString& destPath)
+std::pair<int, QString> WebEditor::registerViewWithPath(const CoreDataT& cdata, const QString& destPath)
 {
   auto rootService = cdata.bpnodes.constFind(ngrt4n::ROOT_ID);
 
@@ -742,8 +742,7 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
   }
 
   std::pair<int, QString> saveResult = ngrt4n::saveDataAsDescriptionFile(destPath, cdata);
-
-  if (saveResult.first != 0) {
+  if (saveResult.first != ngrt4n::RcSuccess) {
     return std::make_pair(-1, saveResult.second);
   }
 
@@ -755,21 +754,20 @@ std::pair<int, QString> WebEditor::saveContentToFile(const CoreDataT& cdata, con
   // save view in database if it's the 1st time
   if (m_currentFilePath.empty()) {
     int rc = m_dbSession->addView(vinfo);
-    if (rc != 0) {
+    if (rc != ngrt4n::RcSuccess) {
       CORE_LOG("error", m_dbSession->lastError());
       return std::make_pair(rc,  m_dbSession->lastError().c_str());
     }
-
-    return std::make_pair(0, "");
+    return std::make_pair(ngrt4n::RcSuccess, "");
   }
 
   int rc = m_dbSession->updateViewWithPath(vinfo, destPath.toStdString());
-  if (rc != 0) {
+  if (rc !=  ngrt4n::RcSuccess) {
     CORE_LOG("error", m_dbSession->lastError());
     return std::make_pair(rc, m_dbSession->lastError().c_str());
   }
 
-  return std::make_pair(0, "");
+  return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
 
@@ -829,7 +827,7 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
   m_currentFilePath.clear();
 
   auto destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
-  auto saveStatus = saveContentToFile(cdata, destPath);
+  auto saveStatus = registerViewWithPath(cdata, destPath);
   if (saveStatus.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
     return ;
@@ -1071,7 +1069,7 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
 
   auto destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
 
-  auto saveStatus = saveContentToFile(cdata, destPath);
+  auto saveStatus = registerViewWithPath(cdata, destPath);
   if (saveStatus.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
     return ;
@@ -1208,7 +1206,7 @@ void WebEditor::importZabbixITServices(const std::string& srcId)
   m_currentFilePath.clear();
 
   auto destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
-  auto saveStatus = saveContentToFile(cdata, destPath);
+  auto saveStatus = registerViewWithPath(cdata, destPath);
   if (saveStatus.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
     return ;

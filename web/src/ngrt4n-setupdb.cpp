@@ -24,16 +24,16 @@
 #include "WebBaseSettings.hpp"
 
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
   WebBaseSettings settings;
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
 
-  int rc = -1;
-  if (! dbSession.isConnected() || dbSession.initDb() != 0) {
+  int rc = ngrt4n::RcFailed;
+  if (! dbSession.isConnected() || dbSession.initDb() != ngrt4n::RcSuccess) {
     std::cerr << Q_TR("Database initialization failed. Please check the core log for more details");
   } else {
-    rc = 0;
+    rc = ngrt4n::RcSuccess;
   }
 
   return rc;
