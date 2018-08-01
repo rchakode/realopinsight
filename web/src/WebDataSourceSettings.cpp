@@ -183,13 +183,11 @@ void WebDataSourceSettings::applyChanges(void)
     DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
     for (auto&& ns: outListNamespaces.first) {
 
-      auto destPath = QString("%1/%2_k8s_ns_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"), ns, ngrt4n::generateId());
-
       NodeT nsNode;
-      nsNode.id = ngrt4n::ROOT_ID;
       nsNode.type = NodeType::K8sClusterService;
-      nsNode.child_nodes = QString("Source%1:%2").arg(sourceIndex).arg(ns);
+      nsNode.id = QString::number(sourceIndex);
       nsNode.name = ns;
+      nsNode.child_nodes = "";
       nsNode.sev_prule = PropRules::Unchanged;
       nsNode.sev_crule = CalcRules::Worst;
       nsNode.weight = ngrt4n::WEIGHT_UNIT;
@@ -200,12 +198,14 @@ void WebDataSourceSettings::applyChanges(void)
       cdata.monitor = MonitorT::Kubernetes;
       cdata.bpnodes.insert(nsNode.id, nsNode);
 
-      std::pair<int, QString> saveResult = ngrt4n::saveDataAsDescriptionFile(destPath, cdata);
-      if (saveResult.first != ngrt4n::RcSuccess) {
-        CORE_LOG("error", saveResult.second.toStdString());
+      auto destPath = QString("%1/k8s_ns_%2_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"), ns, ngrt4n::generateId());
+      std::pair<int, QString> outSaveView = ngrt4n::saveViewDataToPath(cdata, destPath);
+
+      if (outSaveView.first != ngrt4n::RcSuccess) {
+        CORE_LOG("error", outSaveView.second.toStdString());
       } else {
         DboView vinfo;
-        vinfo.name = nsNode.name.toStdString();
+        vinfo.name = QString("Source%1:%2").arg(nsNode.id, nsNode.name).toStdString();
         vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
         vinfo.path = destPath.toStdString();
         if (dbSession.addView(vinfo) != ngrt4n::RcSuccess) {

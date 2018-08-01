@@ -55,8 +55,6 @@ public:
   qint32 timerId(void) const {return m_timerId;}
   qint32 timerInterval(void) const {return m_interval;}
   NodeT rootNode(void);
-  bool lastErrorState() const {return m_lastErrorState;}
-  QString lastErrorMsg(void) const {return m_lastErrorMsg;}
   int extractStatsData(CheckStatusCountT& statsData);
 
 public Q_SLOTS:
@@ -67,7 +65,7 @@ public Q_SLOTS:
   void prepareUpdate(const SourceT& src);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   void checkStandaloneSourceType(SourceT& src);
-  virtual void initialize(BaseSettings* p_settings);
+  virtual std::pair<int, QString> initialize(BaseSettings* p_settings);
   qint32 userRole(void) const {return m_userRole;}
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
   void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
@@ -109,8 +107,6 @@ protected:
   bool m_showOnlyTroubles;
   SourceListT m_sources;
   int m_firstSrcIndex;
-  bool m_lastErrorState;
-  QString m_lastErrorMsg;
 
 protected:
   void resetInterval(BaseSettings* p_settings);

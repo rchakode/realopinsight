@@ -55,15 +55,16 @@ WebDashboard::~WebDashboard()
   unbindWidgets();
 }
 
-void WebDashboard::initialize(BaseSettings* p_settings)
+std::pair<int, QString> WebDashboard::initialize(BaseSettings* p_settings)
 {
-  DashboardBase::initialize(p_settings);
-  if (! DashboardBase::lastErrorState()) {
+  auto outInitilization = DashboardBase::initialize(p_settings);
+  if (outInitilization.first != ngrt4n::RcSuccess) {
+    CORE_LOG("error", outInitilization.second.toStdString());
+  } else {
     m_thumbnailTitleBar.setText( rootNode().name.toStdString() );
     m_thumbnailProblemDetailsBar.setText("");
-  } else {
-    CORE_LOG("error", m_lastErrorMsg.toStdString());
   }
+  return outInitilization;
 }
 
 void WebDashboard::buildTree(void)

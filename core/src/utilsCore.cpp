@@ -376,26 +376,23 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
 
 std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
 {
-  int retcode = -1;
-
   // Nagios
   if (srcInfo.mon_type == MonitorT::Nagios) {
+    int retcode = ngrt4n::RcGenericFailure;
     LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
     if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
-      retcode = 0;
+      retcode = ngrt4n::RcSuccess;
     }
-
     return std::make_pair(retcode, handler.lastError());
   }
 
   // Zabbix
   if (srcInfo.mon_type == MonitorT::Zabbix) {
     ZbxHelper handler;
-    retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     }
-
     return std::make_pair(retcode, handler.lastError());
   }
 
@@ -403,11 +400,10 @@ std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& src
   // Zenoss
   if (srcInfo.mon_type == MonitorT::Zenoss) {
     ZnsHelper handler(srcInfo.mon_url);
-    retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
     if (checks.empty()) {
       retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
     }
-
     return std::make_pair(retcode, handler.lastError());
   }
 
@@ -415,15 +411,14 @@ std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& src
   // Pandora
   if (srcInfo.mon_type == MonitorT::Pandora) {
     PandoraHelper handler(srcInfo.mon_url);
-    retcode = handler.loadChecks(srcInfo, checks, filter);
-
-
+    int retcode = handler.loadChecks(srcInfo, checks, filter);
     return std::make_pair(retcode, handler.lastError());
   }
 
 
   // OpManager
   if (srcInfo.mon_type == MonitorT::OpManager) {
+    int retcode = ngrt4n::RcGenericFailure;
     OpManagerHelper handler(srcInfo.mon_url);
     if (filter.isEmpty()) {
       retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListAllDevices, filter, checks);
@@ -436,37 +431,27 @@ std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& src
         }
       }
     }
-
     return std::make_pair(retcode, handler.lastError());
   }
 
-
-  return std::make_pair(-1, QObject::tr("Unknown data source type"));
+  return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Unknown data source type"));
 }
 
 
-std::pair<int, QString> ngrt4n::saveDataAsDescriptionFile(const QString& path, const CoreDataT& cdata)
+std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const QString& path)
 {
   QFile file(path);
   if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    return std::make_pair(ngrt4n::RcFailed, QObject::tr("Cannot open file: %1").arg(path));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot open file: %1").arg(path));
   }
 
-  NodeListT::ConstIterator rootNode = cdata.bpnodes.find(ngrt4n::ROOT_ID);
-  if (rootNode == cdata.bpnodes.end()) {
-    file.close();
-    return std::make_pair(ngrt4n::RcFailed, QObject::tr("The hierarchy does not have root"));
-  }
 
   QTextStream outStream(&file);
   outStream << "<?xml version=\"1.0\"?>\n"
-            << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(cdata.monitor) )
-            << generateNodeXml(*rootNode);
+            << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(cdata.monitor) );
 
   Q_FOREACH(const NodeT& service, cdata.bpnodes) {
-    if (service.id != ngrt4n::ROOT_ID && ! service.parent.isEmpty()) {
-      outStream << generateNodeXml(service);
-    }
+    outStream << generateNodeXml(service);
   }
 
   Q_FOREACH(const NodeT& service, cdata.cnodes) {

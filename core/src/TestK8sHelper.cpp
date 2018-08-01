@@ -119,7 +119,7 @@ void TestK8sHelper::test_httpDataRetrieving(void)
         CoreDataT cdata;
         auto nsViewOut = k8s.loadNamespaceView(m_PROXY_URL, true, ns, cdata);
         QVERIFY(nsViewOut.second == static_cast<int>(ngrt4n::RcSuccess));
-        ngrt4n::saveDataAsDescriptionFile("/tmp/roi_"+ns+".xml", cdata);
+        ngrt4n::saveViewDataToPath(cdata, "/tmp/roi_"+ns+".xml");
     }
 }
 

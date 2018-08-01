@@ -77,8 +77,7 @@ DashboardBase::DashboardBase(const QString& descriptionFile)
   : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
     m_timerId(-1),
     m_updateCounter(0),
-    m_showOnlyTroubles(false),
-    m_lastErrorState(false)
+    m_showOnlyTroubles(false)
 {
   resetStatData();
 }
@@ -87,27 +86,23 @@ DashboardBase::~DashboardBase()
 {
 }
 
-void DashboardBase::initialize(BaseSettings* p_settings)
+std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings)
 {
-  m_lastErrorState = false;
-
   if (m_descriptionFile.isEmpty()) {
-    m_lastErrorState = true;
-    m_lastErrorMsg = QObject::tr("Empty description file");
-    return ;
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Empty description file"));
   }
 
   Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, p_settings->getGraphLayout());
-
   int rc = parser.process();
-  if (rc != 0) {
-    m_lastErrorState = true;
-    m_lastErrorMsg = parser.lastErrorMsg();
-  } else {
-    buildTree();
-    buildMap();
-    initSettings(p_settings);
+  if (rc != ngrt4n::RcSuccess) {
+    return std::make_pair(ngrt4n::RcGenericFailure, parser.lastErrorMsg());
   }
+
+  buildTree();
+  buildMap();
+  initSettings(p_settings);
+
+  return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
 void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
@@ -295,7 +290,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
   if (node->type == NodeType::ExternalService) {
 
     constexpr long intervalDurationSec = 10 * 60;
-    long toDate = std::time(0);
+    long toDate = std::time(nullptr);
     long fromDate = toDate - intervalDurationSec;
     QosDataListMapT qosMap;
 
@@ -445,8 +440,10 @@ void DashboardBase::resetInterval(BaseSettings* p_settings)
 NodeT DashboardBase::rootNode(void)
 {
   NodeListT::iterator root = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
-  assert(root != m_cdata.bpnodes.end());
-  return *root;
+  if (root != m_cdata.bpnodes.end()) {
+    return *root;
+  }
+  return NodeT();
 }
 
 

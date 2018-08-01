@@ -145,7 +145,7 @@ private:
   Wt::WComboBox* m_selectViewBox;
   Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
 
-  WebDataSourceSettings m_dataSourceSettingsForm;
+  WebDataSourceSettings m_dataSourceSettings;
   WebNotificationSettings m_notificationSettingsForm;
   WebAuthSettings m_authSettingsForm;
   WebDatabaseSettings m_databaseSettingsForm;

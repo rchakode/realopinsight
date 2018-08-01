@@ -63,27 +63,27 @@ ZbxHelper::requestsPatterns()
                             \"params\": [], \
                             \"id\": %9}";
   patterns[GetTriggersByHostOrGroup] = "{\"jsonrpc\": \"2.0\", \
-                                     \"auth\": \"%1\", \
-                                     \"method\": \"trigger.get\", \
-                                     \"params\": { \
-                                     \"active\": true, \
-                                     \%2 \
-                                     \"selectGroups\": [\"name\"], \
-                                     \"selectHosts\": [\"host\"], \
-                                     \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
-                                     \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
-                                     \"limit\": -1}, \
-                                     \"id\": %9}";
-  patterns[GetTriggersByHostOrGroupV18] = "{\"jsonrpc\": \"2.0\", \
-                                        \"auth\": \"%1\", \
-                                        \"method\": \"trigger.get\", \
-                                        \"params\": { \
-                                        \"active\": true, \
-                                        \%2 \
-                                        \"select_hosts\": [\"host\"], \
-                                        \"output\":  \"extend\", \
+                                       \"auth\": \"%1\", \
+                                       \"method\": \"trigger.get\", \
+                                       \"params\": { \
+                                       \"active\": true, \
+                                       \%2 \
+                                       \"selectGroups\": [\"name\"], \
+                                        \"selectHosts\": [\"host\"], \
+                                        \"selectItems\": [\"key_\",\"name\",\"lastclock\"], \
+                                        \"output\": [\"description\",\"value\",\"error\",\"comments\",\"priority\"], \
                                         \"limit\": -1}, \
                                         \"id\": %9}";
+  patterns[GetTriggersByHostOrGroupV18] = "{\"jsonrpc\": \"2.0\", \
+                                          \"auth\": \"%1\", \
+                                          \"method\": \"trigger.get\", \
+                                          \"params\": { \
+                                          \"active\": true, \
+                                          \%2 \
+                                          \"select_hosts\": [\"host\"], \
+                                           \"output\":  \"extend\", \
+                                           \"limit\": -1}, \
+                                           \"id\": %9}";
   patterns[GetTriggersByIds] = "{\"jsonrpc\": \"2.0\", \
                                \"auth\": \"%1\", \
                                \"method\": \"trigger.get\", \
@@ -108,7 +108,7 @@ ZbxHelper::requestsPatterns()
 
 bool ZbxHelper::checkLogin(void)
 {
-  if (! m_isLogged && openSession() != 0) {
+  if (! m_isLogged && openSession() != ngrt4n::RcSuccess) {
     m_isLogged = false;
   }
 
@@ -137,10 +137,11 @@ ZbxHelper::postRequest(qint32 reqId, const QStringList& params)
 
   m_evlHandler.exec();
 
-  if (! reply || parseReply(reply) != 0)
-    return -1;
+  if (! reply) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  return 0;
+  return parseReply(reply);
 }
 
 
@@ -173,13 +174,13 @@ ZbxHelper::parseReply(QNetworkReply* reply)
   // check for error in network communication
   if (reply->error() != QNetworkReply::NoError) {
     m_lastError = tr("%1 (%2)").arg(reply->errorString(), reply->url().toString()) ;
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   // now read data
   QString data = QString(reply->readAll());
   m_replyJsonData.setData( data ) ;
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 bool
@@ -203,23 +204,22 @@ ZbxHelper::openSession(void)
   QStringList params = ngrt4n::getAuthInfo(m_sourceInfo.auth);
   if (params.size() != 2) {
     m_lastError = tr("Bad auth string, should be in the form of login:password");
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   params.push_back(QString::number(GetLogin));
   setSslPeerVerification(m_sourceInfo.verify_ssl_peer != 0);
 
-  if (postRequest(GetLogin, params) != 0)
-    return -1;
+  if (postRequest(GetLogin, params) != ngrt4n::RcSuccess) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  if (processLoginReply() !=0)
-    return -1;
+  if (processLoginReply() != ngrt4n::RcSuccess) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  // Get the API version
-  if (fecthApiVersion() != 0)
-    return -1;
-
-  return 0;
+  // Get the API version and return
+  return fecthApiVersion();
 }
 
 int
@@ -230,28 +230,24 @@ ZbxHelper::processLoginReply(void)
   if (tid == ZbxHelper::GetLogin && ! result.isEmpty()) {
     m_auth = result;
     m_isLogged = true;
-    return 0;
+    return ngrt4n::RcSuccess;
   }
   m_lastError = tr("Login failed");
 
-  return -1;
+  return ngrt4n::RcGenericFailure;
 }
 
 int
 ZbxHelper::fecthApiVersion(void)
 {
-  QStringList params;
-
-  params.push_back(QString::number(GetApiVersion));
   setSslPeerVerification(m_sourceInfo.verify_ssl_peer);
 
-  if (postRequest(ZbxHelper::GetApiVersion, params) != 0)
-    return -1;
+  QStringList params {QString::number(GetApiVersion)};
+  if (postRequest(ZbxHelper::GetApiVersion, params) != ngrt4n::RcSuccess) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  if (processGetApiVersionReply() != 0)
-    return -1;
-
-  return 0;
+  return processGetApiVersionReply();
 }
 
 int
@@ -260,14 +256,14 @@ ZbxHelper::processGetApiVersionReply(void)
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   if (tid != ZbxHelper::GetApiVersion) {
     m_lastError = tr("the transaction id does not correspond to getApiVersion");
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   if (! checkBackendSuccessfulResult())
-    return -1;
+    return ngrt4n::RcGenericFailure;
 
   setApiVersion( m_replyJsonData.getProperty("result").toString() );
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 int
@@ -280,7 +276,7 @@ ZbxHelper::processTriggerData(ChecksT& checks)
       && tid != GetTriggersByHostOrGroupV18
       && tid != GetTriggersByIds) {
     m_lastError = tr("Unexpected transaction id: %1").arg(QString::number(tid));
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   // now treat successful result
@@ -303,7 +299,7 @@ ZbxHelper::processTriggerData(ChecksT& checks)
       check.alarm_msg = "OK ("+triggerName.toStdString()+")";
     } else {
       check.alarm_msg = triggerJsonData.property("error").toString().toStdString();
-      check.status = triggerJsonData.property("priority").toInteger();
+      check.status = static_cast<int>(triggerJsonData.property("priority").toInteger());
     }
 
     if (tid == GetTriggersByHostOrGroupV18) {
@@ -320,7 +316,7 @@ ZbxHelper::processTriggerData(ChecksT& checks)
     check.id = ID_PATTERN.arg(check.host.c_str(), triggerName).toStdString();
     checks.insert(triggerId.toStdString(), check);
   }
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 int
@@ -331,15 +327,15 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& fi
 
   checks.clear();
 
-  if (! checkLogin())
-    return -1;
+  if (! checkLogin()) {
+    return ngrt4n::RcGenericFailure;
+  }
 
   QStringList params;
   if (! filterValue.isEmpty()) {
     if (filterType == ngrt4n::GroupFilter) {
       params.push_back( QString("\"group\": \"%1\",").arg(filterValue) );
     } else {
-      //params.push_back( QString("\"host\": \"%1\",").arg(filterValue) );
       params.push_back( QString("\"filter\": { \"host\":[\"%1\"]},").arg(filterValue) );
     }
   } else {
@@ -348,16 +344,15 @@ ZbxHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks, const QString& fi
   //params.push_back(filter);
   params.push_back(QString::number(m_getTriggersByHostOrGroupApiVersion));
 
-  if (postRequest(m_getTriggersByHostOrGroupApiVersion, params) != 0)
-    return -1;
+  if (postRequest(m_getTriggersByHostOrGroupApiVersion, params) != ngrt4n::RcSuccess) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  if (! checkBackendSuccessfulResult())
-    return -1;
+  if (! checkBackendSuccessfulResult()) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  if (processTriggerData(checks) !=0)
-    return -1;
-
-  return 0;
+  return processTriggerData(checks);
 }
 
 
@@ -369,32 +364,32 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   cdata.monitor = MonitorT::Any;
 
   if (! checkLogin()) {
-    return std::make_pair(-1, QObject::tr("login failed: %s").arg(m_lastError));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("login failed: %s").arg(m_lastError));
   }
 
   QStringList params(QString::number(GetITServices));
-  if (postRequest(GetITServices, params) != 0) {
-    return std::make_pair(-1, QObject::tr("failed to post request: %s").arg(m_lastError));
+  if (postRequest(GetITServices, params) != ngrt4n::RcSuccess) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed to post request: %s").arg(m_lastError));
   }
 
   if (! checkBackendSuccessfulResult()) {
-    return std::make_pair(-1, QObject::tr("failed to parse backend request: %s").arg(m_lastError));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed to parse backend request: %s").arg(m_lastError));
   }
 
   ZabbixParentChildsDependenciesMapT parentChildsDependencies;
   ZabbixChildParentDependenciesMapT childParentDependencies;
   ZabbixServiceTriggerDependenciesMapT serviceTriggerDependencies;
 
-  if (processZabbixITServiceData(cdata, parentChildsDependencies, childParentDependencies, serviceTriggerDependencies)) {
-    return std::make_pair(-1, QObject::tr("failed to process output: %s").arg(m_lastError));
+  if (processZabbixITServiceData(cdata, parentChildsDependencies, childParentDependencies, serviceTriggerDependencies) != ngrt4n::RcSuccess) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed to process output: %s").arg(m_lastError));
   }
 
-  if (setBusinessServiceDependencies(cdata.bpnodes, parentChildsDependencies) != 0) {
-    return std::make_pair(-1, QObject::tr("failed to build dependencies for bpnodes: %s").arg(m_lastError));
+  if (setBusinessServiceDependencies(cdata.bpnodes, parentChildsDependencies) != ngrt4n::RcSuccess) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed to build dependencies for bpnodes: %s").arg(m_lastError));
   }
 
-  if (setITServiceDataPoint(cdata.cnodes, serviceTriggerDependencies) != 0) {
-    return std::make_pair(-1, QObject::tr("failed to build dependencies for cnodes: %s").arg(m_lastError));
+  if (setITServiceDataPoint(cdata.cnodes, serviceTriggerDependencies) != ngrt4n::RcSuccess) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed to build dependencies for cnodes: %s").arg(m_lastError));
   }
 
   NodeT rootService;
@@ -404,7 +399,7 @@ ZbxHelper::loadITServices(const SourceT& srcInfo, CoreDataT& cdata)
   rootService.child_nodes = extractTopParentServices(cdata.bpnodes, childParentDependencies);
   cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
 
-  return std::make_pair(0, "");
+  return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
 QString ZbxHelper::extractTopParentServices(const NodeListT& bpnodes, const ZabbixChildParentDependenciesMapT& childParentDependencies)
@@ -429,7 +424,7 @@ int ZbxHelper::processZabbixITServiceData(CoreDataT& cdata,
   qint32 tid = m_replyJsonData.getProperty("id").toInt32();
   if (tid != GetITServices) {
     m_lastError = tr("Unexpected transaction id: %1, expected: %2").arg(QString::number(tid), QString::number(GetITServices));
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   QScriptValueIterator serviceIter(m_replyJsonData.getProperty("result"));
@@ -465,7 +460,7 @@ int ZbxHelper::processZabbixITServiceData(CoreDataT& cdata,
   setServicesParent(cdata.bpnodes, childParentDependencies);
   setServicesParent(cdata.cnodes, childParentDependencies);
 
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 void ZbxHelper::setServicesParent(NodeListT& nodes, const ZabbixChildParentDependenciesMapT& childParentDependencies)
@@ -526,15 +521,13 @@ int ZbxHelper::setBusinessServiceDependencies(NodeListT& bpnodes, const ZabbixPa
 {
   ZabbixParentChildsDependenciesMapT::ConstIterator dependency = parentChildsDependencies.begin();
   while (dependency != parentChildsDependencies.end()) {
-
     NodeListT::Iterator bpnode = bpnodes.find(dependency.key());
     if (bpnode != bpnodes.end()) {
       bpnode->child_nodes = QStringList( dependency.value().values() ).join(ngrt4n::CHILD_SEP.c_str());
     }
-
     ++dependency;
   }
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 int ZbxHelper::setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTriggerDependenciesMapT& serviceTriggerDependencies)
@@ -545,15 +538,18 @@ int ZbxHelper::setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTrigg
   params.push_back( getTriggersIdsJsonList(uniqueTriggerIds) );
   params.push_back(QString::number(GetTriggersByIds));
 
-  if (postRequest(GetTriggersByIds, params) != 0)
-    return -1;
+  if (postRequest(GetTriggersByIds, params) != ngrt4n::RcSuccess) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  if (! checkBackendSuccessfulResult())
-    return -1;
+  if (! checkBackendSuccessfulResult()) {
+    return ngrt4n::RcGenericFailure;
+  }
 
   ChecksT dataPoints;
-  if (processTriggerData(dataPoints) != 0)
-    return -1;
+  if (processTriggerData(dataPoints) != ngrt4n::RcSuccess) {
+    return ngrt4n::RcGenericFailure;
+  }
 
   ZabbixServiceTriggerDependenciesMapT::ConstIterator serviceTriggerLink = serviceTriggerDependencies.begin();
   while (serviceTriggerLink != serviceTriggerDependencies.end()) {
@@ -571,7 +567,7 @@ int ZbxHelper::setITServiceDataPoint(NodeListT& cnodes, const ZabbixServiceTrigg
     ++serviceTriggerLink;
   }
 
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 

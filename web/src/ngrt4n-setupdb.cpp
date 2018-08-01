@@ -29,7 +29,7 @@ int main(int, char **)
   WebBaseSettings settings;
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
 
-  int rc = ngrt4n::RcFailed;
+  int rc = ngrt4n::RcGenericFailure;
   if (! dbSession.isConnected() || dbSession.initDb() != ngrt4n::RcSuccess) {
     std::cerr << Q_TR("Database initialization failed. Please check the core log for more details");
   } else {

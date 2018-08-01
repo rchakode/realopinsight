@@ -84,31 +84,31 @@ RequestListT ZnsHelper::requestsPatterns()
 {
   RequestListT list;
   list[Device] = "{\"action\": \"DeviceRouter\", "
-      " \"method\": \"getDevices\", "
-      " \"data\": [{ "
-      " \"uid\": \"/zport/dmd/Devices\", "
-      " \"sort\": \"name\", "
-      " \"params\": {\"%1\": \"%2\"}, "
-      " \"keys\":[\"name\",\"uid\",\"groups\"] "
-      "}], "
-      " \"type\": \"rpc\", "
-      " \"tid\": %3}";
+                 " \"method\": \"getDevices\", "
+                 " \"data\": [{ "
+                 " \"uid\": \"/zport/dmd/Devices\", "
+                 " \"sort\": \"name\", "
+                 " \"params\": {\"%1\": \"%2\"}, "
+                 " \"keys\":[\"name\",\"uid\",\"groups\"] "
+                 "}], "
+                 " \"type\": \"rpc\", "
+                 " \"tid\": %3}";
   list[Component] = "{\"action\": \"DeviceRouter\", "
-      " \"method\": \"getComponents\", "
-      " \"data\": [{ "
-      " \"uid\": \"%1\", "
-      " \"limit\": 1000, "
-      " \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\",\"groups\"]"
-      " }], "
-      " \"type\": \"rpc\", "
-      " \"tid\": %2}";
+                    " \"method\": \"getComponents\", "
+                    " \"data\": [{ "
+                    " \"uid\": \"%1\", "
+                    " \"limit\": 1000, "
+                    " \"keys\":[\"name\",\"status\",\"severity\",\"pingStatus\",\"device\",\"failSeverity\",\"lastChanged\",\"groups\"]"
+                    " }], "
+                    " \"type\": \"rpc\", "
+                    " \"tid\": %2}";
   list[DeviceInfo] = "{\"action\": \"DeviceRouter\", "
-      " \"method\": \"getInfo\", "
-      " \"data\": [{ "
-      " \"uid\": \"%1\", "
-      " \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\",\"groups\"] }], "
-      " \"type\": \"rpc\", "
-      " \"tid\": %2}";
+                     " \"method\": \"getInfo\", "
+                     " \"data\": [{ "
+                     " \"uid\": \"%1\", "
+                     " \"keys\":[\"name\",\"status\",\"severity\",\"lastChanged\",\"groups\"] }], "
+                     " \"type\": \"rpc\", "
+                     " \"tid\": %2}";
   return list;
 }
 
@@ -335,7 +335,7 @@ ZnsHelper::processDeviceReply(QNetworkReply* reply, ChecksT& checks)
 
     QScriptValue curDevice = devices.value();
     QString deviceUid = curDevice.property("uid").toString();
-    QNetworkReply* response = NULL;
+    QNetworkReply* response = nullptr;
     response = postRequest(Component, ngrt4n::toByteArray(ReqPatterns[Component].arg(deviceUid, QString::number(Component))));
     processComponentReply(response, checks);
 
@@ -354,14 +354,16 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
   setBaseUrl(srcInfo.mon_url);
 
   // Log in if not yet the case
-  if (! m_isLogged && openSession(srcInfo) != 0)
-    return -1;
+  if (! m_isLogged && openSession(srcInfo) != 0) {
+    return ngrt4n::RcGenericFailure;
+  }
 
-  if (! m_isLogged)
-    return -1;
+  if (! m_isLogged) {
+    return ngrt4n::RcGenericFailure;
+  }
 
   checks.clear();
-  QNetworkReply* response = NULL;
+  QNetworkReply* response = nullptr;
 
   setRouterEndpoint(Device);
   if (filterType == ngrt4n::GroupFilter) {
@@ -370,10 +372,11 @@ ZnsHelper::loadChecks(const SourceT& srcInfo, ChecksT& checks,
     response = postRequest(Device, ngrt4n::toByteArray(ReqPatterns[Device].arg("name", filterValue, QString::number(Device))));
   }
 
-  if (! response || processDeviceReply(response, checks) !=0) {
-    return -1;
+  if (! response || processDeviceReply(response, checks) !=0)  {
+    return ngrt4n::RcGenericFailure;
   }
-  return 0;
+
+  return ngrt4n::RcSuccess;
 }
 
 void

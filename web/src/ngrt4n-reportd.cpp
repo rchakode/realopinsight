@@ -68,7 +68,7 @@ void runCollector(int period)
       // skip the view if the initialization failed
       QosCollector collector(view.path.c_str());
       collector.initialize(&settings);
-      if (collector.lastErrorState()) {
+      if (collector.lastProcessingSucceeded()) {
         REPORTD_LOG("error", collector.lastErrorMsg());
         continue;
       }

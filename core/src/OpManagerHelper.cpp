@@ -119,19 +119,19 @@ OpManagerHelper::loadChecks(const SourceT& srcInfo, int filterType, const QStrin
 
   reply->deleteLater();
   QString data = reply->readAll();
-  //FIXME: generalize error handling
   if (reply->error() != QNetworkReply::NoError) {
     m_lastError = reply->errorString();
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
-  if (checkJsonData(data))
-    return -1;
+  if (checkJsonData(data)) {
+    return ngrt4n::RcGenericFailure;
+  }
 
   processDevicesJsonData(JsonHelper(data).data(), checks);
   Q_FOREACH(const CheckT& check, checks) { fetchAndAppendDeviceMonitors(check.host, check.host_groups, checks); }
 
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 
@@ -145,11 +145,11 @@ OpManagerHelper::fetchAndAppendDeviceMonitors(const std::string& deviceName, con
   QString data = reply->readAll();
 
   if (checkJsonData(data))
-    return -1;
+    return ngrt4n::RcGenericFailure;
 
   processMonitorsJsonData(JsonHelper(data).data(), deviceName, deviceGroups, checks);
 
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 

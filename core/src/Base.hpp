@@ -189,13 +189,13 @@ namespace ngrt4n {
   };
 
   enum ReturnCodeT {
+    RcGenericFailure = -1,
     RcSuccess = 0,
     RccRpcError = 1,
     RcUnexpectedFailure = 2,
     RcParseError = 3,
     RcDbError = 10,
-    RcDbDuplicationError = 11,
-    RcFailed = 255
+    RcDbDuplicationError = 11
   };
 
   const std::string AdmUser   = "ngrt4n_adm";

@@ -721,10 +721,9 @@ void WebEditor::handleSaveViewButton(void)
 
   ngrt4n::fixParentChildrenDependencies(m_cdata);
 
-  auto saveStatus = registerViewWithPath(m_cdata, destPath.c_str());
-
-  if (saveStatus.first != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, saveStatus.second.toStdString());
+  auto outRegisterView = registerViewWithPath(m_cdata, destPath.c_str());
+  if (outRegisterView.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, outRegisterView.second.toStdString());
   } else {
     m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
     m_currentFilePath = destPath;
@@ -736,14 +735,13 @@ void WebEditor::handleSaveViewButton(void)
 std::pair<int, QString> WebEditor::registerViewWithPath(const CoreDataT& cdata, const QString& destPath)
 {
   auto rootService = cdata.bpnodes.constFind(ngrt4n::ROOT_ID);
-
   if (rootService == cdata.bpnodes.cend()) {
-    return std::make_pair(-1, QObject::tr("Invalid or incompleted view"));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Invalid or incompleted view with root"));
   }
 
-  std::pair<int, QString> saveResult = ngrt4n::saveDataAsDescriptionFile(destPath, cdata);
+  std::pair<int, QString> saveResult = ngrt4n::saveViewDataToPath(cdata, destPath);
   if (saveResult.first != ngrt4n::RcSuccess) {
-    return std::make_pair(-1, saveResult.second);
+    return std::make_pair(ngrt4n::RcGenericFailure, saveResult.second);
   }
 
   DboView vinfo;
@@ -1197,9 +1195,9 @@ void WebEditor::importZabbixITServices(const std::string& srcId)
   CoreDataT cdata;
 
   auto allZbxSources = WebBaseSettings().fetchSourceList(MonitorT::Zabbix);
-  auto importStatus = ZbxHelper().loadITServices(allZbxSources[srcId.c_str()], cdata);
-  if (importStatus.first != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Importation failed: %1").arg(importStatus.second).toStdString());
+  auto outLoadItServices = ZbxHelper().loadITServices(allZbxSources[srcId.c_str()], cdata);
+  if (outLoadItServices.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Importation failed: %1").arg(outLoadItServices.second).toStdString());
     return ;
   }
 

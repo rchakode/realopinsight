@@ -67,7 +67,6 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   // export configuration environment variables
   qputenv("REALOPINSIGHT_ROOT_DIR", m_rootDir.toUtf8());
   qputenv("REALOPINSIGHT_CONFIG_DIR", m_configDir.toUtf8());
-  qDebug() <<  qgetenv("REALOPINSIGHT_CONFIG_DIR");
 
   m_breadcrumbsBar = createBreadCrumbsBarTpl();
   m_userAccountForm = createAccountPanel();
@@ -110,7 +109,7 @@ void WebMainUI::unbindWidgets(void)
   unbindExecutiveViewWidgets();
   unbindStackedWidgets();
 
-  m_adminStackedContents.removeWidget(&m_dataSourceSettingsForm);
+  m_adminStackedContents.removeWidget(&m_dataSourceSettings);
   m_adminStackedContents.removeWidget(&m_notificationSettingsForm);
   m_adminStackedContents.removeWidget(&m_authSettingsForm);
   m_adminStackedContents.removeWidget(&m_webEditor);
@@ -178,7 +177,7 @@ void WebMainUI::addEvents(void)
 {
   QObject::connect(&m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   QObject::connect(&m_biDashlet, SIGNAL(reportPeriodChanged(long,long)), this, SLOT(handleReportPeriodChanged(long, long)));
-  m_dataSourceSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
+  m_dataSourceSettings.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_databaseSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.authSystemChanged().connect(this, &WebMainUI::handleAuthSystemChanged);
@@ -412,7 +411,7 @@ void WebMainUI::handleRefresh(void)
   fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
   int currentView = 1;
   for (auto& dashboard : m_dashboardMap) {
-    dashboard->initSettings(& m_dataSourceSettingsForm);
+    dashboard->initSettings(& m_dataSourceSettings);
     dashboard->updateAllNodesStatus(m_dbSession);
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
@@ -539,8 +538,8 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
 void WebMainUI::handleDataSourceSettings(void)
 {
   m_adminPanelTitle.setText(Q_TR("Monitoring Sources"));
-  m_adminStackedContents.setCurrentWidget(&m_dataSourceSettingsForm);
-  m_dataSourceSettingsForm.updateContents();
+  m_adminStackedContents.setCurrentWidget(&m_dataSourceSettings);
+  m_dataSourceSettings.updateContents();
 }
 
 
@@ -646,37 +645,36 @@ void WebMainUI::setupUploadForm(void)
 WebDashboard* WebMainUI::loadView(const std::string& path)
 {
   if (path.empty()) {
-    showMessage(ngrt4n::OperationFailed, Q_TR("Empty path"));
+    showMessage(ngrt4n::OperationFailed, Q_TR("Cannot open empty path"));
     return nullptr;
   }
 
   WebDashboard* dashboardItem = nullptr;
   try {
-    //FIXME: check that the pointer is properly deleted
     dashboardItem = new WebDashboard(path.c_str());
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return nullptr;
     }
 
-    dashboardItem->initialize(& m_dataSourceSettingsForm);
-    if (dashboardItem->lastErrorState()) {
-      showMessage(ngrt4n::OperationFailed, dashboardItem->lastErrorMsg().toStdString());
+    auto outInitialization = dashboardItem->initialize(&m_dataSourceSettings);
+    if (outInitialization.first != ngrt4n::RcSuccess) {
+      showMessage(ngrt4n::OperationFailed, outInitialization.second.toStdString());
       delete dashboardItem;
       return nullptr;
     }
 
-    QString platformName = dashboardItem->rootNode().name;
-    DashboardMapT::Iterator result = m_dashboardMap.find(platformName);
+    QString viewName = dashboardItem->rootNode().name;
+    DashboardMapT::Iterator result = m_dashboardMap.find(viewName);
     if (result != m_dashboardMap.end()) {
-      showMessage(ngrt4n::OperationFailed, tr("A platfom with the same name is already loaded (%1)").arg(platformName).toStdString());
+      showMessage(ngrt4n::OperationFailed, tr("A platfom with the same name is already loaded (%1)").arg(viewName).toStdString());
       delete dashboardItem;
       return nullptr;
     }
 
-    m_dashboardMap.insert(platformName, dashboardItem);
+    m_dashboardMap.insert(viewName, dashboardItem);
     m_dashboardStackedContents.addWidget(dashboardItem);
-    m_selectViewBox->addItem(platformName.toStdString());
+    m_selectViewBox->addItem(viewName.toStdString());
 
     // the inner layout is explicitely removed when the object is destroyed
     if (m_eventFeedLayout) {
@@ -710,7 +708,7 @@ void WebMainUI::setupSettingsPage(void)
   switch (m_dbSession->loggedUser().role) {
     case DboUser::AdmRole: {
       m_settingsMainPageTpl.bindWidget("info-box", &m_infoBox);
-      m_dataSourceSettingsForm.setEnabledInputs(true);
+      m_dataSourceSettings.setEnabledInputs(true);
 
       // Start menu
       std::string menuText = QObject::tr("Welcome").toStdString();
@@ -802,7 +800,7 @@ void WebMainUI::setupSettingsPage(void)
   }
 
   // monitoring settings menu
-  m_adminStackedContents.addWidget(&m_dataSourceSettingsForm);
+  m_adminStackedContents.addWidget(&m_dataSourceSettings);
   link = new Wt::WAnchor("#", Q_TR("Monitoring Sources"));
   m_settingsMainPageTpl.bindWidget("menu-monitoring-settings", link);
   m_menuLinks.insert(MenuMonitoringSettings, link);
@@ -1236,7 +1234,7 @@ void WebMainUI::handleImportDescriptionFile(void)
   CoreDataT cdata;
   Parser parser(tmpFileName ,&cdata, Parser::ParsingModeEditor, m_settings.getGraphLayout());
   int rc = parser.parse();
-  if (rc != 0) {
+  if (rc != ngrt4n::RcSuccess) {
     std::string msg = Q_TR("Invalid description file");
     CORE_LOG("warn", msg);
     showMessage(ngrt4n::OperationFailed, msg);

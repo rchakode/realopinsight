@@ -58,19 +58,22 @@ Parser::~Parser()
 int Parser::process(void)
 {
   int rc = parse();
-  if (rc == 0) {
-    fixParentChildDependenciesAndBuildDotContent();
-    saveCoordinatesFile();
-    rc = computeCoordinates();
+  if (rc != ngrt4n::RcSuccess) {
+    return rc;
   }
-
-  return rc;
+  fixParentChildDependenciesAndBuildDotContent();
+  saveCoordinatesFile();
+  return computeCoordinates();
 }
 
 int Parser::parse(void)
 {
-  m_cdata->clear();
+  if (! m_cdata) {
+    m_lastErrorMsg = QObject::tr("Parser cdata is null");
+    return ngrt4n::RcGenericFailure;
+  }
 
+  m_cdata->clear();
   m_dotContent.clear();
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
@@ -80,19 +83,19 @@ int Parser::parse(void)
   if (! file.open(QIODevice::ReadOnly|QIODevice::Text)) {
     m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_descriptionFile);
     file.close();
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   if (!xmlDoc.setContent(&file)) {
     file.close();
     m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_descriptionFile);
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   file.close(); // The content of the file is already in memory
 
   xmlRoot = xmlDoc.documentElement();
-  m_cdata->monitor = xmlRoot.attribute("monitor").toInt();
+  m_cdata->monitor = static_cast<qint8>(xmlRoot.attribute("monitor").toInt());
   m_cdata->format_version = xmlRoot.attribute("compat").toDouble();
   QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
@@ -141,7 +144,7 @@ int Parser::parse(void)
     }
   }
 
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 
@@ -230,32 +233,32 @@ int Parser::computeCoordinates(void)
   process.waitForFinished(60000);
   if (exitCode != 0) {
     m_lastErrorMsg = QObject::tr("The graph engine exited on error (code: %1, file: %2").arg(QString::number(exitCode), m_dotFile);
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   QFile qfile(m_plainFile);
   if (! qfile.open(QFile::ReadOnly)) {
     m_lastErrorMsg = QObject::tr("Failed to open file: %1").arg(m_plainFile);
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   //start parsing
   QTextStream coodFileStream(& qfile);
   QString line;
-  if(line = coodFileStream.readLine(0), line.isNull()) {
+  if(static_cast<void>(line = coodFileStream.readLine(0)), line.isNull()) {
     m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(m_plainFile);
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   QRegExp regexSep("[ ]+");
   QStringList splitedLine = line.split (regexSep);
   if (splitedLine.size() != 4 || splitedLine[0] != "graph") {
     m_lastErrorMsg = QObject::tr("Invalid graphviz entry: %1").arg(line);
-    return -1;
+    return ngrt4n::RcGenericFailure;
   }
 
   const ScaleFactors SCALE_FACTORS(m_graphLayout);
-  m_cdata->graph_mode = m_graphLayout;
+  m_cdata->graph_mode = static_cast<qint8>(m_graphLayout);
   m_cdata->map_width = splitedLine[2].trimmed().toDouble() * SCALE_FACTORS.x();
   m_cdata->map_height = splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
   m_cdata->min_x = 0;
@@ -266,7 +269,7 @@ int Parser::computeCoordinates(void)
   int x_index = 2;
   int y_index = 3;
 
-  while (line = coodFileStream.readLine(0), ! line.isNull()) {
+  while (static_cast<void>(line = coodFileStream.readLine(0)), ! line.isNull()) {
     splitedLine = line.split (regexSep);
     if (splitedLine[0] == "node") {
       NodeListT::Iterator node;
@@ -304,7 +307,7 @@ int Parser::computeCoordinates(void)
   m_cdata->map_width += m_cdata->min_x;
   m_cdata->map_height += m_cdata->min_y;
 
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 
