@@ -191,7 +191,7 @@ namespace ngrt4n {
   enum ReturnCodeT {
     RcGenericFailure = -1,
     RcSuccess = 0,
-    RccRpcError = 1,
+    RcRpcError = 1,
     RcUnexpectedFailure = 2,
     RcParseError = 3,
     RcDbError = 10,
@@ -352,7 +352,6 @@ struct CoreDataT {
     cnodes.clear();
     bpnodes.clear();
     edges.clear();
-    monitor = MonitorT::Any;
   }
 };
 

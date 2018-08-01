@@ -94,17 +94,22 @@ void  WebEditor::handleOpenViewButton(void)
 
 void  WebEditor::handleOpenFile(const std::string& path, const std::string&)
 {
-  Parser parser(path.c_str(), &m_cdata, Parser::ParsingModeEditor, ngrt4n::DotLayout);
+  WebBaseSettings settings;
+  Parser parser(&m_cdata, Parser::ParsingModeEditor, &settings);
 
-  int rc = parser.process();
+  auto&& outParser = parser.parse(path.c_str());
+  if (outParser.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, outParser.second.toStdString());
+    return ;
+  }
 
-  if (rc != 0) {
+  int rc = parser.processRenderingData();
+  if (rc != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, parser.lastErrorMsg().toStdString());
     return ;
   }
 
   rebuiltTree();
-
   m_currentFilePath = path;
 }
 
@@ -719,7 +724,7 @@ void WebEditor::handleSaveViewButton(void)
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 
-  ngrt4n::fixParentChildrenDependencies(m_cdata);
+  ngrt4n::fixupParentChildrenDependencies(m_cdata);
 
   auto outRegisterView = registerViewWithPath(m_cdata, destPath.c_str());
   if (outRegisterView.first != ngrt4n::RcSuccess) {

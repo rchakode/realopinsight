@@ -131,14 +131,14 @@ qint32 BaseSettings::updateInterval(void) const
   return m_settingFactory->updateInterval();
 }
 
-bool BaseSettings::loadSource(qint32 _id, SourceT& _src)
+bool BaseSettings::loadSource(qint32 in_sourceIndex, SourceT& out_sinfo) const
 {
-  return m_settingFactory->loadSource(_id, _src);
+  return m_settingFactory->loadSource(in_sourceIndex, out_sinfo);
 }
 
-bool BaseSettings::loadSource(const QString& _id, SourceT& _src)
+bool BaseSettings::loadSource(const QString& in_sourceIndex, SourceT& out_sinfo) const
 {
-  return m_settingFactory->loadSource(_id, _src);
+  return m_settingFactory->loadSource(in_sourceIndex, out_sinfo);
 }
 
 

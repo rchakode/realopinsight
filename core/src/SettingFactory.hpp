@@ -79,9 +79,9 @@ public:
 
   void init(void);
 
-  void setKeyValue(const QString & _key, const QString & _value);
+  void setKeyValue(const QString & key, const QString & value);
 
-  QString keyValue(const QString & _key) {return QSettings::value(_key).toString();}
+  QString keyValue(const QString & key) {return QSettings::value(key).toString();}
 
   qint32 updateInterval() const;
 
@@ -89,13 +89,13 @@ public:
 
   QString entry(const QString& key) const {return QSettings::value(key).toString();}
 
-  bool loadSource(qint32 _idx, SourceT& _src);
+  bool loadSource(qint32 sourceIndex, SourceT& sinfo);
 
-  bool loadSource(const QString& _id, SourceT& _src);
+  bool loadSource(const QString& str_sourceId, SourceT& sinfo);
 
-  bool setSource(const QString& _info, SourceT& _src);
+  bool setSource(const QString& sourceData, SourceT& sinfo);
 
-  void emitTimerIntervalChanged(qint32 _interval) {Q_EMIT timerIntervalChanged(_interval);}
+  void emitTimerIntervalChanged(qint32 interval) {Q_EMIT timerIntervalChanged(interval);}
 
   static QString language(void);
 

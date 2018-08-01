@@ -81,7 +81,7 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_k8sProxyU
   rnode.description = "Namespace node";
 
   out_cdata.bpnodes.insert(rnode.id, rnode);
-  ngrt4n::fixParentChildrenDependencies(out_cdata);
+  ngrt4n::fixupParentChildrenDependencies(out_cdata);
 
   return std::make_pair("", ngrt4n::RcSuccess);
 }
@@ -363,14 +363,14 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(const QString& in_k8sProxy
 
   if (! reply) {
     auto&& errorMsg = QObject::tr("Unexpected NULL QNetworkReply");
-    return std::make_pair(QStringList{errorMsg}, ngrt4n::RccRpcError);
+    return std::make_pair(QStringList{errorMsg}, ngrt4n::RcRpcError);
   }
 
   reply->deleteLater();
 
   if (reply->error() != QNetworkReply::NoError) {
     auto&& errorMsg = QObject::tr("HTTP call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString());
-    return std::make_pair(QStringList{errorMsg}, ngrt4n::RccRpcError);
+    return std::make_pair(QStringList{errorMsg}, ngrt4n::RcRpcError);
   }
 
   return parseNamespaces(reply->readAll());
@@ -400,14 +400,14 @@ std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const QString& 
 
   if (! reply) {
     auto&& errorMsg = QByteArray("Unexpected NULL QNetworkReply");
-    return std::make_pair(errorMsg, ngrt4n::RccRpcError);
+    return std::make_pair(errorMsg, ngrt4n::RcRpcError);
   }
 
   reply->deleteLater();
 
   if (reply->error() != QNetworkReply::NoError) {
     auto&& errorMsg = QObject::tr("HTTP call to %1 ended with error: %2").arg(reply->url().toString(), reply->errorString()).toLatin1();
-    return std::make_pair(errorMsg, ngrt4n::RccRpcError);
+    return std::make_pair(errorMsg, ngrt4n::RcRpcError);
   }
 
   return std::make_pair(reply->readAll(), ngrt4n::RcSuccess);

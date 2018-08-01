@@ -63,11 +63,11 @@ Q_SIGNALS:
 
 public Q_SLOTS:
   qint32 updateInterval(void) const;
-  bool loadSource(qint32 _id, SourceT& _src);
-  bool loadSource(const QString& _id, SourceT& _src);
+  bool loadSource(qint32 in_sourceIndex, SourceT& out_sinfo) const;
+  bool loadSource(const QString& in_sourceIndex, SourceT& out_sinfo) const;
 
 protected :
-  virtual void fillFromSource(int _index) = 0;
+  virtual void fillFromSource(int sourceIndex) = 0;
   virtual void updateAllSourceWidgetStates(void) = 0;
   virtual void loadProperties(void);
   virtual void updateFields(void) = 0;

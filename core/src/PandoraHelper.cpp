@@ -140,7 +140,7 @@ PandoraHelper::openSession(const SourceT& srcInfo)
   if (checkCredentialsInfo(srcInfo.auth) != 0)
     return -1;
 
-  setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
+  setSslPeerVerification(srcInfo.verify_ssl_peer);
   QNetworkReply* response = postRequest(LoginTest, QStringList());
 
   if (! response)

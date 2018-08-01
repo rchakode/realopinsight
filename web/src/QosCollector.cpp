@@ -25,8 +25,8 @@
 #include "QosCollector.hpp"
 #include "ctime"
 
-QosCollector::QosCollector(const QString& descriptionFile)
-  : DashboardBase(descriptionFile)
+QosCollector::QosCollector(void)
+  : DashboardBase()
 {
 }
 

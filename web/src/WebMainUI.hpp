@@ -84,7 +84,6 @@ public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
   void showUserHome(void);
-  QString getConfig (void) const {return m_currentDashboard->config();}
   void enable(void) {m_mainWidget.enable();}
   void disbale(void) {m_mainWidget.disable();}
   void startTimer(void);
@@ -121,7 +120,7 @@ private:
 
 
   /** Private members **/
-  SettingFactory m_settings;
+  WebBaseSettings m_settings;
   Wt::WTimer m_globalTimer;
   Wt::WText m_infoBox;
   QMap<int,Wt::WAnchor*> m_menuLinks;

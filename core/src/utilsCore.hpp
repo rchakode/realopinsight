@@ -126,11 +126,11 @@ namespace ngrt4n
   inline QString sourceId(const qint32& idx)
   { return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));}
 
-  inline QString sourceKey(const qint32& idx)
-  { return QString("/Sources/%1").arg(sourceId(idx));}
+  inline QString sourceKey(const qint32& sourceIndex)
+  { return QString("/Sources/%1").arg(sourceId(sourceIndex));}
 
-  inline QString sourceKey(const QString& id)
-  { return QString("/Sources/%1").arg(id);}
+  inline QString sourceKey(const QString& sourceId)
+  { return QString("/Sources/%1").arg(sourceId);}
 
   inline QString realCheckId(const QString& srcid, const QString& chkid)
   { return QString("%1:%2").arg(srcid, chkid);}
@@ -178,7 +178,7 @@ namespace ngrt4n
 
   QString generateNodeXml(const NodeT & node);
 
-  void fixParentChildrenDependencies(CoreDataT& cdata);
+  void fixupParentChildrenDependencies(CoreDataT& cdata);
 
   void setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes);
 

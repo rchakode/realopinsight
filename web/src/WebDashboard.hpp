@@ -86,7 +86,7 @@ class WebDashboard : public DashboardBase, public Wt::WContainerWidget
   Q_OBJECT
 
 public:
-  WebDashboard(const QString& descriptionFile);
+  WebDashboard(void);
   virtual ~WebDashboard();
   void updateMap(void);
   WebMap* map(void) {return &m_map;}
@@ -95,7 +95,7 @@ public:
   Wt::WLabel* thumbnailTitleBar(void) {return &m_thumbnailTitleBar;}
   Wt::WLabel* thumbnailProblemDetailBar(void) {return &m_thumbnailProblemDetailsBar;}
   std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
-  virtual std::pair<int, QString> initialize(BaseSettings* p_settings);
+  virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& descriptionFile);
   std::string tooltip(void) {return m_chart.toStdString();}
   void triggerResizeComponents(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
   void handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* dbSession);

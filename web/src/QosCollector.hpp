@@ -32,7 +32,7 @@
 class QosCollector : public DashboardBase
 {
 public:
-  QosCollector(const QString& descriptionFile);
+  QosCollector(void);
   QosDataT qosInfo(void) const {return m_qosInfo;}
 
 protected:

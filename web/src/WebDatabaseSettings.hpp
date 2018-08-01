@@ -74,7 +74,6 @@ private:
   void unbindFormWidgets(void);
   void applySettings(void);
   void updateFieldEnabledState(void);
-  void handleLdapUseSslChanged(void);
 };
 
 #endif // WEBPOSTGRESQLSETTINGS_HPP

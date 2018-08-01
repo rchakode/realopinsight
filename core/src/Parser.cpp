@@ -25,21 +25,18 @@
 #include "Parser.hpp"
 #include "utilsCore.hpp"
 #include "ThresholdHelper.hpp"
+#include "K8sHelper.hpp"
 #include <QObject>
 #include <QtXml>
 #include <iostream>
-
-const QString Parser::m_dotHeader = "strict graph\n{\n node[shape=plaintext]\n";
-const QString Parser::m_dotFooter = "}";
+#include <cassert>
 
 
-Parser::Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout)
-  : m_descriptionFile(_descriptionFile),
-    m_cdata(_cdata),
+Parser::Parser(CoreDataT* _cdata, int _parsingMode, const BaseSettings* settings)
+  : m_cdata(_cdata),
     m_parsingMode(_parsingMode),
-    m_graphLayout(_graphLayout)
+    m_settings(settings)
 {
-
 }
 
 
@@ -55,41 +52,31 @@ Parser::~Parser()
   fileHandler.close();
 }
 
-int Parser::process(void)
+int Parser::processRenderingData(void)
 {
-  int rc = parse();
-  if (rc != ngrt4n::RcSuccess) {
-    return rc;
-  }
-  fixParentChildDependenciesAndBuildDotContent();
+  fixupVisilityAndDependenciesGraph();
   saveCoordinatesFile();
   return computeCoordinates();
 }
 
-int Parser::parse(void)
+std::pair<int, QString> Parser::parse(const QString& viewFile)
 {
   if (! m_cdata) {
-    m_lastErrorMsg = QObject::tr("Parser cdata is null");
-    return ngrt4n::RcGenericFailure;
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Parser cdata is null"));
   }
 
   m_cdata->clear();
-  m_dotContent.clear();
   QDomDocument xmlDoc;
   QDomElement xmlRoot;
-
-
-  QFile file(m_descriptionFile);
+  QFile file(viewFile);
   if (! file.open(QIODevice::ReadOnly|QIODevice::Text)) {
-    m_lastErrorMsg = QObject::tr("Unable to open the file %1").arg(m_descriptionFile);
     file.close();
-    return ngrt4n::RcGenericFailure;
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Unable to open the file %1").arg(viewFile));
   }
 
-  if (!xmlDoc.setContent(&file)) {
+  if (! xmlDoc.setContent(&file)) {
     file.close();
-    m_lastErrorMsg = QObject::tr("Error while parsing the file %1").arg(m_descriptionFile);
-    return ngrt4n::RcGenericFailure;
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Error while parsing the file %1").arg(viewFile));
   }
 
   file.close(); // The content of the file is already in memory
@@ -97,28 +84,33 @@ int Parser::parse(void)
   xmlRoot = xmlDoc.documentElement();
   m_cdata->monitor = static_cast<qint8>(xmlRoot.attribute("monitor").toInt());
   m_cdata->format_version = xmlRoot.attribute("compat").toDouble();
-  QDomNodeList services = xmlRoot.elementsByTagName("Service");
 
-  NodeT node;
-  qint32 serviceCount = services.length();
-  for (qint32 srv = 0; srv < serviceCount; ++srv) {
-    QDomElement service = services.item(srv).toElement();
+  QDomNodeList xmlNodes = xmlRoot.elementsByTagName("Service");
+
+  if (m_cdata->monitor == MonitorT::Kubernetes) {
+    return loadK8sNamespaceView(xmlNodes, *m_cdata);
+  }
+
+  qint32 xmlNodeCount = xmlNodes.size();
+  for (qint32 nodeIndex = 0; nodeIndex < xmlNodeCount; ++nodeIndex) {
+    QDomElement xmlNode = xmlNodes.item(nodeIndex).toElement();
+    NodeT node;
     node.parent.clear();
     node.monitored = false;
-    node.id = service.attribute("id").trimmed();
+    node.id = xmlNode.attribute("id").trimmed();
     node.sev = node.sev_prop = ngrt4n::Unknown;
-    node.sev_crule = service.attribute("statusCalcRule").toInt();
-    node.sev_prule = service.attribute("statusPropRule").toInt();
-    node.icon = service.firstChildElement("Icon").text().trimmed();
-    node.name = service.firstChildElement("Name").text().trimmed();
-    node.description = service.firstChildElement("Description").text().trimmed();
-    node.alarm_msg = service.firstChildElement("AlarmMsg").text().trimmed();
-    node.notification_msg = service.firstChildElement("NotificationMsg").text().trimmed();
-    node.child_nodes = service.firstChildElement("SubServices").text().trimmed();
-    node.weight = (m_cdata->format_version >= 3.1) ? service.attribute("weight").toDouble() : ngrt4n::WEIGHT_UNIT;
+    node.sev_crule = xmlNode.attribute("statusCalcRule").toInt();
+    node.sev_prule = xmlNode.attribute("statusPropRule").toInt();
+    node.icon = xmlNode.firstChildElement("Icon").text().trimmed();
+    node.name = xmlNode.firstChildElement("Name").text().trimmed();
+    node.description = xmlNode.firstChildElement("Description").text().trimmed();
+    node.alarm_msg = xmlNode.firstChildElement("AlarmMsg").text().trimmed();
+    node.notification_msg = xmlNode.firstChildElement("NotificationMsg").text().trimmed();
+    node.child_nodes = xmlNode.firstChildElement("SubServices").text().trimmed();
+    node.weight = (m_cdata->format_version >= 3.1) ? xmlNode.attribute("weight").toDouble() : ngrt4n::WEIGHT_UNIT;
 
     if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
-      QString thdata = service.firstChildElement("Thresholds").text().trimmed();
+      QString thdata = xmlNode.firstChildElement("Thresholds").text().trimmed();
       node.thresholdLimits = ThresholdHelper::dataToList(thdata);
       qSort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
     }
@@ -128,25 +120,48 @@ int Parser::parse(void)
       node.icon = ngrt4n::DEFAULT_ICON;
     }
 
-    node.type = service.attribute("type").toInt();
+    node.type = xmlNode.attribute("type").toInt();
     switch(node.type) {
       case NodeType::ITService:
         insertITServiceNode(node);
         break;
       case NodeType::BusinessService:
       case NodeType::ExternalService:
-        insertBusinessServiceNode(node);
-        break;
       default:
-        node.type = NodeType::BusinessService;
-        insertBusinessServiceNode(node);
+        m_cdata->bpnodes.insert(node.id, node);
         break;
     }
   }
 
-  return ngrt4n::RcSuccess;
+  return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
+
+std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, CoreDataT& out_cdata)
+{
+  if (in_xmlNodes.size() != 1) {
+    return std::make_pair(ngrt4n::RcParseError, QObject::tr("Unexpected number of nodes in Kubernetes service file: %1").arg(in_xmlNodes.size()));
+  }
+
+  QDomElement xmlNode = in_xmlNodes.item(0).toElement();
+  auto&& sourceId = xmlNode.attribute("id").trimmed();
+  auto&& ns = xmlNode.firstChildElement("Name").text().trimmed();
+
+  out_cdata.sources.insert(sourceId);
+
+  SourceT sinfo;
+  if (! m_settings->loadSource(sourceId, sinfo)) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Failed loading Kubernetes data source: %1").arg(sourceId));
+  }
+
+  auto outK8sLoadNsView = K8sHelper().loadNamespaceView(sinfo.mon_url, sinfo.verify_ssl_peer, ns, out_cdata);
+  if (outK8sLoadNsView.second != ngrt4n::RcSuccess) {
+    auto&& m_lastErrorMsg = ! outK8sLoadNsView.first.isEmpty()? outK8sLoadNsView.first.at(0) : QObject::tr("Got weird error when load view from Kubernetes");
+    return std::make_pair(outK8sLoadNsView.second, m_lastErrorMsg);
+  }
+
+  return std::make_pair(ngrt4n::RcSuccess, "");
+}
 
 QString Parser::escapeLabel(const QString& label)
 {
@@ -162,15 +177,14 @@ QString Parser::escapeId(const QString& id)
 
 
 
-void Parser::fixParentChildDependenciesAndBuildDotContent(void)
+void Parser::fixupVisilityAndDependenciesGraph(void)
 {
-  m_dotContent.append("\n");
+  m_dotContent = "\n";
 
-  for (const auto& bpnode:  m_cdata->bpnodes) {
+  for (auto&& bpnode:  m_cdata->bpnodes) {
+    bpnode.visibility = ngrt4n::Visible|ngrt4n::Expanded;
     auto graphParentId = escapeId(bpnode.id);
-
     m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(graphParentId, escapeLabel(bpnode.name)));
-
     if (bpnode.type == NodeType::ExternalService) {
       continue;
     }
@@ -187,17 +201,17 @@ void Parser::fixParentChildDependenciesAndBuildDotContent(void)
           qDebug() << QObject::tr("Failed to find parent-child dependency'%1' => %2").arg(bpnode.id, childId);
         }
       }
-
     }
   }
 
   // Set IT service nodes' labels
-  for (const auto& cnode: m_cdata->cnodes) {
-    auto graphId = escapeId(cnode.id);
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(graphId, escapeLabel(cnode.name)));
+  for (auto&& cnode: m_cdata->cnodes) {
+    cnode.visibility = ngrt4n::Visible;
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(escapeId(cnode.id), escapeLabel(cnode.name)));
   }
 
 }
+
 
 void Parser::saveCoordinatesFile(void)
 {
@@ -205,12 +219,14 @@ void Parser::saveCoordinatesFile(void)
   m_plainFile = m_dotFile % ".plain";
   QFile file(m_dotFile);
   if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
-    m_lastErrorMsg = QObject::tr("Unable into write the file %1").arg(m_dotFile);
+    m_lastErrorMsg = QObject::tr("Unable into write file %1").arg(m_dotFile);
     file.close();
     exit(1);
   }
   QTextStream fstream(&file);
-  fstream << m_dotHeader << m_dotContent << m_dotFooter;
+  fstream << "strict graph\n{\n node[shape=plaintext]\n"
+          << m_dotContent
+          << "}";
   file.close();
 }
 
@@ -220,7 +236,7 @@ int Parser::computeCoordinates(void)
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << m_plainFile << m_dotFile;
 
   int exitCode = -2;
-  switch (m_graphLayout) {
+  switch (m_settings->getGraphLayout()) {
     case ngrt4n::DotLayout:
       exitCode = process.execute("dot", arguments);
       break;
@@ -257,8 +273,8 @@ int Parser::computeCoordinates(void)
     return ngrt4n::RcGenericFailure;
   }
 
-  const ScaleFactors SCALE_FACTORS(m_graphLayout);
-  m_cdata->graph_mode = static_cast<qint8>(m_graphLayout);
+  const ScaleFactors SCALE_FACTORS(m_settings->getGraphLayout());
+  m_cdata->graph_mode = static_cast<qint8>(m_settings->getGraphLayout());
   m_cdata->map_width = splitedLine[2].trimmed().toDouble() * SCALE_FACTORS.x();
   m_cdata->map_height = splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
   m_cdata->min_x = 0;
@@ -294,7 +310,7 @@ int Parser::computeCoordinates(void)
 
   qfile.close();
 
-  if (m_graphLayout == ngrt4n::NeatoLayout) {
+  if (m_settings->getGraphLayout() == ngrt4n::NeatoLayout) {
     m_cdata->min_x -= (max_text_w * 0.6);
     m_cdata->min_y -= (max_text_h * 0.6);
   }
@@ -313,7 +329,6 @@ int Parser::computeCoordinates(void)
 
 void Parser::insertITServiceNode(NodeT& node)
 {
-  node.visibility = ngrt4n::Visible;
   StringPairT dataPointInfo = ngrt4n::splitDataPointInfo(node.child_nodes);
   m_cdata->hosts[dataPointInfo.first] << dataPointInfo.second;
 
@@ -326,13 +341,6 @@ void Parser::insertITServiceNode(NodeT& node)
   }
   m_cdata->sources.insert(srcid);
   m_cdata->cnodes.insert(node.id, node);
-}
-
-
-void Parser::insertBusinessServiceNode(NodeT& node)
-{
-  node.visibility = ngrt4n::Visible|ngrt4n::Expanded;
-  m_cdata->bpnodes.insert(node.id, node);
 }
 
 

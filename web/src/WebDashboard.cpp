@@ -41,8 +41,8 @@
 
 
 
-WebDashboard::WebDashboard(const QString& descriptionFile)
-  : DashboardBase(descriptionFile)
+WebDashboard::WebDashboard(void)
+  : DashboardBase()
 {
   m_tree.setCdata(&m_cdata);
   m_map.setCoreData(&m_cdata);
@@ -55,9 +55,9 @@ WebDashboard::~WebDashboard()
   unbindWidgets();
 }
 
-std::pair<int, QString> WebDashboard::initialize(BaseSettings* p_settings)
+std::pair<int, QString> WebDashboard::initialize(BaseSettings* p_settings, const QString& viewFile)
 {
-  auto outInitilization = DashboardBase::initialize(p_settings);
+  auto outInitilization = DashboardBase::initialize(p_settings, viewFile);
   if (outInitilization.first != ngrt4n::RcSuccess) {
     CORE_LOG("error", outInitilization.second.toStdString());
   } else {

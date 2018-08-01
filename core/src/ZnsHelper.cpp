@@ -181,8 +181,8 @@ ZnsHelper::openSession(const SourceT& srcInfo)
   params.addQueryItem("__ac_password", authInfo[1]);
   params.addQueryItem("submitted", "true");
   params.addQueryItem("came_from", getApiContextEndpoint());
-  setSslPeerVerification(srcInfo.verify_ssl_peer != 0);
-  QNetworkReply* response = NULL;
+  setSslPeerVerification(srcInfo.verify_ssl_peer);
+  QNetworkReply* response = nullptr;
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
   response = postRequest(ZnsHelper::Login, params.encodedQuery());
 #else

@@ -119,9 +119,9 @@ int SettingFactory::getGraphLayout(void) const
   return entry(SettingFactory::GLOBAL_GRAPH_LAYOUT).toInt();
 }
 
-void SettingFactory::setKeyValue(const QString & _key, const QString & _value)
+void SettingFactory::setKeyValue(const QString & key, const QString & value)
 {
-  setValue(_key, _value.trimmed()) ;
+  setValue(key, value.trimmed()) ;
   sync() ;
 }
 
@@ -137,31 +137,31 @@ void SettingFactory::setEntry(const QString& key, const QString& value)
   QSettings::setValue(key, value);
 }
 
-bool SettingFactory::loadSource(qint32 _idx, SourceT& _src)
+bool SettingFactory::loadSource(qint32 in_sourceIndex, SourceT& out_sinfo)
 {
-  return setSource(QSettings::value(ngrt4n::sourceKey(_idx)).toString(), _src);
+  return setSource(QSettings::value(ngrt4n::sourceKey(in_sourceIndex)).toString(), out_sinfo);
 }
 
-bool SettingFactory::loadSource(const QString& _id, SourceT& _src)
+bool SettingFactory::loadSource(const QString& in_sourceId, SourceT& out_sinfo)
 {
-  return setSource(QSettings::value(ngrt4n::sourceKey(_id)).toString(), _src);
+  return setSource(QSettings::value(ngrt4n::sourceKey(in_sourceId)).toString(), out_sinfo);
 }
 
 
-bool SettingFactory::setSource(const QString& _info, SourceT& _src)
+bool SettingFactory::setSource(const QString& sourceData, SourceT& sinfo)
 {
-  if (_info.isEmpty()) {
+  if (sourceData.isEmpty()) {
     return false;
   }
 
-  JsonHelper jsHelper(_info);
-  _src.id = jsHelper.getProperty("sid").toString();
-  _src.mon_type = static_cast<qint8>(jsHelper.getProperty("mon_type").toInt32());
-  _src.mon_url = jsHelper.getProperty("mon_url").toString();
-  _src.auth = jsHelper.getProperty("auth").toString();
-  _src.ls_addr = jsHelper.getProperty("ls_addr").toString();
-  _src.ls_port = jsHelper.getProperty("ls_port").toInt32();
-  _src.verify_ssl_peer = static_cast<qint8>(jsHelper.getProperty("verify_ssl_peer").toInt32());
+  JsonHelper jsHelper(sourceData);
+  sinfo.id = jsHelper.getProperty("sid").toString();
+  sinfo.mon_type = static_cast<qint8>(jsHelper.getProperty("mon_type").toInt32());
+  sinfo.mon_url = jsHelper.getProperty("mon_url").toString();
+  sinfo.auth = jsHelper.getProperty("auth").toString();
+  sinfo.ls_addr = jsHelper.getProperty("ls_addr").toString();
+  sinfo.ls_port = jsHelper.getProperty("ls_port").toInt32();
+  sinfo.verify_ssl_peer = static_cast<qint8>(jsHelper.getProperty("verify_ssl_peer").toInt32());
 
   return true;
 }

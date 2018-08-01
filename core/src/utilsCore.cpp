@@ -440,6 +440,10 @@ std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& src
 
 std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const QString& path)
 {
+  if (! ngrt4n::MonitorSourceTypes.contains(MonitorT::toString(cdata.monitor))) {
+    const_cast<CoreDataT&>(cdata).monitor = MonitorT::Any;
+  }
+
   QFile file(path);
   if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot open file: %1").arg(path));
@@ -447,16 +451,17 @@ std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const
 
 
   QTextStream outStream(&file);
-  outStream << "<?xml version=\"1.0\"?>\n"
-            << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(cdata.monitor) );
+  outStream << "<?xml version=\"1.0\"?>\n";
 
-  Q_FOREACH(const NodeT& service, cdata.bpnodes) {
-    outStream << generateNodeXml(service);
+  outStream << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(cdata.monitor) );
+
+  for (auto&& bpnode: cdata.bpnodes) {
+    outStream << generateNodeXml(bpnode);
   }
 
-  Q_FOREACH(const NodeT& service, cdata.cnodes) {
-    if (! service.parent.isEmpty()) {
-      outStream << generateNodeXml(service);
+  for (auto&& cnode: cdata.cnodes) {
+    if (! cnode.parent.isEmpty()) {
+      outStream << generateNodeXml(cnode);
     }
   }
 
@@ -497,7 +502,7 @@ QString ngrt4n::generateNodeXml(const NodeT& node)
 }
 
 
-void ngrt4n::fixParentChildrenDependencies(CoreDataT& cdata)
+void ngrt4n::fixupParentChildrenDependencies(CoreDataT& cdata)
 {
   // First clear all existing children for bpnodes
   for (auto& node: cdata.bpnodes) {

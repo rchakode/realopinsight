@@ -30,6 +30,7 @@
 #include "PandoraHelper.hpp"
 #include "OpManagerHelper.hpp"
 #include "StatusAggregator.hpp"
+#include "K8sHelper.hpp"
 #include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <sstream>
@@ -73,9 +74,8 @@ StringMapT DashboardBase::calcRules() {
   return map;
 }
 
-DashboardBase::DashboardBase(const QString& descriptionFile)
-  : m_descriptionFile(ngrt4n::getAbsolutePath(descriptionFile)),
-    m_timerId(-1),
+DashboardBase::DashboardBase(void)
+  : m_timerId(-1),
     m_updateCounter(0),
     m_showOnlyTroubles(false)
 {
@@ -86,21 +86,31 @@ DashboardBase::~DashboardBase()
 {
 }
 
-std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings)
+std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, const QString& viewFile)
 {
-  if (m_descriptionFile.isEmpty()) {
+  if (! p_settings) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Not initialized settings"));
+  }
+
+  if (viewFile.isEmpty()) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Empty description file"));
   }
 
-  Parser parser(m_descriptionFile, &m_cdata, Parser::ParsingModeDashboard, p_settings->getGraphLayout());
-  int rc = parser.process();
+  Parser parser(&m_cdata, Parser::ParsingModeDashboard, p_settings);
+  auto&& outParsing = parser.parse(viewFile);
+  if (outParsing.first != ngrt4n::RcSuccess) {
+    return std::make_pair(outParsing.first, outParsing.second);
+  }
+
+  initSettings(p_settings);
+
+  int rc = parser.processRenderingData();
   if (rc != ngrt4n::RcSuccess) {
-    return std::make_pair(ngrt4n::RcGenericFailure, parser.lastErrorMsg());
+    return std::make_pair(rc, parser.lastErrorMsg());
   }
 
   buildTree();
   buildMap();
-  initSettings(p_settings);
 
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
@@ -111,7 +121,7 @@ void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
   resetStatData();
 
   if (m_cdata.monitor == MonitorT::Any) {
-    for (SourceListT::Iterator src = m_sources.begin(), end = m_sources.end(); src!=end; ++src) { runMonitor(*src);}
+    for (auto&& src: m_sources) { runMonitor(src);}
   } else {
     SourceListT::Iterator src = m_sources.find(0);
     if (src != m_sources.end()) {
@@ -137,7 +147,7 @@ void DashboardBase::runMonitor(SourceT& src)
 void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
 {
   //FIXME: avoid iteration for Pandora FMS => all modules are fetched once
-  Q_FOREACH (const QString& hitem, m_cdata.hosts.keys()) {
+  for (auto&& hitem: m_cdata.hosts.keys()) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
     if (info.first == srcInfo.id) {
       ChecksT checks;
@@ -376,7 +386,6 @@ void DashboardBase::initSettings(BaseSettings* p_settings)
     QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
     if (srcinfo.first) {
       if (p_settings->isSetSource(srcinfo.second)) {
-        
         if (p_settings->loadSource(*id, src)) {
           checkStandaloneSourceType(src);
           m_sources.insert(srcinfo.second, src);

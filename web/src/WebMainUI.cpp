@@ -459,7 +459,7 @@ void WebMainUI::handleLaunchEditor(void)
 
 
 
-void WebMainUI::handlePreviewFile(const std::string& path, const std::string& option)
+void WebMainUI::handlePreviewFile(const std::string& path, const std::string&)
 {
   WebDashboard* dashbord = loadView(path); // FIXME expect viewpath not name
   if (dashbord) {
@@ -651,13 +651,13 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
 
   WebDashboard* dashboardItem = nullptr;
   try {
-    dashboardItem = new WebDashboard(path.c_str());
+    dashboardItem = new WebDashboard();
     if (! dashboardItem) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return nullptr;
     }
 
-    auto outInitialization = dashboardItem->initialize(&m_dataSourceSettings);
+    auto outInitialization = dashboardItem->initialize(&m_dataSourceSettings, path.c_str());
     if (outInitialization.first != ngrt4n::RcSuccess) {
       showMessage(ngrt4n::OperationFailed, outInitialization.second.toStdString());
       delete dashboardItem;
@@ -1224,7 +1224,7 @@ void WebMainUI::handleImportDescriptionFile(void)
   bool success = createDirectory(m_configDir.toStdString(), false); // false means don't clean the directory
 
   if (! success) {
-    showMessage(ngrt4n::OperationFailed, Q_TR("Can't create configuration directory"));
+    showMessage(ngrt4n::OperationFailed, Q_TR("Cannot create configuration directory"));
     return ;
   }
 
@@ -1232,12 +1232,10 @@ void WebMainUI::handleImportDescriptionFile(void)
   CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
 
   CoreDataT cdata;
-  Parser parser(tmpFileName ,&cdata, Parser::ParsingModeEditor, m_settings.getGraphLayout());
-  int rc = parser.parse();
-  if (rc != ngrt4n::RcSuccess) {
-    std::string msg = Q_TR("Invalid description file");
-    CORE_LOG("warn", msg);
-    showMessage(ngrt4n::OperationFailed, msg);
+  Parser parser(&cdata, Parser::ParsingModeEditor, &m_settings);
+  auto&& outParser = parser.parse(tmpFileName);
+  if (outParser.first != ngrt4n::RcSuccess) {
+    showMessage(ngrt4n::OperationFailed, outParser.second.toStdString());
     return ;
   }
 

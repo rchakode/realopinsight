@@ -27,6 +27,8 @@
 
 #include "Base.hpp"
 #include "utilsCore.hpp"
+#include "BaseSettings.hpp"
+#include <QDomNodeList>
 
 
 class Parser : public QObject
@@ -38,10 +40,10 @@ class Parser : public QObject
     static const int ParsingModeExternalService = 2;
 
   public:
-    Parser(const QString& _descriptionFile, CoreDataT* _cdata, int _parsingMode, int _graphLayout);
+    Parser(CoreDataT* _cdata, int _parsingMode, const BaseSettings* settings);
     virtual ~Parser();
-    int process(void);
-    int parse(void);
+    int processRenderingData(void);
+    std::pair<int, QString> parse(const QString& viewFile);
     int computeCoordinates(void);
     QString dotContent(void) const {return m_dotContent;}
     QString dotFile(void) const { return m_dotFile; }
@@ -51,21 +53,18 @@ class Parser : public QObject
 
 
   private:
-    static const QString m_dotHeader;
-    static const QString m_dotFooter;
     QString m_dotContent;
     QString m_dotFile;
     QString m_plainFile;
-    QString m_descriptionFile;
     CoreDataT* m_cdata;
     QString m_lastErrorMsg;
     int m_parsingMode;
-    int m_graphLayout;
+    const BaseSettings* m_settings;
 
-    void fixParentChildDependenciesAndBuildDotContent(void);
+    void fixupVisilityAndDependenciesGraph(void);
     void saveCoordinatesFile(void);
     void insertITServiceNode(NodeT& node);
-    void insertBusinessServiceNode(NodeT& node);
+    std::pair<int, QString> loadK8sNamespaceView(QDomNodeList& in_xmlNodes, CoreDataT& out_cdata);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

@@ -208,7 +208,7 @@ ZbxHelper::openSession(void)
   }
 
   params.push_back(QString::number(GetLogin));
-  setSslPeerVerification(m_sourceInfo.verify_ssl_peer != 0);
+  setSslPeerVerification(m_sourceInfo.verify_ssl_peer);
 
   if (postRequest(GetLogin, params) != ngrt4n::RcSuccess) {
     return ngrt4n::RcGenericFailure;

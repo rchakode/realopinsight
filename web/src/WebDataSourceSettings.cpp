@@ -185,7 +185,7 @@ void WebDataSourceSettings::applyChanges(void)
 
       NodeT nsNode;
       nsNode.type = NodeType::K8sClusterService;
-      nsNode.id = QString::number(sourceIndex);
+      nsNode.id = QString("Source%1").arg(sourceIndex);
       nsNode.name = ns;
       nsNode.child_nodes = "";
       nsNode.sev_prule = PropRules::Unchanged;
@@ -205,7 +205,7 @@ void WebDataSourceSettings::applyChanges(void)
         CORE_LOG("error", outSaveView.second.toStdString());
       } else {
         DboView vinfo;
-        vinfo.name = QString("Source%1:%2").arg(nsNode.id, nsNode.name).toStdString();
+        vinfo.name = QString("%1:%2").arg(nsNode.id, nsNode.name).toStdString();
         vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
         vinfo.path = destPath.toStdString();
         if (dbSession.addView(vinfo) != ngrt4n::RcSuccess) {

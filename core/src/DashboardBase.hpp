@@ -41,14 +41,13 @@ class DashboardBase : public QObject
   Q_OBJECT
 
 public:
-  DashboardBase(const QString& descriptionFile);
+  DashboardBase(void);
   virtual ~DashboardBase();
 
   static StringMapT propRules();
   static StringMapT calcRules();
   void initSettings(BaseSettings* p_settings);
   qint64 updateCounter(void) const {return m_updateCounter;}
-  QString config(void) const {return m_descriptionFile;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString selectedNode(void) const {return m_selectedNode;}
   void setTimerId(qint32 id) {m_timerId = id;}
@@ -65,7 +64,7 @@ public Q_SLOTS:
   void prepareUpdate(const SourceT& src);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   void checkStandaloneSourceType(SourceT& src);
-  virtual std::pair<int, QString> initialize(BaseSettings* p_settings);
+  virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
   qint32 userRole(void) const {return m_userRole;}
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
   void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
@@ -96,7 +95,6 @@ protected:
   virtual void updateEventFeeds(const NodeT& node) = 0;
 
 protected:
-  QString m_descriptionFile;
   CoreDataT m_cdata;
   qint32 m_timerId;
   qint64 m_updateCounter;
