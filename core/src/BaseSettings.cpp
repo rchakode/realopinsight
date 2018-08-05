@@ -162,8 +162,3 @@ bool BaseSettings::getSourceState(int index)
   return m_sourceStates.at(index);
 }
 
-
-void BaseSettings::emitTimerIntervalChanged(qint32 _interval)
-{
-  m_settingFactory->emitTimerIntervalChanged(_interval);
-}

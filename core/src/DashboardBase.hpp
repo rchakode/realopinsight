@@ -61,7 +61,6 @@ public Q_SLOTS:
   void runMonitor(SourceT& src);
   void runDataSourceUpdate(const SourceT& srcInfo);
   void resetStatData(void);
-  void prepareUpdate(const SourceT& src);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   void checkStandaloneSourceType(SourceT& src);
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
@@ -73,12 +72,11 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   void sortEventConsole(void);
-  void updateStatusBar(const QString& msg);
+  void updateMessageChanged(const std::string& msg);
   void settingsLoaded(void);
   void updateSourceUrl(void);
   void timerIntervalChanged(qint32 interval);
   void dashboardLinkSelected(void);
-  void updateInprogress(void);
   void updateFinished(void);
 
 protected:
@@ -113,6 +111,9 @@ protected:
   QStringList getAuthInfo(int srcId);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
+
+private:
+  void signalUpdateProcessing(const SourceT& src);
 };
 
 #endif /* SVNAVIGATOR_HPP */

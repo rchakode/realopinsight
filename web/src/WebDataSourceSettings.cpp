@@ -314,7 +314,7 @@ void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& sou
   sync();
 
   // emit signal a finilize
-  emitTimerIntervalChanged(1000 * QString(m_updateIntervalField.text().toUTF8().c_str()).toInt());
+  Q_EMIT timerIntervalChanged(1000 * QString(m_updateIntervalField.text().toUTF8().c_str()).toInt());
   addToSourceBox(index);
   m_sourceSelectionBox.setCurrentIndex(findSourceIndexInBox(index));
   m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));

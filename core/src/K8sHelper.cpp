@@ -62,7 +62,6 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_k8sProxyU
     return resultParsePods;
   }
 
-
   // append service nodes
   for(auto&& snode: serviceBpnodes) {
     out_cdata.bpnodes.insert(snode.id, snode);
@@ -74,21 +73,23 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_k8sProxyU
   rnode.parent = "";
   rnode.name = in_namespace;
   rnode.type = NodeType::BusinessService;
+  rnode.sev = ngrt4n::Unknown;
   rnode.sev_prule = PropRules::Unchanged;
   rnode.sev_crule = CalcRules::Worst;
   rnode.weight = ngrt4n::WEIGHT_UNIT;
   rnode.icon = ngrt4n::K8S_NS;
   rnode.description = "Namespace node";
-
   out_cdata.bpnodes.insert(rnode.id, rnode);
-  ngrt4n::fixupParentChildrenDependencies(out_cdata);
 
+  ngrt4n::fixupDependencies(out_cdata);
+
+  out_cdata.hosts.insert(in_namespace, QStringList{in_namespace});
+  out_cdata.monitor = MonitorT::Kubernetes;
   return std::make_pair("", ngrt4n::RcSuccess);
 }
 
 std::pair<QStringList, int> K8sHelper::parseNamespaces(const QByteArray& data)
 {
-
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(data, &parserError);
   if (parserError.error != QJsonParseError::NoError) {
@@ -125,6 +126,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
   for (auto item: items) {
     NodeT serviceNode;
     serviceNode.type = NodeType::BusinessService;
+    serviceNode.sev = ngrt4n::Unknown;
     serviceNode.sev_prule = PropRules::Unchanged;
     serviceNode.sev_crule = CalcRules::Average;
     serviceNode.weight = ngrt4n::WEIGHT_UNIT;
@@ -183,6 +185,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
   for (auto item: items) {
     NodeT podNode;
     podNode.type = NodeType::BusinessService;
+    podNode.sev = ngrt4n::Unknown;
     podNode.sev_prule = PropRules::Unchanged;
     podNode.sev_crule = CalcRules::Average; // pods induce a notion of high availability
     podNode.weight = ngrt4n::WEIGHT_UNIT;
@@ -225,6 +228,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
       NodeT containerNode;
       containerNode.parent =  podNode.id ;
       containerNode.type = NodeType::ITService;
+      containerNode.sev = ngrt4n::Unknown;
       containerNode.sev_prule = PropRules::Unchanged;
       containerNode.sev_crule = CalcRules::Worst; // all items composing a pod are typically required to have the pod operational
       containerNode.weight = ngrt4n::WEIGHT_UNIT;

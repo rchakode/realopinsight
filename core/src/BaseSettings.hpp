@@ -56,10 +56,12 @@ public:
   QMap<QString, SourceT> fetchSourceList(int type);
   int getGraphLayout(void) const;
 
+
 Q_SIGNALS:
   void urlChanged(QString);
   void sourcesChanged (QList<qint8>);
   void errorOccurred(QString msg);
+  void timerIntervalChanged(qint32);
 
 public Q_SLOTS:
   qint32 updateInterval(void) const;
@@ -86,7 +88,6 @@ protected Q_SLOTS:
   virtual void handleCancel(void) = 0;
   virtual void addAsSource(void) = 0;
   virtual void deleteSource(void) = 0;
-  void emitTimerIntervalChanged(qint32 _interval);
 
 protected:
   SettingFactory* m_settingFactory;

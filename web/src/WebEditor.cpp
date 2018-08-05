@@ -724,7 +724,7 @@ void WebEditor::handleSaveViewButton(void)
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 
-  ngrt4n::fixupParentChildrenDependencies(m_cdata);
+  ngrt4n::fixupDependencies(m_cdata);
 
   auto outRegisterView = registerViewWithPath(m_cdata, destPath.c_str());
   if (outRegisterView.first != ngrt4n::RcSuccess) {
@@ -859,8 +859,8 @@ void WebEditor::handleDataPointSourceChanged(int index)
   }
 
   ChecksT checks;
-  auto importResult = ngrt4n::importMonitorItemAsDataPoints(srcInfo, "", checks);
-  if (importResult.first != 0) {
+  auto importResult = ngrt4n::loadDataPoints(srcInfo, "", checks);
+  if (importResult.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return;
   }

@@ -95,15 +95,10 @@ public:
 
   bool setSource(const QString& sourceData, SourceT& sinfo);
 
-  void emitTimerIntervalChanged(qint32 interval) {Q_EMIT timerIntervalChanged(interval);}
-
   static QString language(void);
 
   int getGraphLayout(void) const;
 
-
-Q_SIGNALS:
-  void timerIntervalChanged(qint32);
 };
 
 

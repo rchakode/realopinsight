@@ -172,13 +172,13 @@ namespace ngrt4n
 
   std::pair<int, QString> importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata);
 
-  std::pair<int, QString> importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks);
+  std::pair<int, QString> loadDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks);
 
   std::pair<int, QString> saveViewDataToPath(const CoreDataT& cdata, const QString& path);
 
   QString generateNodeXml(const NodeT & node);
 
-  void fixupParentChildrenDependencies(CoreDataT& cdata);
+  void fixupDependencies(CoreDataT& cdata);
 
   void setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes);
 

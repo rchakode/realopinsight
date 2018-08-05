@@ -68,7 +68,7 @@ void WebMsgConsole::setModelHeaders(void)
   m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Date & Hour"), Wt::DisplayRole);
   m_model->setHeaderData(1, Wt::Horizontal, Q_TR("Severity"), Wt::DisplayRole);
   m_model->setHeaderData(2, Wt::Horizontal, Q_TR("Host"), Wt::DisplayRole);
-  m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Service"), Wt::DisplayRole);
+  m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Component"), Wt::DisplayRole);
   m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Message"), Wt::DisplayRole);
   m_model->setHeaderData(ID_COLUMN, Wt::Horizontal, Q_TR("Service ID"), Wt::UserRole);
   hideColumn(ID_COLUMN);
@@ -77,10 +77,10 @@ void WebMsgConsole::setModelHeaders(void)
 void  WebMsgConsole::layoutSizeChanged(int width, int)
 {
   Wt::WLength em = Wt::WLength(1, Wt::WLength::FontEx);
-  setColumnWidth(0, 20 * em);
+  setColumnWidth(0, 25 * em);
   setColumnWidth(1, 10 * em);
-  setColumnWidth(2, 20 * em);
-  setColumnWidth(3, 90); /*size of the header image*/
+  setColumnWidth(2, 25 * em);
+  setColumnWidth(3, 25 * em);
   setColumnWidth(4, width - (55 * em.toPixels() + 90)); /*size of the header image*/
 }
 

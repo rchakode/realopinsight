@@ -29,6 +29,7 @@
 #include "PandoraHelper.hpp"
 #include "OpManagerHelper.hpp"
 #include "ThresholdHelper.hpp"
+#include "K8sHelper.hpp"
 
 #include <QFileInfo>
 
@@ -348,8 +349,8 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
   const auto MONITOR_NAME = MonitorT::toString(srcInfo.mon_type);
 
   ChecksT checks;
-  auto importOut = importMonitorItemAsDataPoints(srcInfo, filter, checks);
-  if (importOut.first != 0) {
+  auto importOut = loadDataPoints(srcInfo, filter, checks);
+  if (importOut.first != ngrt4n::RcSuccess) {
     return std::make_pair(-1, QObject::tr("%1: %2").arg(MONITOR_NAME, importOut.second));
   }
 
@@ -406,7 +407,7 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
 }
 
 
-std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
+std::pair<int, QString> ngrt4n::loadDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
 {
   // Nagios
   if (srcInfo.mon_type == MonitorT::Nagios) {
@@ -466,7 +467,13 @@ std::pair<int, QString> ngrt4n::importMonitorItemAsDataPoints(const SourceT& src
     return std::make_pair(retcode, handler.lastError());
   }
 
-  return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Unknown data source type"));
+  // Kubernetes
+  if (srcInfo.mon_type == MonitorT::Kubernetes) {
+    K8sHelper k8s;
+    return std::make_pair(ngrt4n::RcGenericFailure, "TODO import k8s data points");
+  }
+
+  return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot load data points for unknown data source: %1").arg(srcInfo.mon_type));
 }
 
 
@@ -534,7 +541,7 @@ QString ngrt4n::generateNodeXml(const NodeT& node)
 }
 
 
-void ngrt4n::fixupParentChildrenDependencies(CoreDataT& cdata)
+void ngrt4n::fixupDependencies(CoreDataT& cdata)
 {
   // First clear all existing children for bpnodes
   for (auto& node: cdata.bpnodes) {

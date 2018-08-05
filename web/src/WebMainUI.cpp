@@ -432,20 +432,19 @@ void WebMainUI::handleRefresh(void)
     }
     ++currentView;
   }
+
   // Display notifications only on operator console
   if (! m_dbSession->isLoggedAdmin()) {
-    for(auto severityEntry: problemTypeCount) {
+    for (auto severityEntry: problemTypeCount) {
       m_notificationBoxes[severityEntry.first]->setText(QString::number(severityEntry.second).toStdString());
       m_notificationBoxes[severityEntry.first]->setHidden(severityEntry.second <= 0);
     }
     updateEventFeeds();
-  } // notification section
+  }
 
   startTimer();
 
-  logMsg = QObject::tr("console update completed (operator: %1, session: %2)")
-           .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
-  CORE_LOG("info", logMsg.toStdString());
+  CORE_LOG("info", QObject::tr("console update completed (operator: %1, session: %2)").arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str()).toStdString());
 }
 
 
@@ -461,9 +460,10 @@ void WebMainUI::handleLaunchEditor(void)
 
 void WebMainUI::handlePreviewFile(const std::string& path, const std::string&)
 {
-  WebDashboard* dashbord = loadView(path); // FIXME expect viewpath not name
-  if (dashbord) {
-    setDashboardAsFrontStackedWidget(dashbord);
+  WebDashboard* dashboard = loadView(path);
+  if (dashboard) {
+    QObject::connect(dashboard, SIGNAL(updateMessageChanged(std::string)), this, SLOT(showProgressMessage(std::string)));
+    setDashboardAsFrontStackedWidget(dashboard);
   }
 }
 
@@ -649,36 +649,36 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     return nullptr;
   }
 
-  WebDashboard* dashboardItem = nullptr;
+  WebDashboard* dashboard = nullptr;
   try {
-    dashboardItem = new WebDashboard();
-    if (! dashboardItem) {
+    dashboard = new WebDashboard();
+    if (! dashboard) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return nullptr;
     }
 
-    auto outInitialization = dashboardItem->initialize(&m_dataSourceSettings, path.c_str());
-    if (outInitialization.first != ngrt4n::RcSuccess) {
-      showMessage(ngrt4n::OperationFailed, outInitialization.second.toStdString());
-      delete dashboardItem;
+    auto outInitDashboard = dashboard->initialize(&m_dataSourceSettings, path.c_str());
+    if (outInitDashboard.first != ngrt4n::RcSuccess) {
+      showMessage(ngrt4n::OperationFailed, outInitDashboard.second.toStdString());
+      delete dashboard;
       return nullptr;
     }
 
-    QString viewName = dashboardItem->rootNode().name;
+    QString viewName = dashboard->rootNode().name;
     DashboardMapT::Iterator result = m_dashboardMap.find(viewName);
     if (result != m_dashboardMap.end()) {
       showMessage(ngrt4n::OperationFailed, tr("A platfom with the same name is already loaded (%1)").arg(viewName).toStdString());
-      delete dashboardItem;
+      delete dashboard;
       return nullptr;
     }
 
-    m_dashboardMap.insert(viewName, dashboardItem);
-    m_dashboardStackedContents.addWidget(dashboardItem);
+    m_dashboardMap.insert(viewName, dashboard);
+    m_dashboardStackedContents.addWidget(dashboard);
     m_selectViewBox->addItem(viewName.toStdString());
 
     // the inner layout is explicitely removed when the object is destroyed
     if (m_eventFeedLayout) {
-      m_eventFeedLayout->addItem(dashboardItem->eventFeedLayout());
+      m_eventFeedLayout->addItem(dashboard->eventFeedLayout());
     }
 
   } catch (const std::bad_alloc&) {
@@ -687,8 +687,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     showMessage(ngrt4n::OperationFailed, errorMsg);
     return nullptr;
   }
-
-  return dashboardItem;
+  return dashboard;
 }
 
 void WebMainUI::scaleMap(double factor)
@@ -917,6 +916,7 @@ void WebMainUI::showMessage(int status, const std::string& msg)
       logLevel = "error";
       break;
     default:
+      qDebug() << "hide" << status;
       m_infoBox.hide();
       hidden = true;
       break;

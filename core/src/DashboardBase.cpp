@@ -117,16 +117,16 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
 
 void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
 {
-  Q_EMIT updateInprogress();
   resetStatData();
 
-  if (m_cdata.monitor == MonitorT::Any) {
-    for (auto&& src: m_sources) { runMonitor(src);}
-  } else {
-    SourceListT::Iterator src = m_sources.find(0);
-    if (src != m_sources.end()) {
-      runMonitor(*src);
-    }
+  switch (m_cdata.monitor) {
+    case MonitorT::Kubernetes:
+    case MonitorT::Any:
+      for (auto&& src: m_sources) { runMonitor(src);}
+      break;
+    default:
+      if (! m_sources.isEmpty()) {  runMonitor(*m_sources.begin()); }
+      break;
   }
   computeBpNodeStatus(ngrt4n::ROOT_ID, dbSession);
 
@@ -139,25 +139,36 @@ void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
 
 void DashboardBase::runMonitor(SourceT& src)
 {
-  prepareUpdate(src);
+  signalUpdateProcessing(src);
   runDataSourceUpdate(src);
   finalizeUpdate(src);
+}
+
+void DashboardBase::signalUpdateProcessing(const SourceT& src)
+{
+  QString monitorName = MonitorT::toString(src.mon_type);
+  if (src.mon_type == MonitorT::Nagios) {
+    Q_EMIT updateMessageChanged(QObject::tr("quering %1/%2 => %3:%4...").arg(monitorName, src.id, src.ls_addr, QString::number(src.ls_port)).toStdString());
+  } else {
+    Q_EMIT updateMessageChanged(QObject::tr("querying %1/%2 => %3)...").arg(monitorName, src.id, src.mon_url).toStdString());
+  }
 }
 
 void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
 {
   //FIXME: avoid iteration for Pandora FMS => all modules are fetched once
-  for (auto&& hitem: m_cdata.hosts.keys()) {
+  for (const auto& hitem: m_cdata.hosts.keys()) {
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
-    if (info.first == srcInfo.id) {
-      ChecksT checks;
-      auto importResult = ngrt4n::importMonitorItemAsDataPoints(srcInfo, info.second, checks);
-      if (importResult.first == 0) {
-        updateCNodesWithChecks(checks, srcInfo);
-      } else {
-        updateDashboardOnError(srcInfo, importResult.second);
-        break;
-      }
+    if (info.first != srcInfo.id) {
+      continue;
+    }
+    ChecksT checks;
+    auto importResult = ngrt4n::loadDataPoints(srcInfo, info.second, checks);
+    if (importResult.first != ngrt4n::RcSuccess) {
+      updateDashboardOnError(srcInfo, importResult.second);
+    } else {
+      updateCNodesWithChecks(checks, srcInfo);
+      break;
     }
   }
 }
@@ -172,27 +183,6 @@ void DashboardBase::resetStatData(void)
   m_cdata.check_status_count[ngrt4n::Unknown] = m_cdata.cnodes.size();
 }
 
-
-void DashboardBase::prepareUpdate(const SourceT& src)
-{
-  QString msg = QObject::tr("updating %1 (%2)...");
-  switch(src.mon_type) {
-    case MonitorT::Nagios:
-      msg = msg.arg(src.id, QString("tcp://%1:%2").arg(src.ls_addr, QString::number(src.ls_port)));
-      break;
-    case MonitorT::Zabbix:
-    case MonitorT::Zenoss:
-    case MonitorT::Pandora:
-    case MonitorT::OpManager:
-    case MonitorT::Kubernetes:
-      msg = msg.arg(src.id, src.mon_url);
-      break;
-    default:
-      msg = msg.arg(src.id, "undefined source type");
-      break;
-  }
-  Q_EMIT updateStatusBar(msg);
-}
 
 void DashboardBase::updateDashboard(const NodeT& _node)
 {
@@ -364,14 +354,12 @@ QStringList DashboardBase::getAuthInfo(int srcId)
 void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
   if (! msg.isEmpty()) {
-    Q_EMIT updateStatusBar(msg);
+    Q_EMIT updateMessageChanged(msg.toStdString());
   }
 
   for (NodeListIteratorT cnode = m_cdata.cnodes.begin(); cnode != m_cdata.cnodes.end(); ++cnode) {
-
     StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
     if (info.first != src.id) continue;
-    
     ngrt4n::setCheckOnError(-1, msg, cnode->check);
     updateNodeStatusInfo(*cnode, src);
     cnode->monitored = true;
