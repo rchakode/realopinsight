@@ -184,6 +184,7 @@ void DashboardBase::prepareUpdate(const SourceT& src)
     case MonitorT::Zenoss:
     case MonitorT::Pandora:
     case MonitorT::OpManager:
+    case MonitorT::Kubernetes:
       msg = msg.arg(src.id, src.mon_url);
       break;
     default:

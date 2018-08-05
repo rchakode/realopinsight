@@ -233,18 +233,20 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
       auto&& containerStatusData = containerStatus.toObject();
       auto&& containerName = containerStatusData["name"].toString();
       auto&& containerId = containerStatusData["containerID"].toString();
+      auto&& ready = containerStatusData["ready"].toBool();
       auto&& restartCount = containerStatusData["restartCount"].toInt();
-      auto&& stateData = parseStateData(containerStatusData["state"].toObject());
 
       containerNode.id = ngrt4n::md5IdFromString(QString("%1/%2").arg(podFqdn, containerId));
       containerNode.name = containerName;
-      containerNode.description = QString("containerID: %1, restartCount: %2").arg(containerId, restartCount);
+      containerNode.description = QString("Ready -> %1, restartCount -> %2").arg(ready ? "true" : "false").arg(restartCount);
       containerNode.child_nodes = QString("%1/%2").arg(podFqdn, containerName); //FIXME: is it a good as assumption ?
       containerNode.check.id = containerNode.child_nodes.toStdString();
       containerNode.check.host = containerNode.name.toStdString();
       containerNode.check.host_groups = podName.toStdString();
 
+      auto&& stateData = parseStateData(containerStatusData["state"].toObject());
       containerNode.check.status = stateData.first;
+      containerNode.check.alarm_msg = (containerNode.check.status == ngrt4n::K8sPending) ? QObject::tr("Pod waiting to be scheduled").toStdString() : "";
       containerNode.check.last_state_change = ngrt4n::convertToTimet(
                                                 (stateData.second.isEmpty()? podCreationTime : stateData.second),
                                                 "yyyy-MM-ddThh:mm:ssZ");
@@ -275,23 +277,23 @@ std::pair<int, QString> K8sHelper::parseStateData(const QJsonObject& state)
   QString&& runningKey = "running";
   if (stateKeys.contains(runningKey)) {
     auto && stateTimestamp = state[runningKey].toObject()["startedAt"].toString();
-    return std::make_pair(ngrt4n::Normal, stateTimestamp);
+    return std::make_pair(ngrt4n::K8sRunning, stateTimestamp);
   }
 
   QString&& terminatedKey  = "terminated";
   if (stateKeys.contains(terminatedKey)) {
     auto&& stateTerminated = state[terminatedKey].toObject();
     auto&& stateTimestamp = stateTerminated["finishedAt"].toString();
-    int severity = ngrt4n::Normal;
+    int stateCode = ngrt4n::K8sTerminatedNormal;
     if (stateTerminated["exitCode"].toInt() != 0) {
-      severity = ngrt4n::Critical;
+      stateCode = ngrt4n::K8sTerminatedError;
     }
-    return std::make_pair(severity, stateTimestamp);
+    return std::make_pair(stateCode, stateTimestamp);
   }
 
   // default state is "waiting"
   // See Kubernetes documentation: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core
-  return std::make_pair(ngrt4n::Unknown, "");
+  return std::make_pair(ngrt4n::K8sPending, "");
 }
 
 

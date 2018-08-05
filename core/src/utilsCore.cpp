@@ -56,7 +56,10 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
       default:
         break;
     }
-  } else if (monitorType == MonitorT::Zabbix) {
+    return static_cast<ngrt4n::SeverityT>(criticity);
+  }
+
+  if (monitorType == MonitorT::Zabbix) {
     switch(statusValue) {
       case ngrt4n::ZabbixClear:
         criticity = ngrt4n::Normal;
@@ -75,7 +78,10 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
       default:
         break;
     }
-  } else if (monitorType == MonitorT::Zenoss){
+    return static_cast<ngrt4n::SeverityT>(criticity);
+  }
+
+  if (monitorType == MonitorT::Zenoss){
     switch(statusValue) {
       case ngrt4n::ZenossClear:
         criticity = ngrt4n::Normal;
@@ -93,7 +99,10 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
       default:
         break;
     }
-  } else if (monitorType == MonitorT::Pandora) {
+    return static_cast<ngrt4n::SeverityT>(criticity);
+  }
+
+  if (monitorType == MonitorT::Pandora) {
     switch(statusValue) {
       case ngrt4n::PandoraNormal:
         criticity = ngrt4n::Normal;
@@ -109,7 +118,11 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
         criticity = ngrt4n::Unknown;
         break;
     }
-  } else  if (monitorType == MonitorT::OpManager) {
+
+    return static_cast<ngrt4n::SeverityT>(criticity);
+  }
+
+  if (monitorType == MonitorT::OpManager) {
     switch(statusValue) {
       case ngrt4n::OpManagerClear:
         criticity = ngrt4n::Normal;
@@ -128,8 +141,27 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
         criticity = ngrt4n::Unknown;
         break;
     }
+    return static_cast<ngrt4n::SeverityT>(criticity);
   }
-  return static_cast<ngrt4n::SeverityT>(criticity);
+
+  if (monitorType == MonitorT::Kubernetes) {
+    switch(statusValue) {
+      case ngrt4n::K8sRunning:
+      case ngrt4n::K8sTerminatedNormal:
+        criticity = ngrt4n::Normal;
+        break;
+      case ngrt4n::K8sTerminatedError:
+        criticity = ngrt4n::Critical;
+        break;
+      case ngrt4n::K8sPending:
+      default:
+        criticity = ngrt4n::Unknown;
+        break;
+    }
+    return static_cast<ngrt4n::SeverityT>(criticity);
+  }
+
+  return ngrt4n::Unknown;
 }
 
 

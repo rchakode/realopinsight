@@ -163,6 +163,13 @@ namespace ngrt4n {
     OpManagerClear     = 5
   };
 
+  enum K8sSeverityT {
+    K8sPending  = 1,
+    K8sRunning  = 2,
+    K8sTerminatedNormal = 3,
+    K8sTerminatedError   = 4
+  };
+
   enum {
     AdmUserRole = 100,
     OpUserRole  = 101
