@@ -191,7 +191,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
 Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
-  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), tr("%1 event on %2").arg(Severity(node.sev).toString(),                                                                                 node.child_nodes).toStdString());
+  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), node.child_nodes.toStdString());
 
   std::string viewName = rootNode().name.toStdString();
 

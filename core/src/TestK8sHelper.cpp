@@ -46,7 +46,7 @@ void TestK8sHelper::test_parseNamespaces(void)
 
     QVERIFY(nsesDataFile.open(QIODevice::ReadOnly));
 
-    K8sHelper k8s;
+    K8sHelper k8s(m_PROXY_URL, false);
     auto&& out = k8s.parseNamespaces(nsesDataFile.readAll());
     QCOMPARE(out.second, static_cast<int>(ngrt4n::RcSuccess));
     QCOMPARE(out.first.size(), 8);
@@ -58,7 +58,7 @@ void TestK8sHelper::test_parseNamespacedServices(void)
 
     QVERIFY(servicesDataFile.open(QIODevice::ReadOnly));
 
-    K8sHelper k8s;
+    K8sHelper  k8s(m_PROXY_URL, false);
     NodeListT bpnodes;
     QMap<QString, QMap<QString, QString>> serviceSelectorInfos;
     auto&& out = k8s.parseNamespacedServices(servicesDataFile.readAll(), "project1", serviceSelectorInfos, bpnodes);
@@ -88,7 +88,7 @@ void TestK8sHelper::test_parseNamespacedPods(void)
 
     QVERIFY(servicesDataFile.open(QIODevice::ReadOnly));
 
-    K8sHelper k8s;
+    K8sHelper k8s(m_PROXY_URL, false);
     NodeListT serviceBpnodes;
     QMap<QString, QMap<QString, QString>> serviceSelectorInfos;
     auto&& outServices = k8s.parseNamespacedServices(servicesDataFile.readAll(), "project1", serviceSelectorInfos, serviceBpnodes);
@@ -109,15 +109,15 @@ void TestK8sHelper::test_parseNamespacedPods(void)
 
 void TestK8sHelper::test_httpDataRetrieving(void)
 {
-    K8sHelper k8s;
+    K8sHelper  k8s(m_PROXY_URL, false);
     SourceT sinfo;
-    auto&& outNs = k8s.listNamespaces(m_PROXY_URL, true);
+    auto&& outNs = k8s.listNamespaces();
     qDebug() << outNs.first;
     QCOMPARE(outNs.second, static_cast<int>(ngrt4n::RcSuccess));
     QCOMPARE(outNs.first.size() > 0, true);
     for (auto&& ns: outNs.first) {
         CoreDataT cdata;
-        auto nsViewOut = k8s.loadNamespaceView(m_PROXY_URL, true, ns, cdata);
+        auto nsViewOut = k8s.loadNamespaceView(ns, cdata);
         QVERIFY(nsViewOut.second == static_cast<int>(ngrt4n::RcSuccess));
         ngrt4n::saveViewDataToPath(cdata, "/tmp/roi_"+ns+".xml");
     }

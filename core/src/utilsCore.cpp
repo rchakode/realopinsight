@@ -148,10 +148,10 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
   if (monitorType == MonitorT::Kubernetes) {
     switch(statusValue) {
       case ngrt4n::K8sRunning:
-      case ngrt4n::K8sTerminatedNormal:
+      case ngrt4n::K8sSucceeded:
         criticity = ngrt4n::Normal;
         break;
-      case ngrt4n::K8sTerminatedError:
+      case ngrt4n::K8sFailed:
         criticity = ngrt4n::Critical;
         break;
       case ngrt4n::K8sPending:
@@ -385,9 +385,9 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
     triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
     triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
 
-    NodeListIteratorT hostIterPos =  cdata.bpnodes.find(hostNode.id);
-    if (hostIterPos != cdata.bpnodes.end()) {
-      hostIterPos->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
+    NodeListT::Iterator hostNodeIter =  cdata.bpnodes.find(hostNode.id);
+    if (hostNodeIter != cdata.bpnodes.end()) {
+      hostNodeIter->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
     } else {
       hostNode.child_nodes = triggerNode.id;
       if (rootService.child_nodes.isEmpty()) {
@@ -469,7 +469,7 @@ std::pair<int, QString> ngrt4n::loadDataPoints(const SourceT& srcInfo, const QSt
 
   // Kubernetes
   if (srcInfo.mon_type == MonitorT::Kubernetes) {
-    K8sHelper k8s;
+    K8sHelper k8s(srcInfo.mon_url, srcInfo.verify_ssl_peer);
     return std::make_pair(ngrt4n::RcGenericFailure, "TODO import k8s data points");
   }
 

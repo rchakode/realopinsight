@@ -270,7 +270,7 @@ void WebMap:: updateThumbnail(void)
 
 void WebMap::expandCollapse(const QString& nodeId)
 {
-  NodeListIteratorT node;
+  NodeListT::Iterator node;
   if (ngrt4n::findNode(m_cdata, nodeId, node)) {
     qint8 childMask = 0x0;
     if (node->visibility & ngrt4n::Expanded) {
@@ -290,7 +290,7 @@ void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
 {
   if (node.type != NodeType::ITService && ! node.child_nodes.isEmpty()) {
     for (const auto & childId: node.child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
-      NodeListIteratorT child;
+      NodeListT::Iterator child;
       if(ngrt4n::findNode(m_cdata, childId, child)) {
         if (node.visibility & ngrt4n::Expanded) {
           child->visibility |= mask;

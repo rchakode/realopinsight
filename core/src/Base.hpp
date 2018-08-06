@@ -163,11 +163,20 @@ namespace ngrt4n {
     OpManagerClear     = 5
   };
 
-  enum K8sSeverityT {
+  enum K8sSummaryStatusT {
     K8sPending  = 1,
     K8sRunning  = 2,
-    K8sTerminatedNormal = 3,
-    K8sTerminatedError   = 4
+    K8sSucceeded = 3,
+    K8sFailed = 4
+  };
+
+  enum K8sPodPhaseStatusT {
+    K8sPodPhaseUndefined  = 0,
+    K8sPodPhasePending  = 1,
+    K8sPodPhaseRunning  = 2,
+    K8sPodPhaseSucceeded = 3,
+    K8sPodPhaseFailed = 4,
+    K8sPodPhaseCrashLoopBackoff = 5
   };
 
   enum {
@@ -336,7 +345,6 @@ struct NodeT {
 };
 
 typedef QHash<QString, NodeT> NodeListT;
-typedef NodeListT::Iterator NodeListIteratorT;
 typedef QMap<qint32, qint32> CheckStatusCountT;
 typedef QHash<QString, QStringList> HostListT;
 
@@ -355,7 +363,8 @@ struct CoreDataT {
   double map_height;
   double map_width;
 
-  void clear(void) {
+  void clear(void)
+  {
     cnodes.clear();
     bpnodes.clear();
     edges.clear();

@@ -46,7 +46,7 @@ public:
         + m_statsData[ngrt4n::Critical]
         + m_statsData[ngrt4n::Unknown];}
   std::string problemsDetailsText(void) {
-    return QObject::tr("%1/%2 IT problems")
+    return QObject::tr("%1/%2 failures")
         .arg(QString::number(problemCount()))
         .arg(QString::number(m_dataCount)).toStdString();}
   void updateStatsData(const CheckStatusCountT& statsData, int count);

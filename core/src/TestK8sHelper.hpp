@@ -25,6 +25,7 @@
 #ifndef TESTK8SHELPER_H
 #define TESTK8SHELPER_H
 
+#include "Base.hpp"
 #include <QObject>
 
 class TestK8sHelper : public QObject

@@ -154,7 +154,7 @@ std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, 
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Failed loading Kubernetes data source: %1").arg(sourceId));
   }
 
-  auto outK8sLoadNsView = K8sHelper().loadNamespaceView(sinfo.mon_url, sinfo.verify_ssl_peer, ns, out_cdata);
+  auto outK8sLoadNsView = K8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer).loadNamespaceView(ns, out_cdata);
   if (outK8sLoadNsView.second != ngrt4n::RcSuccess) {
     auto&& m_lastErrorMsg = ! outK8sLoadNsView.first.isEmpty()? outK8sLoadNsView.first.at(0) : QObject::tr("Got weird error when load view from Kubernetes");
     return std::make_pair(outK8sLoadNsView.second, m_lastErrorMsg);
@@ -192,7 +192,7 @@ void Parser::fixupVisilityAndDependenciesGraph(void)
     if (! bpnode.child_nodes.isEmpty()) {
       QStringList children = bpnode.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
       for(const auto& childId: children) {
-        NodeListIteratorT childIt;
+        NodeListT::Iterator childIt;
         if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childIt)) {
           childIt->parent = bpnode.id;
           auto graphChildId = escapeId(childIt->id);

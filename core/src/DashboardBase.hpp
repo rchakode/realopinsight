@@ -59,7 +59,8 @@ public:
 public Q_SLOTS:
   void updateAllNodesStatus(DbSession* dbSession);
   void runMonitor(SourceT& src);
-  void runDataSourceUpdate(const SourceT& srcInfo);
+  void runGenericDataSourceUpdate(const SourceT& srcInfo);
+  void runK8sDataSourceUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   void checkStandaloneSourceType(SourceT& src);

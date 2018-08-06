@@ -173,10 +173,10 @@ void WebDataSourceSettings::applyChanges(void)
   bool sourceCheckedSuccessfully = false;
   QString validationErrorMsg = "";
   if (selectedMonitor == MonitorT::toString(MonitorT::Kubernetes)) {
-    K8sHelper k8s;
     auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
     auto&& verifySslPeer = m_dontVerifyCertificateField.checkState() == Wt::Checked;
-    auto outListNamespaces = k8s.listNamespaces(k8sProxyUrl, verifySslPeer);
+    K8sHelper k8s(k8sProxyUrl, verifySslPeer);
+    auto outListNamespaces = k8s.listNamespaces();
     sourceCheckedSuccessfully = outListNamespaces.second == ngrt4n::RcSuccess;
 
     WebBaseSettings settings;

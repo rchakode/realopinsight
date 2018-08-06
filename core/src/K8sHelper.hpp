@@ -36,11 +36,11 @@ class K8sHelper : public QNetworkAccessManager
   Q_OBJECT
 
 public:
-  K8sHelper(void);
-  std::pair<QString, int> loadNamespaceView(const QString& in_k8sProxyUrl, bool in_verifySslPeer, const QString& in_namespace, CoreDataT& out_cdata);
-  std::pair<QStringList, int> listNamespaces(const QString& in_k8sProxyUrl, bool in_verifySslPeer);
-  std::pair<QByteArray, int> requestNamespacedItemsData(const QString& in_k8sProxyUrl, bool in_verifySslPeer, const QString& k8sNamespace, const QString& itemType);
-  std::pair<int, QString> parseStateData(const QJsonObject& state);
+  K8sHelper(const QString& apiUrl, bool verifySslPeer);
+  std::pair<QString, int> loadNamespaceView(const QString& in_namespace, CoreDataT& out_cdata);
+  std::pair<QStringList, int> listNamespaces();
+  std::pair<QByteArray, int> requestNamespacedItemsData(const QString& in_namespace, const QString& in_itemType);
+  std::tuple<int,  std::string, std::string> extractStateInfo(const QJsonObject& state);
   std::pair<QStringList, int> parseNamespaces(const QByteArray& data);
 
   std::pair<QString, int> parseNamespacedServices(const QByteArray& in_data,
@@ -59,9 +59,12 @@ public Q_SLOTS:
   void exitEventLoop(const QNetworkReply::NetworkError& code) { m_eventLoop.exit(code);}
 
 private:
+  QString m_apiUrl;
+  bool m_verifySslPeer;
   QEventLoop m_eventLoop;
   void setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption);
   std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos, const QMap<QString, QVariant>& podLabels);
+  int convertToPodPhaseStatusEnum(const QString& podPhaseStatusText);
 };
 
 #endif // K8SHELPER_H

@@ -219,7 +219,7 @@ QString NodeT::toString(void) const
                                ).arg(name,
                                      Severity(sev).toString(),
                                      PropRules(sev_prule).toString(),
-                                     (weight == ngrt4n::WEIGHT_MAX)? QObject::tr("Essential") : QString::number(weight),
+                                     (qAbs(weight - ngrt4n::WEIGHT_MAX) <= 1e-3)? QObject::tr("Essential") : QString::number(weight),
                                      CalcRules(sev_crule).toString(),
                                      description.isEmpty()? "-" : const_cast<QString&>(description).replace("\n", " "),
                                      toThresholdsString());
@@ -228,12 +228,10 @@ QString NodeT::toString(void) const
     result.append(QObject::tr("\nHost: %1"
                               "\nGroups: %2"
                               "\nData Point: %3"
-                              "\nRaw Output: %4"
-                              "\nOther Details: %5").arg(QString::fromStdString(check.host).replace("\n", " "),
+                              "\nMessage: %4").arg(QString::fromStdString(check.host).replace("\n", " "),
                                                          (check.host_groups.empty())? "-" : QString::fromStdString(check.host_groups),
                                                          child_nodes.isEmpty()? "-" : child_nodes,
-                                                         QString::fromStdString(check.alarm_msg),
-                                                         actual_msg));
+                                                         QString::fromStdString(check.alarm_msg)));
   } else {
     result.append(QObject::tr("\nAlarm Message: %1").arg(actual_msg));
   }

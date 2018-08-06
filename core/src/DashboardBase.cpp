@@ -118,29 +118,26 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
 void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
 {
   resetStatData();
-
-  switch (m_cdata.monitor) {
-    case MonitorT::Kubernetes:
-    case MonitorT::Any:
-      for (auto&& src: m_sources) { runMonitor(src);}
-      break;
-    default:
-      if (! m_sources.isEmpty()) {  runMonitor(*m_sources.begin()); }
-      break;
-  }
+  for (auto&& src: m_sources) { runMonitor(src);}
   computeBpNodeStatus(ngrt4n::ROOT_ID, dbSession);
-
   updateChart();
-
   ++m_updateCounter;
-
   Q_EMIT updateFinished();
 }
 
 void DashboardBase::runMonitor(SourceT& src)
 {
   signalUpdateProcessing(src);
-  runDataSourceUpdate(src);
+
+  switch (src.mon_type) {
+    case MonitorT::Kubernetes:
+      runK8sDataSourceUpdate(src);
+      break;
+    default:
+      runGenericDataSourceUpdate(src);
+      break;
+  }
+
   finalizeUpdate(src);
 }
 
@@ -154,10 +151,33 @@ void DashboardBase::signalUpdateProcessing(const SourceT& src)
   }
 }
 
-void DashboardBase::runDataSourceUpdate(const SourceT& srcInfo)
+void DashboardBase::runK8sDataSourceUpdate(const SourceT& srcInfo)
 {
-  //FIXME: avoid iteration for Pandora FMS => all modules are fetched once
-  for (const auto& hitem: m_cdata.hosts.keys()) {
+  auto k8sNs = rootNode().name;
+  K8sHelper k8s(srcInfo.mon_url, srcInfo.verify_ssl_peer);
+  CoreDataT upcdata;
+  auto&& outLoadNsView = k8s.loadNamespaceView(k8sNs, upcdata);
+  if (outLoadNsView.second != ngrt4n::RcSuccess) {
+    updateDashboardOnError(srcInfo, outLoadNsView.first);
+  } else {
+    for (const auto& upcnode: upcdata.cnodes) {
+      auto cnode = m_cdata.cnodes.find(upcnode.id);
+      if (cnode != m_cdata.cnodes.end()) {
+        cnode->check = upcnode.check;
+        updateNodeStatusInfo(*cnode, srcInfo);
+        updateDashboard(*cnode);
+        cnode->monitored = true;
+      } else {
+        qDebug() << "Seems like pod changed:" << upcnode.name << upcnode.child_nodes;
+      }
+    }
+  }
+}
+
+
+void DashboardBase::runGenericDataSourceUpdate(const SourceT& srcInfo)
+{
+  for (const auto& hitem: m_cdata.hosts.keys()) { //FIXME: avoid iteration for Pandora FMS => all modules are fetched once
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
     if (info.first != srcInfo.id) {
       continue;
@@ -357,13 +377,13 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
     Q_EMIT updateMessageChanged(msg.toStdString());
   }
 
-  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(); cnode != m_cdata.cnodes.end(); ++cnode) {
-    StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode->child_nodes);
+  for (auto& cnode: m_cdata.cnodes) {
+    StringPairT info = ngrt4n::splitSourceDataPointInfo(cnode.child_nodes);
     if (info.first != src.id) continue;
-    ngrt4n::setCheckOnError(-1, msg, cnode->check);
-    updateNodeStatusInfo(*cnode, src);
-    cnode->monitored = true;
-    updateDashboard(*cnode);
+    ngrt4n::setCheckOnError(-1, msg, cnode.check);
+    updateNodeStatusInfo(cnode, src);
+    cnode.monitored = true;
+    updateDashboard(cnode);
   }
 }
 
@@ -416,16 +436,16 @@ void DashboardBase::computeFirstSrcIndex(void)
 
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
-  for (NodeListIteratorT cnode = m_cdata.cnodes.begin(), end = m_cdata.cnodes.end(); cnode != end; ++cnode) {
+  for (auto& cnode: m_cdata.cnodes) {
     QString srcPrefix = QString("%1:").arg(src.id);
-    if (! cnode->monitored && cnode->child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
+    if (! cnode.monitored && cnode.child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
       ngrt4n::setCheckOnError(ngrt4n::Unset,
-                              tr("Undefined service (%1)").arg(cnode->child_nodes),
-                              cnode->check);
-      updateNodeStatusInfo(*cnode, src);
-      updateDashboard(*cnode);
+                              tr("Undefined service (%1)").arg(cnode.child_nodes),
+                              cnode.check);
+      updateNodeStatusInfo(cnode, src);
+      updateDashboard(cnode);
     }
-    cnode->monitored = false;
+    cnode.monitored = false;
   }
 }
 
