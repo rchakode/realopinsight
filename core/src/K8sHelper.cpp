@@ -274,6 +274,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     if (k8sNamespace != in_matchNamespace) {
       continue;
     }
+    k8sNamespaces.insert(k8sNamespace);
 
     // check whether pod selectors match any service
     auto&& podLabels =  metaData["labels"].toObject().toVariantMap();
@@ -281,27 +282,23 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     if (! serviceMatch.second) {
       continue;
     }
-
-
-    // start processing pod matching a service selector
-    k8sNamespaces.insert(k8sNamespace);
     auto&& serviceFqdn = QString("%1.%2").arg(serviceMatch.first, k8sNamespace);
+
     auto&& podName = metaData["name"].toString();
     auto&& podUid = metaData["uid"].toString();
     auto&& podCreationTime = metaData["creationTimestamp"].toString();
     auto&& podFqdn = QString("%1.%2").arg(podName, k8sNamespace);
-
     podNode.name = podName;
     podNode.id = ngrt4n::md5IdFromString(podFqdn);
     podNode.description = QString("uid -> %1, creationTimestamp -> %2").arg(std::move(podUid), std::move(podCreationTime));
     podNode.parent = ngrt4n::md5IdFromString(serviceFqdn); // shall match what is set for node in method parseNamespacedServices
 
-    // add pod node as business process service
-
+    // add pod node
     auto&& podStatusData = podData["status"].toObject();
     auto&& podPhaseStatus = podStatusData["phase"].toString();
 
     switch (convertToPodPhaseStatusEnum(podPhaseStatus)) {
+      // handle Failed and CrashLoopBackoff pods as IT services
       case ngrt4n::K8sPodPhaseFailed:
       case ngrt4n::K8sPodPhaseCrashLoopBackoff:
         podNode.type = NodeType::ITService;
@@ -315,7 +312,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
         out_cnodes.insert(podNode.id, podNode);
         continue;
         break;
-
+        // handle Pending, Running and Succeeded pods as business process nodes
       case ngrt4n::K8sPodPhasePending:
       case ngrt4n::K8sPodPhaseRunning:
       case ngrt4n::K8sPodPhaseSucceeded:
