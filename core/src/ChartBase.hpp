@@ -38,21 +38,29 @@ public:
   ChartBase();
   void updateStatsRatio(void);
   std::string defaultTooltipText(void);
-  double statusRatio(int status) const { return m_severityRatio[status]; }
+  double statusRatio(int status) const { return static_cast<double>(m_severityRatio[status]); }
   std::string toStdString(void) {return defaultTooltipText();}
-  int problemCount(void) {
-    return m_statsData[ngrt4n::Minor]
-        + m_statsData[ngrt4n::Major]
-        + m_statsData[ngrt4n::Critical]
-        + m_statsData[ngrt4n::Unknown];}
-  std::string problemsDetailsText(void) {
-    return QObject::tr("%1/%2 failures")
-        .arg(QString::number(problemCount()))
-        .arg(QString::number(m_dataCount)).toStdString();}
   void updateStatsData(const CheckStatusCountT& statsData, int count);
   void setSeverityData(double normal, double minor, double major, double critical, double total);
   void setDataType(int dataType) {m_dataType = dataType;}
   QString timeFromSeconds(long seconds);
+
+  int problemCount(void) {
+    return m_statsData[ngrt4n::Minor]
+        + m_statsData[ngrt4n::Major]
+        + m_statsData[ngrt4n::Critical]
+        + m_statsData[ngrt4n::Unknown];
+  }
+
+  std::string problemsDetailsText(void) {
+    auto&& nbProblems = problemCount();
+    return QObject::tr("%1 problem%2/%3 probe%4")
+        .arg(QString::number(nbProblems))
+        .arg(nbProblems > 1? "s": "")
+        .arg(QString::number(m_dataCount))
+        .arg(m_dataCount > 1? "s": "")
+        .toStdString();
+  }
 
 protected:
   CheckStatusCountT m_statsData;

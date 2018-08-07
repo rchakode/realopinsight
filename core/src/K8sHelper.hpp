@@ -49,8 +49,8 @@ public:
                                                   NodeListT& out_bpnodes);
 
   std::pair<QString, int> parseNamespacedPods(const QByteArray& in_data,
-                                              const QString& in_sacthNamespace,
-                                              const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
+                                              const QString& in_matchNamespace,
+                                              const QMap<QString, QMap<QString, QString>>& in_allServicesSelectors,
                                               NodeListT& out_bpnodes,
                                               NodeListT& out_cnodes);
 
@@ -63,7 +63,7 @@ private:
   bool m_verifySslPeer;
   QEventLoop m_eventLoop;
   void setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption);
-  std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos, const QMap<QString, QVariant>& podLabels);
+  std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors, const QMap<QString, QVariant>& podLabels);
   int convertToPodPhaseStatusEnum(const QString& podPhaseStatusText);
 };
 

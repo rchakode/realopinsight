@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MainWebWindow.cpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
@@ -967,17 +967,13 @@ void WebMainUI::initOperatorDashboard(void)
     if (! dashboardItem) {
       continue;
     }
-
-    Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(),
-                                                       dashboardItem->thumbnailProblemDetailBar(),
-                                                       dashboardItem->thumbnail());
-    int rowIndex = thumbIndex / thumbPerRow;
-    int colIndex = thumbIndex % thumbPerRow;
-    m_thumbsLayout->addWidget(thumbWidget, rowIndex, colIndex); // take the ownership of the widget
-    m_thumbsWidgets.insert(view.name, thumbWidget);
-
     QObject::connect(dashboardItem, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
-    thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, view.name));
+    auto&& dashboardName =  dashboardItem->rootNode().name.toStdString() ;
+
+    Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(), dashboardItem->thumbnailProblemDetailBar(), dashboardItem->thumbnail());
+    thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, dashboardName));
+    m_thumbsLayout->addWidget(thumbWidget, thumbIndex / thumbPerRow, thumbIndex % thumbPerRow); // take the ownership of the widget
+    m_thumbsWidgets.insert(dashboardName, thumbWidget);
 
     ++thumbIndex;
   }

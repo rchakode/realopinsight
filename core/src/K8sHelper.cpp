@@ -242,11 +242,12 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
 }
 
 std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data,
-                                                       const QString& in_macthNamespace,
-                                                       const QMap<QString, QMap<QString, QString>>& in_serviceSelectorInfos,
+                                                       const QString& in_matchNamespace,
+                                                       const QMap<QString, QMap<QString, QString>>& in_allServicesSelectors,
                                                        NodeListT& out_bpnodes,
                                                        NodeListT& out_cnodes)
 {
+  qDebug() <<in_allServicesSelectors;
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(in_data, &parserError);
   if (parserError.error != QJsonParseError::NoError) {
@@ -271,21 +272,22 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     auto&& k8sNamespace = metaData["namespace"].toString();
 
     // escape pod if not matches the given namespace
-    if (k8sNamespace != in_macthNamespace) {
+    if (k8sNamespace != in_matchNamespace) {
       continue;
     }
 
     // check whether pod selectors match any service
     auto&& podLabels =  metaData["labels"].toObject().toVariantMap();
-    auto&& serviceMatch = findMatchingService(in_serviceSelectorInfos, podLabels);
+    auto&& serviceMatch = findMatchingService(in_allServicesSelectors, podLabels);
     if (! serviceMatch.second) {
       continue;
     }
 
+
     // start processing pod matching a service selector
     k8sNamespaces.insert(k8sNamespace);
     auto&& serviceFqdn = QString("%1.%2").arg(serviceMatch.first, k8sNamespace);
-    auto podName = metaData["name"].toString();
+    auto&& podName = metaData["name"].toString();
     auto&& podUid = metaData["uid"].toString();
     auto&& podCreationTime = metaData["creationTimestamp"].toString();
     auto&& podFqdn = QString("%1.%2").arg(podName, k8sNamespace);
@@ -310,7 +312,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
         podNode.check.host_groups = serviceFqdn.toStdString();
         podNode.check.status = ngrt4n::K8sFailed;
         podNode.check.last_state_change = ngrt4n::convertToTimet(podCreationTime, "yyyy-MM-ddThh:mm:ssZ");
-        podNode.check.alarm_msg = QString("%1 (%2)").arg(podStatusData["reason"].toString(), podStatusData["message"].toString()).toStdString();
+        podNode.check.alarm_msg = QString("pod is %1 => %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
         out_cnodes.insert(podNode.id, podNode);
         continue;
         break;
@@ -375,7 +377,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
   out_bpnodes.clear();
   out_cnodes.clear();
 
-  return std::make_pair(QObject::tr("no pod data matching namespace %1").arg(in_macthNamespace), ngrt4n::RcSuccess);
+  return std::make_pair(QObject::tr("no pod data matching namespace %1").arg(in_matchNamespace), ngrt4n::RcSuccess);
 }
 
 
@@ -407,31 +409,30 @@ std::tuple<int,  std::string, std::string> K8sHelper::extractStateInfo(const QJs
 }
 
 
-std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, QString>>& serviceSelectorInfos,
+std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors,
                                                         const QMap<QString, QVariant>& podLabels)
 {
-  QString outMatchedService = "";
-  bool outSelectorMatched = false;
+  std::pair<QString, bool>&& out = std::make_pair("", false);
 
   auto&& podLabelsTags = QSet<QString>::fromList(podLabels.keys());
-  for (auto&& curSelectorInfo: serviceSelectorInfos.toStdMap()) {
-    auto&& selectorTags = curSelectorInfo.second.keys();
+  for (auto&& currentServiceSelectors: allServicesSelectors.toStdMap()) {
+    auto&& selectorTags = currentServiceSelectors.second.keys();
     if (podLabelsTags.contains(QSet<QString>::fromList(selectorTags))) {
       bool matched = true;
       for (auto&& curTag: selectorTags) {
-        if (curSelectorInfo.second[curTag] != podLabels[curTag]) {
+        if (currentServiceSelectors.second[curTag] != podLabels[curTag]) {
           matched = false;
           break;
         }
       }
       if (matched) {
-        outSelectorMatched = true;
-        outMatchedService = curSelectorInfo.first;
+        out.first = currentServiceSelectors.first;
+        out.second = true;
         break;
       }
     }
   }
-  return std::make_pair(outMatchedService, outSelectorMatched);
+  return out;
 }
 
 void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption)
