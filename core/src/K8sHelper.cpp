@@ -247,7 +247,6 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
                                                        NodeListT& out_bpnodes,
                                                        NodeListT& out_cnodes)
 {
-  qDebug() <<in_allServicesSelectors;
   QJsonParseError parserError;
   QJsonDocument jdoc= QJsonDocument::fromJson(in_data, &parserError);
   if (parserError.error != QJsonParseError::NoError) {
