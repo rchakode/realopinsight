@@ -289,7 +289,7 @@ void WebMap::expandCollapse(const QString& nodeId)
 void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
 {
   if (node.type != NodeType::ITService && ! node.child_nodes.isEmpty()) {
-    for (const auto & childId: node.child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+    for (const auto & childId: node.child_nodes.split(ngrt4n::CHILD_Q_SEP)) {
       NodeListT::Iterator child;
       if(ngrt4n::findNode(m_cdata, childId, child)) {
         if (node.visibility & ngrt4n::Expanded) {

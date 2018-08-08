@@ -129,8 +129,8 @@ void WebTree::addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectIt
 
   m_treeItems.insert(_node.id, item);
 
-  if (_bindToParent) {
-    bindChildToParent(_node.id, _node.parent);
+  if (_bindToParent && ! _node.parents.isEmpty()) {
+    bindChildToParent(_node.id, *_node.parents.begin());
   }
 
   if (_selectItemAfterProcessing) {
@@ -142,7 +142,7 @@ void WebTree::addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectIt
 Wt::WStandardItem* WebTree::findItemByNodeId(const QString& _nodeId)
 {
   auto item = m_treeItems.find(_nodeId);
-  return (item != m_treeItems.end())? *item : NULL;
+  return (item != m_treeItems.end())? *item : nullptr;
 }
 
 

@@ -48,8 +48,8 @@ class Parser : public QObject
     QString dotContent(void) const {return m_dotContent;}
     QString dotFile(void) const { return m_dotFile; }
     QString lastErrorMsg(void) const {return m_lastErrorMsg;}
-    static QString escapeLabel(const QString& label);
-    static QString escapeId(const QString& id);
+    static QString escapeLabel4Graphviz(const QString& label);
+    static QString escapeId4Graphviz(const QString& id);
 
 
   private:
@@ -65,6 +65,7 @@ class Parser : public QObject
     void saveCoordinatesFile(void);
     void insertITServiceNode(NodeT& node);
     std::pair<int, QString> loadK8sNamespaceView(QDomNodeList& in_xmlNodes, CoreDataT& out_cdata);
+    void bindGraphDependencies(const NodeT& node);
 };
 
 #endif /* SNAVPARSESVCONFIG_H_ */

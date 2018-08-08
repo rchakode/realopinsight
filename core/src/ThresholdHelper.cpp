@@ -97,7 +97,7 @@ QString ThresholdHelper::listToData(const QVector<ThresholdT>& thresholds)
   QString result = "";
   Q_FOREACH(const ThresholdT& th, thresholds) {
     if (! result.isEmpty())
-      result.append( ngrt4n::CHILD_SEP.c_str() );
+      result.append( ngrt4n::CHILD_Q_SEP );
 
     result.append( ThresholdHelper(th.weight, th.sev_in, th.sev_out).data() );
   }
@@ -109,7 +109,7 @@ QString ThresholdHelper::listToData(const QVector<ThresholdT>& thresholds)
 QVector<ThresholdT> ThresholdHelper::dataToList(const QString& data)
 {
   QVector<ThresholdT> result;
-  Q_FOREACH(const QString& entry, data.split(ngrt4n::CHILD_SEP.c_str()))
+  Q_FOREACH(const QString& entry, data.split(ngrt4n::CHILD_Q_SEP))
     result.push_back(ThresholdHelper(entry).toThreshold());
 
   return result;

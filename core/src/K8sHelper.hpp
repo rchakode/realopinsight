@@ -63,7 +63,7 @@ private:
   bool m_verifySslPeer;
   QEventLoop m_eventLoop;
   void setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption);
-  std::pair<QString, bool> findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors, const QMap<QString, QVariant>& podLabels);
+  QSet<QString> findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors, const QMap<QString, QVariant>& podLabels);
   int convertToPodPhaseStatusEnum(const QString& podPhaseStatusText);
 };
 

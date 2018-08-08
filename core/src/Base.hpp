@@ -325,7 +325,7 @@ struct NodeT {
   qint32 sev_prop;
   QString icon;
   QString description;
-  QString parent;
+  QSet<QString> parents;
   QString alarm_msg;
   QString notification_msg;
   QString actual_msg;

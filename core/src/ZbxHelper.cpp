@@ -471,9 +471,9 @@ void ZbxHelper::setServicesParent(NodeListT& nodes, const ZabbixChildParentDepen
   while (node != nodes.end()) {
     ZabbixChildParentDependenciesMapT::ConstIterator parentIdIter = childParentDependencies.find(node->id);
     if (parentIdIter != childParentDependencies.end()) {
-      node->parent = *parentIdIter;
+      node->parents = QSet<QString>{ *parentIdIter };
     } else {
-      node->parent = ngrt4n::ROOT_ID;
+      node->parents = QSet<QString>{ ngrt4n::ROOT_ID };
     }
     ++node;
   }
@@ -523,7 +523,7 @@ int ZbxHelper::setBusinessServiceDependencies(NodeListT& bpnodes, const ZabbixPa
   while (dependency != parentChildsDependencies.end()) {
     NodeListT::Iterator bpnode = bpnodes.find(dependency.key());
     if (bpnode != bpnodes.end()) {
-      bpnode->child_nodes = QStringList( dependency.value().values() ).join(ngrt4n::CHILD_SEP.c_str());
+      bpnode->child_nodes = QStringList( dependency.value().values() ).join(ngrt4n::CHILD_Q_SEP);
     }
     ++dependency;
   }

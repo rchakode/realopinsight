@@ -95,7 +95,7 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
   for (qint32 nodeIndex = 0; nodeIndex < xmlNodeCount; ++nodeIndex) {
     QDomElement xmlNode = xmlNodes.item(nodeIndex).toElement();
     NodeT node;
-    node.parent.clear();
+    node.parents.clear();
     node.monitored = false;
     node.id = xmlNode.attribute("id").trimmed();
     node.sev = node.sev_prop = ngrt4n::Unknown;
@@ -133,6 +133,16 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
     }
   }
 
+  // set nodes' parents
+  for (const auto& bpnode: m_cdata->bpnodes) {
+    for (const auto& childId: bpnode.child_nodes.split(ngrt4n::CHILD_Q_SEP)) {
+      NodeListT::Iterator childRef;
+      if (ngrt4n::findNode(m_cdata, childId, childRef)) {
+        childRef->parents.insert(bpnode.id);
+      }
+    }
+  }
+
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
@@ -163,13 +173,13 @@ std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, 
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
-QString Parser::escapeLabel(const QString& label)
+QString Parser::escapeLabel4Graphviz(const QString& label)
 {
   QString rwLabel = label;
   return rwLabel.replace("'", " ").replace("-", " ").replace("\"", " ").replace(' ', '#').replace(';', '_').replace('&', '_').replace('$', '_');
 }
 
-QString Parser::escapeId(const QString& id)
+QString Parser::escapeId4Graphviz(const QString& id)
 {
   QString rwId = id;
   return rwId.replace("'", " ").replace("-", "_").replace("\"", "_").replace(' ', '_').replace('#', '_');
@@ -183,33 +193,30 @@ void Parser::fixupVisilityAndDependenciesGraph(void)
 
   for (auto&& bpnode:  m_cdata->bpnodes) {
     bpnode.visibility = ngrt4n::Visible|ngrt4n::Expanded;
-    auto graphParentId = escapeId(bpnode.id);
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(graphParentId, escapeLabel(bpnode.name)));
-    if (bpnode.type == NodeType::ExternalService) {
-      continue;
-    }
-
-    if (! bpnode.child_nodes.isEmpty()) {
-      QStringList children = bpnode.child_nodes.split(ngrt4n::CHILD_SEP.c_str());
-      for(const auto& childId: children) {
-        NodeListT::Iterator childIt;
-        if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, childId, childIt)) {
-          childIt->parent = bpnode.id;
-          auto graphChildId = escapeId(childIt->id);
-          m_dotContent.append(QString("\t%1--%2\n").arg(graphParentId, graphChildId));
-        } else {
-          qDebug() << QObject::tr("Failed to find parent-child dependency'%1' => %2").arg(bpnode.id, childId);
-        }
-      }
-    }
+    auto bpnodeGraphId = escapeId4Graphviz(bpnode.id);
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(bpnodeGraphId, escapeLabel4Graphviz(bpnode.name)));
+    bindGraphDependencies(bpnode);
   }
 
   // Set IT service nodes' labels
   for (auto&& cnode: m_cdata->cnodes) {
     cnode.visibility = ngrt4n::Visible;
-    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(escapeId(cnode.id), escapeLabel(cnode.name)));
+    m_dotContent.insert(0, QString("\t%1[label=\"%2\"];\n").arg(escapeId4Graphviz(cnode.id), escapeLabel4Graphviz(cnode.name)));
+    bindGraphDependencies(cnode);
   }
+}
 
+void Parser::bindGraphDependencies(const NodeT& node)
+{
+  auto&& nodeGraphId = escapeId4Graphviz(node.id);
+  for (const auto& parentId: node.parents) {
+    NodeListT::Iterator parentRef;
+    if (ngrt4n::findNode(m_cdata, parentId, parentRef)) {
+      m_dotContent.append(QString("\t%1--%2\n").arg(escapeId4Graphviz(parentId), nodeGraphId));
+    } else {
+      qDebug() << QObject::tr("Failed to find parent-child dependency '%1' => %2").arg(parentId, node.id);
+    }
+  }
 }
 
 
@@ -290,7 +297,7 @@ int Parser::computeCoordinates(void)
     if (splitedLine[0] == "node") {
       NodeListT::Iterator node;
       QString nid = splitedLine[1].trimmed();
-      if (ngrt4n::findNode(m_cdata->bpnodes, m_cdata->cnodes, nid, node)) {
+      if (ngrt4n::findNode(m_cdata, nid, node)) {
         node->pos_x = splitedLine[x_index].trimmed().toDouble() * SCALE_FACTORS.x();
         node->pos_y =  splitedLine[y_index].trimmed().toDouble() * SCALE_FACTORS.y();
         node->text_w = splitedLine[4].trimmed().toDouble() * SCALE_FACTORS.x();

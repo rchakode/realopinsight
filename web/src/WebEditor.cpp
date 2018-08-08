@@ -291,7 +291,7 @@ void WebEditor::handleNewViewButton(void)
   node.id = ngrt4n::ROOT_ID;
   node.name = QObject::tr("New service view");
   node.type = NodeType::BusinessService;
-  node.parent = "";
+  node.parents.clear();
   node.sev_prule = PropRules::Unchanged;
   node.sev_crule = CalcRules::Worst;
   node.weight = ngrt4n::WEIGHT_UNIT;
@@ -406,7 +406,7 @@ void WebEditor::addSubServiceFromTreeNodeIndex(const Wt::WModelIndex& index)
   childSrv.sev_crule = CalcRules::Worst;
   childSrv.weight = ngrt4n::WEIGHT_UNIT;
   childSrv.icon = ngrt4n::DEFAULT_ICON;
-  childSrv.parent = nodeId;
+  childSrv.parents = QSet<QString>{ nodeId };
 
   m_cdata.bpnodes.insert(childSrv.id, childSrv);
 
@@ -434,15 +434,13 @@ void WebEditor::removeServiceByTreeNodeIndex(const Wt::WModelIndex& index)
   }
 
   QString nodeId = m_tree.findNodeIdFromTreeItem(index);
-
   NodeListT::iterator ninfoIt;
-
   if ( ! ngrt4n::findNode(&m_cdata, nodeId, ninfoIt) ) {
     return ;
   }
 
   int depth = findNodeDepth(*ninfoIt);
-  auto parentId = ninfoIt->parent;
+  auto parentId = *ninfoIt->parents.begin();
 
   m_formerSelectedNodeId.clear();
 
@@ -489,13 +487,13 @@ QList<NodeT> WebEditor::findDescendantNodes(const QString& nodeId) {
   QList<NodeT> descendants;
 
   for (const auto& node:  m_cdata.bpnodes) {
-    if (node.parent == nodeId) {
+    if (*node.parents.begin() == nodeId) {
       descendants.append(node);
     }
   }
 
   for (const auto& node:  m_cdata.cnodes) {
-    if (node.parent == nodeId) {
+    if (*node.parents.begin() == nodeId) {
       descendants.append(node);
     }
   }
@@ -514,9 +512,7 @@ int WebEditor::findNodeDepth(const NodeT& ninfo)
   }
 
   NodeListT::const_iterator parentNodeIt;
-
-  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, ninfo.parent, parentNodeIt);
-
+  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, *ninfo.parents.begin(), parentNodeIt);
   if (! success) {
     return -1;
   }
@@ -529,11 +525,11 @@ void WebEditor::bindParentChildEdges(void)
 {
   m_cdata.edges.clear();
   for (const auto& node:  m_cdata.bpnodes) {
-    m_cdata.edges.insertMulti(node.parent, node.id);
+    m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
   }
 
   for (const auto& node:  m_cdata.cnodes) {
-    m_cdata.edges.insertMulti(node.parent, node.id);
+    m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
   }
 
 }
@@ -874,7 +870,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
   m_dataPointGroupField.addItem(ALL_GROUPS);
   for (const auto& check: checks) {
     std::string dataPoint = QString("%1:%2").arg(srcId, check.id.c_str()).toStdString();
-    QStringList groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_SEP.c_str());
+    QStringList groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_Q_SEP);
 
     if (groups.isEmpty()) {
       m_dataPointsListByGroup[NO_GROUP.c_str()].push_back(dataPoint);
@@ -971,7 +967,7 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
       groupSrv.id = groudId;
       groupSrv.name = groudId;
       groupSrv.type = NodeType::BusinessService;
-      groupSrv.parent = "";
+      groupSrv.parents.clear();
       groupSrv.sev_prule = PropRules::Unchanged;
       groupSrv.sev_crule = CalcRules::Worst;
       groupSrv.weight = ngrt4n::WEIGHT_UNIT;
@@ -1088,11 +1084,11 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
 void WebEditor::attachOrphanedNodesToRoot(NodeListT& nodes, NodeT& root)
 {
   for (auto& node: nodes) {
-    if (! node.parent.isEmpty()) {
+    if (! node.parents.isEmpty()) {
       continue;
     }
 
-    node.parent = root.id;
+    node.parents = QSet<QString>{ root.id };
     if (! root.child_nodes.isEmpty()) {
       root.child_nodes.append(ngrt4n::CHILD_Q_SEP);
     }
@@ -1138,13 +1134,13 @@ std::pair<int, std::string> WebEditor::extractNagiosBpiGroupMembers(const QStrin
       NodeListT::Iterator currentMemberSrvIt = bpnodes.find(memberId);
 
       if (currentMemberSrvIt != bpnodes.end()) {
-        currentMemberSrvIt->parent = parentServiceId;
+        currentMemberSrvIt->parents = QSet<QString>{ parentServiceId };
       } else {
         NodeT memberSrv;
         memberSrv.id = memberId;
         memberSrv.name = memberLabel;
         memberSrv.type = NodeType::BusinessService;
-        memberSrv.parent = parentServiceId;
+        memberSrv.parents = QSet<QString>{parentServiceId};
         memberSrv.sev_prule = PropRules::Unchanged;
         memberSrv.sev_crule = CalcRules::Worst;
         memberSrv.weight = ngrt4n::WEIGHT_UNIT;
@@ -1164,7 +1160,7 @@ std::pair<int, std::string> WebEditor::extractNagiosBpiGroupMembers(const QStrin
         cnode.id = currentChildId;
         cnode.name = QString("%1 on %2").arg(fields[1], fields[0]);
         cnode.type = NodeType::ITService;
-        cnode.parent = parentServiceId;
+        cnode.parents = QSet<QString>{ parentServiceId };
         cnode.sev_prule = PropRules::Unchanged;
         cnode.sev_crule = CalcRules::Worst;
         cnode.weight = isEssentialMember ? ngrt4n::WEIGHT_MAX: ngrt4n::WEIGHT_UNIT;

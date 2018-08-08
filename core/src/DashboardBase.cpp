@@ -342,7 +342,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
 
   StatusAggregator severityAggregator;
   
-  for (auto&& childId: node->child_nodes.split(ngrt4n::CHILD_SEP.c_str())) {
+  for (auto&& childId: node->child_nodes.split(ngrt4n::CHILD_Q_SEP)) {
     status2Propagate = computeBpNodeStatus(childId, p_dbSession);
     severityAggregator.addSeverity(status2Propagate.sev, status2Propagate.weight);
   }

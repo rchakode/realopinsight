@@ -75,23 +75,25 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_namespace
   }
 
   // add namespace as root service node
-  NodeT rnode;
-  rnode.id = ngrt4n::ROOT_ID;
-  rnode.parent = "";
-  rnode.name = in_namespace;
-  rnode.type = NodeType::BusinessService;
-  rnode.sev = ngrt4n::Unknown;
-  rnode.sev_prule = PropRules::Unchanged;
-  rnode.sev_crule = CalcRules::Worst;
-  rnode.weight = ngrt4n::WEIGHT_UNIT;
-  rnode.icon = ngrt4n::K8S_NS;
-  rnode.description = "Namespace node";
-  out_cdata.bpnodes.insert(rnode.id, rnode);
+  NodeT rootNode;
+  rootNode.id = ngrt4n::ROOT_ID;
+  rootNode.parents.clear();
+  rootNode.name = in_namespace;
+  rootNode.parents = QSet<QString>{""};
+  rootNode.type = NodeType::BusinessService;
+  rootNode.sev = ngrt4n::Unknown;
+  rootNode.sev_prule = PropRules::Unchanged;
+  rootNode.sev_crule = CalcRules::Worst;
+  rootNode.weight = ngrt4n::WEIGHT_UNIT;
+  rootNode.icon = ngrt4n::K8S_NS;
+  rootNode.description = "Namespace node";
+
+  out_cdata.bpnodes.insert(rootNode.id, rootNode);
+  out_cdata.hosts.insert(in_namespace, QStringList{in_namespace});
+  out_cdata.monitor = MonitorT::Kubernetes;
 
   ngrt4n::fixupDependencies(out_cdata);
 
-  out_cdata.hosts.insert(in_namespace, QStringList{in_namespace});
-  out_cdata.monitor = MonitorT::Kubernetes;
   return std::make_pair("", ngrt4n::RcSuccess);
 }
 
@@ -231,7 +233,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
 
     serviceNode.name = serviceName;
     serviceNode.id = ngrt4n::md5IdFromString(k8sServiceFqdn);
-    serviceNode.parent = ngrt4n::ROOT_ID; // by convention the root node will be created and labeled with the namespace
+    serviceNode.parents = QSet<QString>{ ngrt4n::ROOT_ID }; // by convention the root node will be created and labeled with the namespace
     serviceNode.description = serviceSpecItem.toString();
 
     out_bpnodes.insert(serviceNode.id, serviceNode);
@@ -254,7 +256,6 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
   }
 
   QSet<QString> k8sNamespaces;
-
   QJsonObject jsonData = jdoc.object();
   QJsonArray items = jsonData["items"].toArray();
 
@@ -278,11 +279,16 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
 
     // check whether pod selectors match any service
     auto&& podLabels =  metaData["labels"].toObject().toVariantMap();
-    auto&& serviceMatch = findMatchingService(in_allServicesSelectors, podLabels);
-    if (! serviceMatch.second) {
+    auto&& matchedServices= findMatchingService(in_allServicesSelectors, podLabels);
+    if (matchedServices.isEmpty()) {
       continue;
     }
-    auto&& serviceFqdn = QString("%1.%2").arg(serviceMatch.first, k8sNamespace);
+
+    podNode.parents.clear();
+    for (const auto& matchedService: matchedServices) {
+      auto&& matchedServiceFqdn = QString("%1.%2").arg(matchedService, k8sNamespace);
+      podNode.parents.insert( ngrt4n::md5IdFromString(matchedServiceFqdn) );
+    }
 
     auto&& podName = metaData["name"].toString();
     auto&& podUid = metaData["uid"].toString();
@@ -291,7 +297,6 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     podNode.name = podName;
     podNode.id = ngrt4n::md5IdFromString(podFqdn);
     podNode.description = QString("uid -> %1, creationTimestamp -> %2").arg(std::move(podUid), std::move(podCreationTime));
-    podNode.parent = ngrt4n::md5IdFromString(serviceFqdn); // shall match what is set for node in method parseNamespacedServices
 
     // add pod node
     auto&& podStatusData = podData["status"].toObject();
@@ -302,10 +307,10 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
       case ngrt4n::K8sPodPhaseFailed:
       case ngrt4n::K8sPodPhaseCrashLoopBackoff:
         podNode.type = NodeType::ITService;
-        podNode.child_nodes = QString("%1/%2").arg(serviceFqdn, podName);
+        podNode.child_nodes = podFqdn;
         podNode.check.id = podNode.child_nodes.toStdString();
         podNode.check.host = podFqdn.toStdString();
-        podNode.check.host_groups = serviceFqdn.toStdString();
+        podNode.check.host_groups = podFqdn.toStdString();
         podNode.check.status = ngrt4n::K8sFailed;
         podNode.check.last_state_change = ngrt4n::convertToTimet(podCreationTime, "yyyy-MM-ddThh:mm:ssZ");
         podNode.check.alarm_msg = QString("pod is %1 => %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
@@ -328,7 +333,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     auto&& containerStatuses = podStatusData["containerStatuses"].toArray();
     for (auto containerStatus: containerStatuses) {
       NodeT containerNode;
-      containerNode.parent =  podNode.id ;
+      containerNode.parents =  QSet<QString>{ podNode.id };
       containerNode.type = NodeType::ITService;
       containerNode.sev = ngrt4n::Unknown;
       containerNode.sev_prule = PropRules::Unchanged;
@@ -405,10 +410,10 @@ std::tuple<int,  std::string, std::string> K8sHelper::extractStateInfo(const QJs
 }
 
 
-std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors,
-                                                        const QMap<QString, QVariant>& podLabels)
+QSet<QString> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors,
+                                             const QMap<QString, QVariant>& podLabels)
 {
-  std::pair<QString, bool>&& out = std::make_pair("", false);
+  QSet<QString>&& out{};
 
   auto&& podLabelsTags = QSet<QString>::fromList(podLabels.keys());
   for (auto&& currentServiceSelectors: allServicesSelectors.toStdMap()) {
@@ -422,13 +427,11 @@ std::pair<QString, bool> K8sHelper::findMatchingService(const QMap<QString, QMap
         }
       }
       if (matched) {
-        out.first = currentServiceSelectors.first;
-        out.second = true;
-        break;
+        out.insert(currentServiceSelectors.first);
       }
     }
   }
-  return out;
+  return std::move(out);
 }
 
 void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption)

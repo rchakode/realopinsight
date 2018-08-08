@@ -373,7 +373,7 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
   triggerNode.type = NodeType::ITService;
 
   for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-    hostNode.parent = rootService.id;
+    hostNode.parents = QSet<QString>{ rootService.id };
     hostNode.name = hostNode.description = QString::fromStdString(check->host);
     hostNode.id = "";
 
@@ -381,7 +381,7 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
 
     QString checkId = QString::fromStdString(check->id);
     triggerNode.id = ngrt4n::generateId();
-    triggerNode.parent = hostNode.id;
+    triggerNode.parents = QSet<QString>{ hostNode.id };
     triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
     triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
 
@@ -499,7 +499,7 @@ std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const
   }
 
   for (auto&& cnode: cdata.cnodes) {
-    if (! cnode.parent.isEmpty()) {
+    if (! cnode.parents.isEmpty()) {
       outStream << generateNodeXml(cnode);
     }
   }
@@ -548,28 +548,32 @@ void ngrt4n::fixupDependencies(CoreDataT& cdata)
     node.child_nodes.clear();
   }
 
-  // build dependencies for bpnodes
+  // bpnodes
   for (const auto& node: cdata.bpnodes) {
-    setParentChildDependency(node.id, node.parent, cdata.bpnodes);
+    for (const auto& parentId: node.parents) {
+      setParentChildDependency(node.id, parentId, cdata.bpnodes);
+    }
   }
 
-  // build dependencies for cnodes
+  // cnodes
   for (const auto& node: cdata.cnodes) {
-    setParentChildDependency(node.id, node.parent, cdata.bpnodes);
+    for (const auto& parentId: node.parents) {
+      setParentChildDependency(node.id, parentId, cdata.bpnodes);
+    }
   }
 }
 
 
 void ngrt4n::setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes)
 {
-  auto parent_it = pnodes.find(parentId);
-  if (parent_it == pnodes.end()) {
+  auto parentRef = pnodes.find(parentId);
+  if (parentRef == pnodes.end()) {
     return ;
   }
 
-  if (parent_it->child_nodes.isEmpty()) {
-    parent_it->child_nodes = childId;
+  if (parentRef->child_nodes.isEmpty()) {
+    parentRef->child_nodes = childId;
   } else {
-    parent_it->child_nodes += (QString(ngrt4n::CHILD_SEP.c_str()) % childId);
+    parentRef->child_nodes += QString("%1%2").arg(ngrt4n::CHILD_Q_SEP, childId);
   }
 }
