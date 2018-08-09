@@ -48,6 +48,7 @@ WebDashboard::WebDashboard(void)
   m_map.setCoreData(&m_cdata);
   bindFormWidgets();
   addJsEventScript();
+  map()->containerSizeChanged().connect(this, & WebDashboard::hanleRenderingAreaSizeChanged);
 }
 
 WebDashboard::~WebDashboard()
@@ -126,40 +127,40 @@ void WebDashboard::bindFormWidgets(void)
   setLayout(m_mainLayout = new Wt::WHBoxLayout());
 
   m_mainLayout->setContentsMargins(0, 0, 0, 0);
-  m_leftSubMainLayout.setContentsMargins(0, 0, 0, 0);
-  m_rightSubMainLayout.setContentsMargins(0, 0, 0, 0);
+  m_leftVBoxLayout.setContentsMargins(0, 0, 0, 0);
+  m_rightVBoxLayout.setContentsMargins(0, 0, 0, 0);
 
   m_mainLayout->setSpacing(2);
-  m_leftSubMainLayout.setSpacing(2);
-  m_rightSubMainLayout.setSpacing(2);
+  m_leftVBoxLayout.setSpacing(2);
+  m_rightVBoxLayout.setSpacing(2);
 
-  m_leftSubMainLayout.addWidget(&m_tree);
-  m_leftSubMainLayout.addWidget(&m_chart);
+  m_leftVBoxLayout.addWidget(&m_tree);
+  m_leftVBoxLayout.addWidget(&m_chart);
 
-  m_rightSubMainLayout.addWidget(m_map.getWidget());
-  m_rightSubMainLayout.addWidget(&m_msgConsole);
-  m_mainLayout->addLayout(&m_leftSubMainLayout);
-  m_mainLayout->addLayout(&m_rightSubMainLayout);
+  m_rightVBoxLayout.addWidget(m_map.renderingScrollArea());
+  m_rightVBoxLayout.addWidget(&m_msgConsole);
+  m_mainLayout->addLayout(&m_leftVBoxLayout);
+  m_mainLayout->addLayout(&m_rightVBoxLayout);
 
-  m_leftSubMainLayout.setResizable(0);
-  m_mainLayout->setResizable(0);
-  m_mainLayout->setResizable(1);
-  m_leftSubMainLayout.setResizable(0);
-  m_leftSubMainLayout.setResizable(1);
-  m_rightSubMainLayout.setResizable(0);
-  m_rightSubMainLayout.setResizable(1);
+  m_leftVBoxLayout.setResizable(0, true);
+  m_mainLayout->setResizable(0, true);
+  m_mainLayout->setResizable(1, true);
+  m_leftVBoxLayout.setResizable(0, true);
+  m_leftVBoxLayout.setResizable(1, true);
+  m_rightVBoxLayout.setResizable(0, true);
+  m_rightVBoxLayout.setResizable(1, true);
 }
 
 
 void WebDashboard::unbindWidgets(void)
 {
   m_eventFeedLayout.clear();
-  m_leftSubMainLayout.removeWidget(&m_tree);
-  m_leftSubMainLayout.removeWidget(&m_chart);
-  m_rightSubMainLayout.removeWidget(m_map.getWidget());
-  m_rightSubMainLayout.removeWidget(&m_msgConsole);
-  m_mainLayout->removeItem(&m_leftSubMainLayout);
-  m_mainLayout->removeItem(&m_rightSubMainLayout);
+  m_leftVBoxLayout.removeWidget(&m_tree);
+  m_leftVBoxLayout.removeWidget(&m_chart);
+  m_rightVBoxLayout.removeWidget(m_map.renderingScrollArea());
+  m_rightVBoxLayout.removeWidget(&m_msgConsole);
+  m_mainLayout->removeItem(&m_leftVBoxLayout);
+  m_mainLayout->removeItem(&m_rightVBoxLayout);
   clear();
 }
 
@@ -167,7 +168,7 @@ void WebDashboard::unbindWidgets(void)
 void WebDashboard::addJsEventScript(void)
 {
   setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
-  triggerResizeComponents();
+  doJavascriptAutoResize();
 }
 
 

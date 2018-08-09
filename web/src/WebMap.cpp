@@ -51,13 +51,12 @@ WebMap::WebMap(void)
     m_scaleY(1),
     m_initialLoading(true),
     m_containerSizeChanged(this, "containerSizeChanged"),
-    m_loaded(this),
     m_thumbUrlPath("")
 {
   m_scrollArea.setWidget(this);
   setPreferredMethod();
   setLayoutSizeAware(true);
-  setJavaScriptMember();
+  Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS, "");
   m_containerSizeChanged.connect(this, &WebMap::handleContainedSizeChanged);
 }
 
@@ -73,11 +72,6 @@ void WebMap::setPreferredMethod(void)
 {
   setInline(false);
   WPaintedWidget::setPreferredMethod(InlineSvgVml);
-}
-
-void WebMap::setJavaScriptMember(void)
-{
-  Wt::WPaintedWidget::setJavaScriptMember(WT_RESIZE_JS,"");
 }
 
 void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
@@ -108,6 +102,8 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 
 void WebMap::layoutSizeChanged(int width, int height)
 {
+  //WPaintedWidget::layoutSizeChanged(widt
+  //m_scrollArea.resize(width, height);
   //TODO layoutSizeChanged(int width, int height)
   //qDebug()<<m_cdata->map_width * m_scaleX << m_cdata->map_height * m_scaleY << width << height << m_cdata->map_width << m_cdata->map_height;
 }

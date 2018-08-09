@@ -258,12 +258,12 @@ void WebMainUI::handleShowSettingsView(void)
   if (! m_dbSession->isLoggedAdmin()) {
     hideAdminSettingsMenu();
   }
-  setWidgetAsFrontStackedWidget(&m_settingsMainPageTpl);
+  swicthFrontStackedWidgetTo(&m_settingsMainPageTpl);
 }
 
 void WebMainUI::handleShowExecutiveView(void)
 {
-  setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
+  swicthFrontStackedWidgetTo(&m_operatorHomeTpl);
   resetViewSelectionBox();
 }
 
@@ -460,10 +460,13 @@ void WebMainUI::handleLaunchEditor(void)
 
 void WebMainUI::handlePreviewFile(const std::string& path, const std::string&)
 {
+  showMessage(ngrt4n::OperationInProgress, "Loading view...");
   WebDashboard* dashboard = loadView(path);
   if (dashboard) {
-    QObject::connect(dashboard, SIGNAL(updateMessageChanged(std::string)), this, SLOT(showProgressMessage(std::string)));
     setDashboardAsFrontStackedWidget(dashboard);
+    showMessage(ngrt4n::OperationFinished, "");
+  } else {
+    showMessage(ngrt4n::OperationFailed, "Loading failed");
   }
 }
 
@@ -554,9 +557,9 @@ void WebMainUI::handleNewViewSelected(void)
     m_currentDashboard = nullptr;
     m_displayOnlyTroubleEventsBox->setHidden(true);
     if (! m_dbSession->isLoggedAdmin()) {
-      setWidgetAsFrontStackedWidget(&m_operatorHomeTpl);
+      swicthFrontStackedWidgetTo(&m_operatorHomeTpl);
     } else {
-      setWidgetAsFrontStackedWidget(&m_settingsMainPageTpl);
+      swicthFrontStackedWidgetTo(&m_settingsMainPageTpl);
     }
   }
 }
@@ -916,7 +919,6 @@ void WebMainUI::showMessage(int status, const std::string& msg)
       logLevel = "error";
       break;
     default:
-      qDebug() << "hide" << status;
       m_infoBox.hide();
       hidden = true;
       break;
@@ -1183,10 +1185,9 @@ WebMsgDialog* WebMainUI::createNotificationManager(void)
 void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
 {
   if (dashboard) {
-    setWidgetAsFrontStackedWidget(dashboard);
-    dashboard->triggerResizeComponents();
-    int index = m_selectViewBox->findText(dashboard->rootNode().name.toStdString());
-    m_selectViewBox->setCurrentIndex(index);
+    swicthFrontStackedWidgetTo(dashboard);
+    dashboard->doJavascriptAutoResize();
+    m_selectViewBox->setCurrentIndex( m_selectViewBox->findText(dashboard->rootNode().name.toStdString()) );
     m_displayOnlyTroubleEventsBox->setHidden(false);
     m_currentDashboard = dashboard;
   }
@@ -1201,7 +1202,7 @@ void WebMainUI::handleDashboardSelected(std::string viewName)
 }
 
 
-void WebMainUI::setWidgetAsFrontStackedWidget(Wt::WWidget* widget)
+void WebMainUI::swicthFrontStackedWidgetTo(Wt::WWidget* widget)
 {
   if (widget) {
     m_dashboardStackedContents.setCurrentWidget(widget);

@@ -46,7 +46,7 @@
 #define ROOT_DIV wApp->root()->id()
 #define TREEVIEW_DIV m_tree.id()
 #define MAP_DIV m_map.id()
-#define MAP_SCROLL_AREA_DIV m_map.getWidget()->id()
+#define MAP_SCROLL_AREA_DIV m_map.renderingScrollArea()->id()
 #define CHART_SCROLL_AREA_DIV m_chart.id()
 #define MSG_CONSOLE_DIV m_msgConsole.id()
 #define MAP_AREA_HEIGHT_RATIO "0.4"
@@ -58,26 +58,22 @@
   */
 #define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
   computeWindowHeight \
-  "var contentHeight = wh - 50;" \
+  "var contentHeight = winH - 50;" \
   "$('#stackcontentarea').height(contentHeight);" \
   "var treeHeight=contentHeight*0.6 - 25;" \
   "var chartAreaHeight=contentHeight - treeHeight - 25;" \
-  "var mapAreaHeight=contentHeight*"+std::string(MAP_AREA_HEIGHT_RATIO)+" - 25;" \
-  "var msgConsoleHeight=contentHeight - mapAreaHeight - 25;" \
-  "$('#wrapper').height(wh);" \
-  "$('#maincontainer').height(wh);" \
-  "$('#"+ROOT_DIV+"').height(wh);" \
+  "$('#wrapper').height(winH);" \
+  "$('#maincontainer').height(winH);" \
+  "$('#"+ROOT_DIV+"').height(winH);" \
   "$('#"+TREEVIEW_DIV+"').height(treeHeight);" \
-  "$('#"+MAP_SCROLL_AREA_DIV+"').height(mapAreaHeight);" \
-  "$('#"+CHART_SCROLL_AREA_DIV+"').height(chartAreaHeight);" \
-  "$('#"+MSG_CONSOLE_DIV+"').height(msgConsoleHeight);"
+  "$('#"+CHART_SCROLL_AREA_DIV+"').height(chartAreaHeight);"
 
 #define JS_AUTO_RESIZING_FUNCTION \
-  "function(self, width, height) {" \
-  JS_AUTO_RESIZING_SCRIPT("wh=height;") \
-  "var mapHeight = height*0.45 - 25;" \
-  "var mapWidth = $('#"+MAP_SCROLL_AREA_DIV+"').width();" \
-  "Wt.emit("+MAP_DIV+", 'containerSizeChanged', mapWidth, mapHeight);" \
+  "function(self, winW, winH) {" \
+  JS_AUTO_RESIZING_SCRIPT("winH=winH;") \
+  "var mapH = winH*0.45 - 25;" \
+  "var mapW = $('#"+MAP_SCROLL_AREA_DIV+"').width();" \
+  "Wt.emit("+MAP_DIV+", 'containerSizeChanged', mapW, mapH, winW, winH);" \
   "}"
 
 
@@ -97,7 +93,7 @@ public:
   std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& descriptionFile);
   std::string tooltip(void) {return m_chart.toStdString();}
-  void triggerResizeComponents(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("wh=$(window).height();"));}
+  void doJavascriptAutoResize(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("winH=$(window).height();"));}
   void handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* dbSession);
   Wt::WVBoxLayout* eventFeedLayout(void) {return &m_eventFeedLayout;}
   void handleDashboardSelected(std::string viewName) {Q_EMIT dashboardSelected(viewName);}
@@ -127,14 +123,15 @@ private:
   EventFeedItemsT m_eventFeedItems;
 
   Wt::WHBoxLayout* m_mainLayout;
-  Wt::WVBoxLayout m_leftSubMainLayout;
-  Wt::WVBoxLayout m_rightSubMainLayout;
+  Wt::WVBoxLayout m_leftVBoxLayout;
+  Wt::WVBoxLayout m_rightVBoxLayout;
 
   void bindFormWidgets(void);
   void unbindWidgets(void);
   void addJsEventScript(void);
   void addEvents(void);
   Wt::WWidget* createEventFeedTpl(const NodeT& node);
+  void hanleRenderingAreaSizeChanged(double mapW, double mapH, double winW, double winH) {}
 };
 
 

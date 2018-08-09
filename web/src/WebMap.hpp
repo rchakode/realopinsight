@@ -46,15 +46,13 @@ public:
   virtual ~WebMap();
   void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void drawMap(void);
-  Wt::WScrollArea* getWidget(void) {return &m_scrollArea;}
+  Wt::WWidget* renderingScrollArea(void) {return &m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
-  Wt::JSignal<double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
-  Wt::Signal<void>& loaded(void) {return m_loaded;}
+  Wt::JSignal<double, double, double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
   void updateThumbnail(void);
   std::string thumbnailPath(void) {return m_thumbUrlPath;}
   Wt::WImage* thumbnailImage(void) {return &m_thumbImage;}
-  void emitLoaded(void) const {m_loaded.emit();}
   void setThumbnailTooltip(const std::string& tooltip) {m_thumbImage.setToolTip(tooltip);}
 
 
@@ -69,7 +67,7 @@ private:
   std::shared_ptr<Wt::WPainter> m_painter;
   Wt::WScrollArea m_scrollArea;
   bool m_initialLoading;
-  Wt::JSignal<double, double> m_containerSizeChanged;
+  Wt::JSignal<double, double, double, double> m_containerSizeChanged;
   Wt::Signal<void> m_loaded;
   std::string m_thumbUrlPath;
   double m_translateY;
@@ -80,7 +78,6 @@ private:
   void createNodeLink(const NodeT& node, const Wt::WPointF& pos);
   void createExpIconLink(const NodeT& node, const Wt::WPointF& expIconPos);
   void setPreferredMethod(void);
-  void setJavaScriptMember(void);
   void handleContainedSizeChanged(double w, double h);
   void expandCollapse(const QString& nodeId);
   void applyVisibilityToChild(const NodeT& node, qint8 mask);

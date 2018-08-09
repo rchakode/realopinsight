@@ -95,7 +95,7 @@ public:
 public Q_SLOTS:
   void resetTimer(qint32 interval);
   void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
-  void setWidgetAsFrontStackedWidget(Wt::WWidget* widget);
+  void swicthFrontStackedWidgetTo(Wt::WWidget* widget);
   void resetViewSelectionBox(void) { m_selectViewBox->setCurrentIndex(0); m_displayOnlyTroubleEventsBox->setHidden(true);}
   void showMessage(int status, const std::string& msg);
   void showProgressMessage(const std::string& msg) {showMessage(ngrt4n::OperationInProgress, msg); }
