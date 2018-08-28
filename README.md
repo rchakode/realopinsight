@@ -1,53 +1,10 @@
-RealOpinsight is an open-source operations monitoring system. RealOpInsight works on top of Kubernetes®, Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and various other monitoring systems, to provide powerful aggregation and visualization to provide a comprehensive insight on your business applications.
+RealOpinsight is an open-source operations monitoring system for Kubernetes®, Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and various other monitoring systems. The RealOpinsight benefits is to provide powerful aggregation and visualization for a comprehensive insight on your business applications.
 
-RealOpInsight is released under the terms of GPLv3 License. See the LICENSE file.
+# Installation 
 
-# Installation Requirements
-For building and running RealOpInsight Ultimate, you will need the following:
+See http://docs.realopinsight.com/
 
-- Ubuntu 16.04 LTS 64 bits
-- GCC-C++ >= 4.7
-- Install Qt version 5.5 with the following modules : QtCore, QtGui, QtSvg, QtWebKit, QtXml, QtScript. Other versions may work but are not tested.
-- sudo apt-get install graphviz
-- sudo apt-get install postgresql-client-9.5 postgresql-server-dev-9.5 postgresql-server-dev-all
-- sudo apt-get install libldap2-dev
-- sudo apt-get install libgl1-mesa-dev
-- Install Wt Web Toolkit version 3.3.9 with PostgresSQL dbo features
-
-
-# Quick Installation
-You just have to follow the next steps, assuming you have a Ubuntu 14.04 LTS 64 bits with all the above dependencies installed.
-*$* indicates a terminal prompt.
-
-1. Checkout the latest source package from Github
-
-  ```
-  $ git clone https://github.com/RealOpInsightLabs/realopinsight-ultimate.git
-  ```
-
-2. Move to the source directory
-
-  ```
-  $ cd realopinsight-ultimate/
-  ```
-
-3. Export environement variable
-  ```
-  export WT_ROOT=/path/to/wt/install/dir
-  ```
-
-4. Launch the installation
-
-  ```
-  $ sudo ./install-manager -m ultimate
-  ```
-  Then wait that the installation completes.
-
-5. Move forward
-  Please go to RealOpInsight Ultimate documentation website at http://docs.realopinsight.com, 
-  go throughout our tutorials and user/administrator manuals to start mastering the software. 
-
-# Create PostgreSQL database
+# Create PostgreSQL database for RealOpinsight
 
 See official documentation for more details: https://www.postgresql.org/docs/9.3/static/tutorial-createdb.html
 
