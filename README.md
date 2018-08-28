@@ -1,15 +1,8 @@
-RealOpInsight Ultimate is a web-based business service monitoring tool allowing advanced aggregation and correlation of monitoring events on top of existing systems, including Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and more.
+RealOpinsight is an open-source operations monitoring system. Working on top of Kubernetes®, Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and various other monitoring systems, RealOpInsight provides powerful aggregation and visualization aiming to provide a comprehensive insight on your business applications.
 
 RealOpInsight is released under the terms of GPLv3 License. See the LICENSE file.
- 
 
-INSTALLATION
-============
-This component needs to be installed on the user workstation.
-
-Requirements
-============
-
+# Installation Requirements
 For building and running RealOpInsight Ultimate, you will need the following:
 
 - Ubuntu 16.04 LTS 64 bits
@@ -20,10 +13,9 @@ For building and running RealOpInsight Ultimate, you will need the following:
 - sudo apt-get install libldap2-dev
 - sudo apt-get install libgl1-mesa-dev
 - Install Wt Web Toolkit version 3.3.9 with PostgresSQL dbo features
- 
-Quick Installation
-==================
 
+
+# Quick Installation
 You just have to follow the next steps, assuming you have a Ubuntu 14.04 LTS 64 bits with all the above dependencies installed.
 *$* indicates a terminal prompt.
 
@@ -55,8 +47,7 @@ You just have to follow the next steps, assuming you have a Ubuntu 14.04 LTS 64 
   Please go to RealOpInsight Ultimate documentation website at http://docs.realopinsight.com, 
   go throughout our tutorials and user/administrator manuals to start mastering the software. 
 
-Create PostgreSQL database
-==========================
+# Create PostgreSQL database
 
 See official documentation for more details: https://www.postgresql.org/docs/9.3/static/tutorial-createdb.html
 
@@ -110,8 +101,8 @@ The following page would be also helpful: https://stackoverflow.com/questions/76
   postgres=# GRANT ALL PRIVILEGES ON DATABASE realopinsight TO realopinsight ;
   ```
 
-Security notes about integration with PostgreSQL
-==============================================
+# Security notes about integration with PostgreSQL
+
 Note that the role in PostgreSQL **does not need**:
 
 * to be a superuser
