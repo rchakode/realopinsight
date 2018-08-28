@@ -313,7 +313,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
         podNode.check.host_groups = podFqdn.toStdString();
         podNode.check.status = ngrt4n::K8sFailed;
         podNode.check.last_state_change = ngrt4n::convertToTimet(podCreationTime, "yyyy-MM-ddThh:mm:ssZ");
-        podNode.check.alarm_msg = QString("pod is %1 => %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
+        podNode.check.alarm_msg = QString("pod is %1 since %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
         out_cnodes.insert(podNode.id, podNode);
         continue;
         break;

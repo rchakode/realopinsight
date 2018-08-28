@@ -481,7 +481,7 @@
   <div id="monitoring-settings-section">
      <fieldset>
        <div class="col-sm-12 form-group">
-         <label class="control-label">Source&nbsp;</label>
+         <label class="control-label">Source Id&nbsp;</label>
          <span>${source-box}</span>
          <span>Type&nbsp;</span>
          <span>${monitor-type}</span>
@@ -506,7 +506,7 @@
 
      <fieldset>
        <div class="col-sm-12 form-group">
-         <label class="control-label">Web URL&nbsp;</label>
+         <label class="control-label">Monitor API Base URL&nbsp;</label>
          <span>${monitor-url}</span>
        </div>
        <div class="col-sm-12 form-group">
