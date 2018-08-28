@@ -307,7 +307,7 @@
 
     ${<if:role>}
     <div class="col-sm-12 form-group">
-          <label for="${id:role}" class="control-label">User level*</label>
+          <label for="${id:role}" class="control-label">User Role*</label>
           <div class="controls">
               ${role} <span class="help-inline">${role-info}</span>
           </div>
@@ -316,7 +316,7 @@
 
     ${<if:dashboard-mode>}
     <div class="col-sm-12 form-group">
-          <label for="${id:dashboard-mode}" class="control-label">Dashboard Display*</label>
+          <label for="${id:dashboard-mode}" class="control-label">Dashboard Display Mode*</label>
           <div class="controls">
               ${dashboard-mode} <span class="help-inline">${dashboard-mode-info}</span>
           </div>
