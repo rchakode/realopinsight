@@ -1,4 +1,4 @@
-RealOpinsight is an open-source operations monitoring system. Working on top of Kubernetes®, Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and various other monitoring systems, RealOpInsight provides powerful aggregation and visualization aiming to provide a comprehensive insight on your business applications.
+RealOpinsight is an open-source operations monitoring system. RealOpInsight works on top of Kubernetes®, Nagios®, Zabbix®, ManageEngine OpManager®, Pandora FMS®, Zenoss®, Icinga®, op5®, Centreon®, Shinken®, GroundWork®, and various other monitoring systems, to provide powerful aggregation and visualization to provide a comprehensive insight on your business applications.
 
 RealOpInsight is released under the terms of GPLv3 License. See the LICENSE file.
 
