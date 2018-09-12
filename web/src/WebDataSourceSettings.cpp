@@ -169,62 +169,65 @@ void WebDataSourceSettings::applyChanges(void)
     return;
   }
 
-  auto&& selectedMonitor = QString::fromStdString(m_monitorTypeField.currentText().toUTF8());
-  bool sourceCheckedSuccessfully = false;
+  auto&& monitorLabel = QString::fromStdString(m_monitorTypeField.currentText().toUTF8());
   QString validationErrorMsg = "";
-  if (selectedMonitor == MonitorT::toString(MonitorT::Kubernetes)) {
-    auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
-    auto&& verifySslPeer = m_dontVerifyCertificateField.checkState() == Wt::Checked;
-    K8sHelper k8s(k8sProxyUrl, verifySslPeer);
-    auto outListNamespaces = k8s.listNamespaces();
-    sourceCheckedSuccessfully = outListNamespaces.second == ngrt4n::RcSuccess;
-
-    WebBaseSettings settings;
-    DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
-    for (auto&& ns: outListNamespaces.first) {
-
-      NodeT nsNode;
-      nsNode.type = NodeType::K8sClusterService;
-      nsNode.id = QString("Source%1").arg(sourceIndex);
-      nsNode.name = ns;
-      nsNode.child_nodes = "";
-      nsNode.sev_prule = PropRules::Unchanged;
-      nsNode.sev_crule = CalcRules::Worst;
-      nsNode.weight = ngrt4n::WEIGHT_UNIT;
-      nsNode.icon = ngrt4n::K8S_NS;
-      nsNode.description = QString("Namespace %1").arg(ns);
-
-      CoreDataT cdata;
-      cdata.monitor = MonitorT::Kubernetes;
-      cdata.bpnodes.insert(nsNode.id, nsNode);
-
-      auto destPath = QString("%1/k8s_ns_%2_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"), ns, ngrt4n::generateId());
-      std::pair<int, QString> outSaveView = ngrt4n::saveViewDataToPath(cdata, destPath);
-
-      if (outSaveView.first != ngrt4n::RcSuccess) {
-        CORE_LOG("error", outSaveView.second.toStdString());
-      } else {
-        DboView vinfo;
-        vinfo.name = QString("%1:%2").arg(nsNode.id, nsNode.name).toStdString();
-        vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
-        vinfo.path = destPath.toStdString();
-        if (dbSession.addView(vinfo) != ngrt4n::RcSuccess) {
-          CORE_LOG("error", dbSession.lastError());
-        }
-      }
-    }
-    validationErrorMsg = outListNamespaces.first.isEmpty()? "" : outListNamespaces.first.at(0);
+  if (monitorLabel.contains(MonitorT::toString(MonitorT::Kubernetes))) {
+    saveK8sDataSource(sourceIndex);
   } else {
-    selectedMonitor = true;
-  }
-
-  if (sourceCheckedSuccessfully) {
-    saveAsSource(sourceIndex, selectedMonitor);
-  } else {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Failed when connecting to source (%1)").arg(validationErrorMsg).toStdString());
+    saveAsSource(sourceIndex, monitorLabel);
   }
 }
 
+
+void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
+{
+  auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
+  auto&& verifySslPeer = m_dontVerifyCertificateField.checkState() == Wt::Checked;
+
+  K8sHelper k8s(k8sProxyUrl, verifySslPeer);
+  auto outListNamespaces = k8s.listNamespaces();
+  if (outListNamespaces.second != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Failed when connecting to data source (%1)").arg(outListNamespaces.first.at(0)).toStdString());
+    return ;
+  }
+
+  saveAsSource(sourceIndex, MonitorT::toString(MonitorT::Kubernetes));
+
+  WebBaseSettings settings;
+  DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
+
+  for (auto&& ns: outListNamespaces.first) {
+    NodeT nsNode;
+    nsNode.type = NodeType::K8sClusterService;
+    nsNode.id = QString("Source%1").arg(sourceIndex);
+    nsNode.name = ns;
+    nsNode.child_nodes = "";
+    nsNode.sev_prule = PropRules::Unchanged;
+    nsNode.sev_crule = CalcRules::Worst;
+    nsNode.weight = ngrt4n::WEIGHT_UNIT;
+    nsNode.icon = ngrt4n::K8S_NS;
+    nsNode.description = QString("Namespace %1").arg(ns);
+
+    CoreDataT cdata;
+    cdata.monitor = MonitorT::Kubernetes;
+    cdata.bpnodes.insert(nsNode.id, nsNode);
+
+    auto destPath = QString("%1/k8s_ns_%2_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"), ns, ngrt4n::generateId());
+    std::pair<int, QString> outSaveView = ngrt4n::saveViewDataToPath(cdata, destPath);
+
+    if (outSaveView.first != ngrt4n::RcSuccess) {
+      CORE_LOG("error", outSaveView.second.toStdString());
+    } else {
+      DboView vinfo;
+      vinfo.name = QString("%1:%2").arg(nsNode.id, nsNode.name).toStdString();
+      vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
+      vinfo.path = destPath.toStdString();
+      if (dbSession.addView(vinfo) != ngrt4n::RcSuccess) {
+        CORE_LOG("error", dbSession.lastError());
+      }
+    }
+  }
+}
 
 
 void WebDataSourceSettings::addAsSource(void)

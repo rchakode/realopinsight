@@ -91,6 +91,7 @@ private:
   void handleSourceBoxChanged(void);
   void updateComponentsVisibiliy(int monitorTypeCurrentIndex);
   void handleShowAuthStringChanged(void);
+  void saveK8sDataSource(int sourceIndex);
 };
 
 #endif // WEBDATASOURCESETTINGS_HPP

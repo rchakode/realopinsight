@@ -38,11 +38,11 @@ public:
 protected:
   virtual void updateChart(void);
   virtual void buildMap(void) {}
-  virtual void updateMap(const NodeT& _node, const QString& _tip) {}
+  virtual void updateMap(const NodeT&, const QString&) {}
   virtual void buildTree(void) {}
-  virtual void updateTree(const NodeT& _node, const QString& _tip){}
-  virtual void updateMsgConsole(const NodeT& _node) {}
-  virtual void updateEventFeeds(const NodeT& node) {}
+  virtual void updateTree(const NodeT&, const QString&){}
+  virtual void updateMsgConsole(const NodeT&) {}
+  virtual void updateEventFeeds(const NodeT&) {}
 
 private:
   ChartBase m_chartBase;

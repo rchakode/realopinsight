@@ -214,7 +214,9 @@ void Parser::bindGraphDependencies(const NodeT& node)
     if (ngrt4n::findNode(m_cdata, parentId, parentRef)) {
       m_dotContent.append(QString("\t%1--%2\n").arg(escapeId4Graphviz(parentId), nodeGraphId));
     } else {
-      qDebug() << QObject::tr("Failed to find parent-child dependency '%1' => %2").arg(parentId, node.id);
+      if (node.id != ngrt4n::ROOT_ID) {
+        qDebug() << QObject::tr("Failed to find parent-child dependency '%1' => %2").arg(parentId, node.id);
+      }
     }
   }
 }

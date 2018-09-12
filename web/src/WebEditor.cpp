@@ -87,7 +87,14 @@ void WebEditor::configureTreeComponent()
 
 void  WebEditor::handleOpenViewButton(void)
 {
-  m_openViewDialog.updateContentWithViewList(m_dbSession->listViews());
+  // view name starting with "Source?:" must not be edited. E.g. Kubernetes view
+  DbViewsT viewList;
+  for (auto && view: m_dbSession->listViews()) {
+      if (! QString::fromStdString(view.name).startsWith("Source", Qt::CaseSensitive)) {
+        viewList.push_back(view);
+      }
+  }
+  m_openViewDialog.updateContentWithViewList(viewList);
   m_openViewDialog.show();
 }
 

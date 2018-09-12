@@ -64,18 +64,17 @@ void runCollector(int period)
     }
 
     for (const auto& view: vlist) {
-      // initialize a collector for the current view.
-      // skip the view if the initialization failed
-      QosCollector collector(view.path.c_str());
-      collector.initialize(&settings);
-      if (collector.lastProcessingSucceeded()) {
-        REPORTD_LOG("error", collector.lastErrorMsg());
-        continue;
+      QosCollector collector;
+      auto outInitilization = collector.initialize(&settings, view.path.c_str());
+      if (outInitilization.first != ngrt4n::RcSuccess) {
+        REPORTD_LOG("error", outInitilization.second.toStdString());
+        continue; // skip the view if the initialization failed
       }
+
       collector.initSettings(&settings);
       collector.updateAllNodesStatus(&dbSession);
       QosDataT qosData = collector.qosInfo();
-      qosData.timestamp = time(NULL); // now
+      qosData.timestamp = time(nullptr); // now
       qosDataList.push_back(qosData);
       rootNodes[qosData.view_name.c_str()] = collector.rootNode();
       try {
@@ -87,7 +86,7 @@ void runCollector(int period)
     }
     // now handle notifications if applicable
     if (settings.getNotificationType() != WebBaseSettings::NoNotification) {
-      for (const auto qosEntry : qosDataList) {
+      for (const auto& qosEntry : qosDataList) {
         notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);
       }
     }

@@ -76,6 +76,7 @@ DbSession::DbSession(int dbType, const std::string& db)
   } catch (const std::exception& ex) {
     m_lastError = QObject::tr("Connection to database failed: %1").arg(ex.what()).toStdString();
     CORE_LOG("fatal", m_lastError);
+    REPORTD_LOG("fatal", m_lastError);
   }
 }
 
@@ -364,11 +365,15 @@ int DbSession::initDb(void)
 
     rc = addUser(adm);
     if (rc == ngrt4n::RcSuccess) {
-      CORE_LOG("info", Q_TR("Database initialized successfully"));
+      auto&& msg = Q_TR("Database initialized successfully");
+      CORE_LOG("info", msg);
+      REPORTD_LOG("info", msg);
     }
 
   } catch (dbo::Exception& ex) {
-    CORE_LOG("error", QObject::tr("%1: failed initializing the database: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    auto&& msg = QObject::tr("%1: failed initializing the database: %2").arg(Q_FUNC_INFO, ex.what()).toStdString();
+    CORE_LOG("error", msg);
+    REPORTD_LOG("error", msg);
   }
 
   return rc;
@@ -579,10 +584,9 @@ int DbSession::addQosData(const QosDataT& qosData)
     ptr_qosDboData->view = find<DboView>().where("name=?").bind(qosData.view_name);;
     dbo::ptr<DboQosData> dboEntry = add(ptr_qosDboData);
     retValue = 0;
-    m_lastError = Q_TR("QoS entry added: ") + dboEntry->toString();
+    REPORTD_LOG("error", QObject::tr("QoS entry added: %1").arg(dboEntry->toString().c_str()));
   } catch (const dbo::Exception& ex) {
-    m_lastError = "Failed to add QoS entry, please check the log file";
-    CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    REPORTD_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   return retValue;
