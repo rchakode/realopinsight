@@ -960,16 +960,23 @@ void WebMainUI::initOperatorDashboard(void)
 
   auto vlist = m_dbSession->listViewListByAssignedUser(m_dbSession->loggedUser().username);
 
-  // Build view thumbnails
+  if (vlist.size() == 0) {
+    showMessage(ngrt4n::OperationFailed, Q_TR("No view loaded"));
+    return ;
+  }
+
+  // Generate view thumbnails
   int thumbIndex = 0;
   int thumbPerRow = m_dbSession->dashboardTilesPerRow();
+  std::string failedViews = "";
   for (const auto& view : vlist) {
     WebDashboard* dashboardItem = loadView(view.path);
     if (! dashboardItem) {
+      failedViews.append(" ").append(view.name);
       continue;
     }
     QObject::connect(dashboardItem, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
-    auto&& dashboardName =  dashboardItem->rootNode().name.toStdString() ;
+    auto&& dashboardName =  dashboardItem->rootNode().name.toStdString();
 
     Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(), dashboardItem->thumbnailProblemDetailBar(), dashboardItem->thumbnail());
     thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, dashboardName));
@@ -983,8 +990,10 @@ void WebMainUI::initOperatorDashboard(void)
 
   if (thumbIndex > 0) {
     startDashbaordUpdate();
-  } else {
-    showMessage(ngrt4n::OperationFailed, Q_TR("No view to display"));
+  }
+
+  if (thumbIndex != static_cast<int>(vlist.size())) {
+    showMessage(ngrt4n::OperationFailed, QObject::tr("Failed while loading views: %1").arg(failedViews.c_str()).toStdString());
   }
 }
 
