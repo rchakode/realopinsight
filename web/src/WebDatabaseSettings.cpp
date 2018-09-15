@@ -26,7 +26,7 @@
 #include "WebUtils.hpp"
 #include "WebDatabaseSettings.hpp"
 #include "Validators.hpp"
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include <QString>
 #include <Wt/WTemplate>
 #include <Wt/WContainerWidget>

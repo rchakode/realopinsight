@@ -20,7 +20,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include "WebBaseSettings.hpp"
 
 

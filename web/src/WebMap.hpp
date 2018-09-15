@@ -58,7 +58,6 @@ public:
 
 protected:
   void paintEvent(Wt::WPaintDevice *paintDevice);
-  void layoutSizeChanged(int width, int height );
 
 private:
   CoreDataT* m_cdata;

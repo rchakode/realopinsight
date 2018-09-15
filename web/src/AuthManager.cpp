@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include "WebUtils.hpp"
 #include "WebMainUI.hpp"
 #include "AuthManager.hpp"
@@ -43,7 +43,7 @@ AuthManager::AuthManager(DbSession* dbSession)
   : Wt::Auth::AuthWidget(dbSession->loginObject()),
     m_isActivatedLicense(false),
     m_dbSession(dbSession),
-    m_mainUI(NULL)
+    m_mainUI(nullptr)
 {
   AuthModelProxy* authModelProxy = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
   authModelProxy->loginFailed().connect(this, &AuthManager::handleLoginFailed);

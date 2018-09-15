@@ -1,7 +1,7 @@
 #ifndef WEBCSVREPORTRESOURCE_HPP
 #define WEBCSVREPORTRESOURCE_HPP
 
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include <Wt/WResource>
 #include <Wt/WAnchor>
 

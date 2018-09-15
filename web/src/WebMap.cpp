@@ -99,15 +99,6 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 }
 
 
-
-void WebMap::layoutSizeChanged(int width, int height)
-{
-  //WPaintedWidget::layoutSizeChanged(widt
-  //m_scrollArea.resize(width, height);
-  //TODO layoutSizeChanged(int width, int height)
-  //qDebug()<<m_cdata->map_width * m_scaleX << m_cdata->map_height * m_scaleY << width << height << m_cdata->map_width << m_cdata->map_height;
-}
-
 void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this calls paintEvent

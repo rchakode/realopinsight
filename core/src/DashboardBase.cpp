@@ -97,7 +97,7 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
   }
 
   Parser parser(&m_cdata, Parser::ParsingModeDashboard, p_settings);
-  auto&& outParsing = parser.parse(viewFile);
+  auto outParsing = parser.parse(viewFile);
   if (outParsing.first != ngrt4n::RcSuccess) {
     return std::make_pair(outParsing.first, outParsing.second);
   }
@@ -155,20 +155,20 @@ void DashboardBase::runK8sDataSourceUpdate(const SourceT& srcInfo)
 {
   auto k8sNs = rootNode().name;
   K8sHelper k8s(srcInfo.mon_url, srcInfo.verify_ssl_peer);
-  CoreDataT upcdata;
-  auto&& outLoadNsView = k8s.loadNamespaceView(k8sNs, upcdata);
+  CoreDataT cdata4Update;
+  auto&& outLoadNsView = k8s.loadNamespaceView(k8sNs, srcInfo.id, cdata4Update);
   if (outLoadNsView.second != ngrt4n::RcSuccess) {
     updateDashboardOnError(srcInfo, outLoadNsView.first);
   } else {
-    for (const auto& upcnode: upcdata.cnodes) {
-      auto cnode = m_cdata.cnodes.find(upcnode.id);
+    for (const auto& cnodeUpdated: cdata4Update.cnodes) {
+      auto cnode = m_cdata.cnodes.find(cnodeUpdated.id);
       if (cnode != m_cdata.cnodes.end()) {
-        cnode->check = upcnode.check;
+        cnode->check = cnodeUpdated.check;
         updateNodeStatusInfo(*cnode, srcInfo);
         updateDashboard(*cnode);
         cnode->monitored = true;
       } else {
-        qDebug() << "Seems like pod changed:" << upcnode.name << upcnode.child_nodes;
+        qDebug() << "Seems like pod changed:" << cnodeUpdated.name << cnodeUpdated.child_nodes;
       }
     }
   }
@@ -439,9 +439,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
   for (auto& cnode: m_cdata.cnodes) {
     QString srcPrefix = QString("%1:").arg(src.id);
     if (! cnode.monitored && cnode.child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
-      ngrt4n::setCheckOnError(ngrt4n::Unset,
-                              tr("Undefined service (%1)").arg(cnode.child_nodes),
-                              cnode.check);
+      ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode.child_nodes), cnode.check);
       updateNodeStatusInfo(cnode, src);
       updateDashboard(cnode);
     }

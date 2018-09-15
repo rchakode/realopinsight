@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "dbo/ViewAclManagement.hpp"
+#include "dbo/src/ViewAclManagement.hpp"
 #include "AuthManager.hpp"
 #include "WebMainUI.hpp"
 #include "utilsCore.hpp"
@@ -391,10 +391,7 @@ void WebMainUI::resetTimer(qint32 interval)
 
 void WebMainUI::handleRefresh(void)
 {
-  QString logMsg;
-  logMsg = QObject::tr("console update triggered (operator: %1, session: %2)")
-           .arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str());
-  CORE_LOG("info", logMsg.toStdString());
+  CORE_LOG("info", QObject::tr("updating console (operator: %1, session: %2)").arg(m_dbSession->loggedUserName(), wApp->sessionId().c_str()).toStdString());
   m_globalTimer.stop();
 
   std::map<int, int> problemTypeCount;
@@ -405,7 +402,9 @@ void WebMainUI::handleRefresh(void)
   problemTypeCount[ngrt4n::Unknown]  = 0;
 
   // clear the notification manager when applicable
-  if (m_notificationManager) m_notificationManager->clearAllServicesData();
+  if (m_notificationManager) {
+    m_notificationManager->clearAllServicesData();
+  }
 
   QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
@@ -419,7 +418,9 @@ void WebMainUI::handleRefresh(void)
     int platformSeverity = qMin(rootService.sev, static_cast<int>(ngrt4n::Unknown));
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
-      if (m_notificationManager) m_notificationManager->updateServiceData(rootService);
+      if (m_notificationManager) {
+        m_notificationManager->updateServiceData(rootService);
+      }
     }
     std::string viewName =  rootService.name.toStdString();
     ThumbnailMapT::Iterator thumbnailItem = m_thumbsWidgets.find(viewName);
@@ -427,7 +428,7 @@ void WebMainUI::handleRefresh(void)
       (*thumbnailItem)->setStyleClass(dashboard->thumbnailCssClass());
       (*thumbnailItem)->setToolTip(dashboard->tooltip());
       if (m_dbSession->isCompleteUserDashboard()) {
-        m_biDashlet.updateViewCharts(viewName, qosDataMap);
+        m_biDashlet.updateChartsByViewName(viewName, qosDataMap);
       }
     }
     ++currentView;
@@ -460,13 +461,9 @@ void WebMainUI::handleLaunchEditor(void)
 
 void WebMainUI::handlePreviewFile(const std::string& path, const std::string&)
 {
-  showMessage(ngrt4n::OperationInProgress, "Loading view...");
   WebDashboard* dashboard = loadView(path);
   if (dashboard) {
     setDashboardAsFrontStackedWidget(dashboard);
-    showMessage(ngrt4n::OperationFinished, "");
-  } else {
-    showMessage(ngrt4n::OperationFailed, "Loading failed");
   }
 }
 
@@ -531,7 +528,7 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
   QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, start, end);
   Q_FOREACH(const std::string& viewName, qosDataMap.keys())
-    m_biDashlet.updateViewCharts(viewName, qosDataMap);
+    m_biDashlet.updateChartsByViewName(viewName, qosDataMap);
   showMessage(ngrt4n::OperationSucceeded, Q_TR("Reports updated: ")
               .append(ngrt4n::wHumanTimeText(start).toUTF8())
               .append(" - ")
@@ -647,6 +644,7 @@ void WebMainUI::setupUploadForm(void)
 
 WebDashboard* WebMainUI::loadView(const std::string& path)
 {
+  showMessage(ngrt4n::OperationInProgress, Q_TR("Loading view..."));
   if (path.empty()) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Cannot open empty path"));
     return nullptr;
@@ -670,7 +668,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     QString viewName = dashboard->rootNode().name;
     DashboardMapT::Iterator result = m_dashboardMap.find(viewName);
     if (result != m_dashboardMap.end()) {
-      showMessage(ngrt4n::OperationFailed, tr("A platfom with the same name is already loaded (%1)").arg(viewName).toStdString());
+      showMessage(ngrt4n::OperationFailed, tr("A console with the same name is already loaded (%1)").arg(viewName).toStdString());
       delete dashboard;
       return nullptr;
     }
@@ -690,6 +688,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     showMessage(ngrt4n::OperationFailed, errorMsg);
     return nullptr;
   }
+  showMessage(ngrt4n::OperationSucceeded, Q_TR("View loaded"));
   return dashboard;
 }
 
@@ -1270,7 +1269,7 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
 void WebMainUI::fetchQosData(QosDataListMapT& qosDataMap, long start, long end)
 {
   m_dbSession->listQosData(qosDataMap,
-                           "", /** viewName: empty means all views **/
+                           "", // empty view name means all views **/
                            start,
                            end);
 }

@@ -78,14 +78,14 @@ Wt::WText* WebBiDashlet::createTitleWidget(const std::string& viewName)
 }
 
 
-void WebBiDashlet::updateViewCharts(const std::string& viewName, const QosDataListMapT& qosDataMap)
+void WebBiDashlet::updateChartsByViewName(const std::string& viewName, const QosDataListMapT& qosDataMap)
 {
   QosDataListMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewName);
-  if (iterQosDataSet ==  qosDataMap.end())
-    return; // stop process
+  if (iterQosDataSet ==  qosDataMap.end()) {
+    return; // return if view not found
+  }
 
-  // Here we have: iterQosDataSet !=  qosDataMap.end()
-  // So update qos chart when applicable
+  // process update since view found
   QMap<std::string, WebPieChart*>::iterator iterSlaPiechart = m_slaPieChartMap.find(viewName);
   if (iterSlaPiechart != m_slaPieChartMap.end()) {
     WebBiSlaDataAggregator slaData(*iterQosDataSet);

@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include "WebBaseSettings.hpp"
 #include "QosCollector.hpp"
 #include "WebUtils.hpp"
@@ -36,11 +36,12 @@
 #include <QString>
 #include <getopt.h>
 #include <unistd.h>
+#include <regex>
 
 
 void wait_for_interval(int interval)
 {
-  int remaining = interval;
+  unsigned int remaining = static_cast<unsigned int>(interval);
   while ((remaining = sleep(remaining)) > 0);
 }
 
@@ -67,7 +68,7 @@ void runCollector(int period)
       QosCollector collector;
       auto outInitilization = collector.initialize(&settings, view.path.c_str());
       if (outInitilization.first != ngrt4n::RcSuccess) {
-        REPORTD_LOG("error", outInitilization.second.toStdString());
+        REPORTD_LOG("error", QObject::tr("%1: %2").arg(view.name.c_str(), outInitilization.second).toStdString());
         continue; // skip the view if the initialization failed
       }
 
@@ -79,7 +80,6 @@ void runCollector(int period)
       rootNodes[qosData.view_name.c_str()] = collector.rootNode();
       try {
         dbSession.addQosData(qosData);
-        REPORTD_LOG("notice", dbSession.lastError());
       } catch(const std::exception& ex) {
         REPORTD_LOG("warn", std::string(ex.what()));
       }

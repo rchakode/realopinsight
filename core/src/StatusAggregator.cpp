@@ -64,9 +64,9 @@ void StatusAggregator::addThresholdLimit(QVector<ThresholdT>& thresholdsLimits, 
 void StatusAggregator::updateThresholds(void)
 {
   if (m_nonEssentialTotalWeight > 0)
-    Q_FOREACH(int sev, m_severityWeightsMap.keys()) m_statusRatios[sev] = m_severityWeightsMap[sev] / m_nonEssentialTotalWeight;
+    for (int sev : m_severityWeightsMap.keys()) m_statusRatios[sev] = m_severityWeightsMap[sev] / m_nonEssentialTotalWeight;
   else
-    Q_FOREACH(int sev, m_severityWeightsMap.keys()) m_statusRatios[sev] = DBL_MAX;
+    for (int sev : m_severityWeightsMap.keys()) m_statusRatios[sev] = DBL_MAX;
 }
 
 QString StatusAggregator::toDetailsString(void)
@@ -121,7 +121,7 @@ int StatusAggregator::propagate(int sev, int prule)
 {
   qint8 result = static_cast<ngrt4n::SeverityT>(sev);
   Severity sevHelper(static_cast<ngrt4n::SeverityT>(sev));
-  switch(prule) {
+  switch (prule) {
   case PropRules::Increased:
     result = (++sevHelper).value();
     break;
@@ -138,7 +138,7 @@ int StatusAggregator::weightedAverage(void)
 {
   double severityScore = 0;
   double weightSum = 0;
-  Q_FOREACH(int sev, m_severityWeightsMap.keys()) {
+  for(int sev : m_severityWeightsMap.keys()) {
     double weight = m_severityWeightsMap[sev];
     if (weight > 0) {
       severityScore += weight * static_cast<double>(sev);

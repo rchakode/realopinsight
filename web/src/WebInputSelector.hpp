@@ -1,6 +1,6 @@
 #ifndef WEBVIEWSELECTOR_H
 #define WEBVIEWSELECTOR_H
-#include "dbo/DbObjects.hpp"
+#include "dbo/src/DbObjects.hpp"
 #include "Base.hpp"
 #include <Wt/WComboBox>
 #include <Wt/WDialog>

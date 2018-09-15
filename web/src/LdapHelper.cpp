@@ -22,7 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "dbo/DbObjects.hpp"
+#include "dbo/src/DbObjects.hpp"
 #include "LdapHelper.hpp"
 #include "SettingFactory.hpp"
 #include "WebUtils.hpp"
@@ -38,7 +38,7 @@ LdapHelper::LdapHelper(const std::string& serverUri,
                        bool sslUseMyCert,
                        const std::string& sslCertFile,
                        const std::string& sslCaFile)
-  : m_handler(NULL),
+  : m_handler(nullptr),
     m_serverUri(serverUri),
     m_version(version),
     m_sslUseMyCert(sslUseMyCert),
@@ -66,7 +66,7 @@ int LdapHelper::setupHandler(void)
 void LdapHelper::cleanupHandler(void)
 {
   if (m_handler)
-    ldap_unbind_ext(m_handler, NULL, NULL);
+    ldap_unbind_ext(m_handler, nullptr, nullptr);
 }
 
 void LdapHelper::reset(void)
@@ -79,11 +79,11 @@ void LdapHelper::setSslSettings(void)
 {
   if ( ldap_is_ldaps_url(m_serverUri.c_str()) ) {
     int sslRequireCert = LDAP_OPT_X_TLS_DEMAND;
-    ldap_set_option (NULL, LDAP_OPT_X_TLS_REQUIRE_CERT, &sslRequireCert);
+    ldap_set_option (nullptr, LDAP_OPT_X_TLS_REQUIRE_CERT, &sslRequireCert);
 
     if (m_sslUseMyCert) {
-      ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, m_sslCaFile.c_str());
-      ldap_set_option(NULL, LDAP_OPT_X_TLS_CERTFILE, m_sslCertFile.c_str());
+      ldap_set_option(nullptr, LDAP_OPT_X_TLS_CACERTFILE, m_sslCaFile.c_str());
+      ldap_set_option(nullptr, LDAP_OPT_X_TLS_CERTFILE, m_sslCertFile.c_str());
     }
   }
 }
@@ -111,7 +111,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
 
   // User authentication (bind)
   bool resultStatus = false;
-  int rc = ldap_sasl_bind_s(m_handler, dn.c_str(), LDAP_SASL_SIMPLE, &cred, NULL,NULL,NULL);
+  int rc = ldap_sasl_bind_s(m_handler, dn.c_str(), LDAP_SASL_SIMPLE, &cred, nullptr,nullptr,nullptr);
   if (rc != LDAP_SUCCESS) {
     m_lastError = QString("LDAP: %1").arg(ldap_err2string(rc));
   } else {
@@ -149,10 +149,10 @@ int LdapHelper::listUsers(const std::string& searchBase,
                               searchBase.c_str(),
                               LDAP_SCOPE_SUBTREE,
                               filter.c_str(),
-                              NULL,
+                              nullptr,
                               0,
-                              NULL,
-                              NULL,
+                              nullptr,
+                              nullptr,
                               &timeout,
                               0,
                               &searchResult);
@@ -163,7 +163,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
 
   // parse result
   for (LDAPMessage* currentEntry = ldap_first_entry(m_handler, searchResult);
-       currentEntry != NULL;
+       currentEntry != nullptr;
        currentEntry = ldap_next_entry(m_handler, currentEntry)) {
     std::string dn = getObjectDistingisghName(currentEntry);
     userMap[dn].insert("dn", dn);
@@ -181,7 +181,7 @@ std::string LdapHelper::getObjectDistingisghName(LDAPMessage* objectData)
 {
   char* buffer;
   std::string result = "";
-  if ((buffer = ldap_get_dn(m_handler, objectData)) != NULL) {
+  if ((buffer = ldap_get_dn(m_handler, objectData)) != nullptr) {
     result = std::string(buffer);
     ldap_memfree(buffer);
   }
@@ -193,9 +193,9 @@ void LdapHelper::parseObjectAttr(LDAPMessage* objectData, LdapUserAttrsT& userIn
   BerElement* ber;
   struct berval** values;
   for (char* curAttr = ldap_first_attribute(m_handler, objectData, &ber);
-       curAttr != NULL; curAttr = ldap_next_attribute(m_handler, objectData, ber) ) {
-    if ((values = ldap_get_values_len(m_handler, objectData, curAttr)) != NULL ) {
-      for (int attrIndex = 0; values[attrIndex] != NULL; attrIndex++ ) {
+       curAttr != nullptr; curAttr = ldap_next_attribute(m_handler, objectData, ber) ) {
+    if ((values = ldap_get_values_len(m_handler, objectData, curAttr)) != nullptr ) {
+      for (int attrIndex = 0; values[attrIndex] != nullptr; attrIndex++ ) {
         userInfo.insertMulti(QString(curAttr).toLower().toStdString(), values[attrIndex]->bv_val);
       }
       ldap_value_free_len(values);

@@ -84,13 +84,13 @@ check_prerequisites()
   [ ! -e $QLRELEASE ] && echo "[ERROR] lrelease not found." && exit 1
   echo "done" 
   
-  echo -n "[DEBUG] Checking if WT_HOME is set... "
-  [ -z $WT_HOME ] && echo "[ERROR] WT_HOME environment variable is not set." && exit 1
+  echo -n "[DEBUG] Checking if WT_ROOT is set... "
+  [ -z $WT_ROOT ] && echo "[ERROR] WT_ROOT environment variable is not set." && exit 1
   echo "done"
   
-  WT_DBO_SQLITE=${WT_HOME}/include/Wt/Dbo/backend/Sqlite3
-  echo -n "[DEBUG] Checking Wt include files from $WT_HOME... "
-  [ ! -e $WT_DBO_SQLITE ] && echo -en "[ERROR] $WT_DBO_SQLITE not found.\n => $WT_HOME does not seem to be a Wt installation base directory." && exit 1
+  WT_DBO_SQLITE=${WT_ROOT}/include/Wt/Dbo/backend/Sqlite3
+  echo -n "[DEBUG] Checking Wt include files from $WT_ROOT... "
+  [ ! -e $WT_DBO_SQLITE ] && echo -en "[ERROR] $WT_DBO_SQLITE not found.\n => $WT_ROOT does not seem to be a Wt installation base directory." && exit 1
   echo "done"   
  
   echo -n "[DEBUG] Checking make => ${MAKE:=`which make`}... "

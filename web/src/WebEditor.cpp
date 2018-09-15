@@ -44,6 +44,7 @@
 #include <Wt/WImage>
 #include <Wt/WTemplate>
 #include <Wt/WPoint>
+#include <regex>
 
 
 const QMap<int, std::string> WebEditor::MENU_LABELS = {
@@ -90,7 +91,7 @@ void  WebEditor::handleOpenViewButton(void)
   // view name starting with "Source?:" must not be edited. E.g. Kubernetes view
   DbViewsT viewList;
   for (auto && view: m_dbSession->listViews()) {
-      if (! QString::fromStdString(view.name).startsWith("Source", Qt::CaseSensitive)) {
+      if (! std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
         viewList.push_back(view);
       }
   }

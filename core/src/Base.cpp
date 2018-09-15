@@ -115,47 +115,50 @@ Severity Severity::operator *(Severity& sev) const
       return sev;
       break;
     case ngrt4n::Minor:
-      if(sev.m_sev == ngrt4n::Critical ||
-         sev.m_sev == ngrt4n::Major ||
-         sev.m_sev == ngrt4n::Unknown)
+      if (sev.m_sev == ngrt4n::Critical || sev.m_sev == ngrt4n::Major || sev.m_sev == ngrt4n::Unknown) {
         return sev;
-      return Severity(m_sev);
+      } else {
+        return Severity(m_sev);
+      }
       break;
     case ngrt4n::Major:
-      if(sev.m_sev == ngrt4n::Critical ||
-         sev.m_sev == ngrt4n::Unknown)
+      if (sev.m_sev == ngrt4n::Critical || sev.m_sev == ngrt4n::Unknown) {
         return sev;
-      return Severity(m_sev);
+      } else {
+        return Severity(m_sev);
+      }
       break;
+    case ngrt4n::Unknown:
     default:
-      // MonitorBroker::CRITICITY_UNKNOWN
-      if(sev.m_sev == ngrt4n::Critical)
+      if (sev.m_sev == ngrt4n::Critical) {
         return sev;
+      }
       break;
-  }  //end switch
+  }  //switch
   return Severity(ngrt4n::Unknown);
 }
 
 Severity Severity::operator / (Severity& st) const
 {
-  if(m_sev == st.m_sev)
+  if (m_sev == st.m_sev) {
     return st;
+  }
 
-  if(m_sev == ngrt4n::Critical ||
-     st.m_sev == ngrt4n::Critical)
+  if (m_sev == ngrt4n::Critical || st.m_sev == ngrt4n::Critical)  {
     return Severity(ngrt4n::Critical);
+  }
 
-  if(m_sev == ngrt4n::Unknown ||
-     st.m_sev == ngrt4n::Unknown)
+  if (m_sev == ngrt4n::Unknown || st.m_sev == ngrt4n::Unknown) {
     return Severity(ngrt4n::Unknown);
+  }
 
-  if(m_sev == ngrt4n::Major ||
-     st.m_sev == ngrt4n::Major)
+  if (m_sev == ngrt4n::Major || st.m_sev == ngrt4n::Major) {
     return Severity(ngrt4n::Major);
+  }
 
-  if(m_sev == ngrt4n::Minor ||
-     st.m_sev == ngrt4n::Minor)
+  if (m_sev == ngrt4n::Minor || st.m_sev == ngrt4n::Minor) {
     return Severity(ngrt4n::Minor);
+  }
 
   return Severity(ngrt4n::Normal);
 }

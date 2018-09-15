@@ -25,7 +25,7 @@
 #ifndef WEBEDITOR_HPP
 #define WEBEDITOR_HPP
 
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include "WebInputSelector.hpp"
 #include "WebTree.hpp"
 #include <Wt/WGridLayout>

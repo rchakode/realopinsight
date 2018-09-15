@@ -25,7 +25,7 @@
 #define WEBBASESETTINGS_HPP
 
 #include "BaseSettings.hpp"
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include <Wt/WCheckBox>
 
 

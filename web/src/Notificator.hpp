@@ -25,7 +25,7 @@
 #ifndef NOTIFICATOR_H
 #define NOTIFICATOR_H
 #include "Base.hpp"
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include "WebNotificationSettings.hpp"
 #include "utils/smtpclient/MailSender.hpp"
 #include <QObject>

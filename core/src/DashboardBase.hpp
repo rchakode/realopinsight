@@ -30,7 +30,7 @@
 #include "BaseSettings.hpp"
 #include "ZbxHelper.hpp"
 #include "ZnsHelper.hpp"
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbSession.hpp"
 #include <QString>
 
 class QScriptValueIterator;

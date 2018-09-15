@@ -25,8 +25,8 @@
 #ifndef REPORTCOLLECTOR_HPP
 #define REPORTCOLLECTOR_HPP
 #include "DashboardBase.hpp"
-#include "dbo/DbObjects.hpp"
-#include "dbo/DbSession.hpp"
+#include "dbo/src/DbObjects.hpp"
+#include "dbo/src/DbSession.hpp"
 #include "ChartBase.hpp"
 
 class QosCollector : public DashboardBase

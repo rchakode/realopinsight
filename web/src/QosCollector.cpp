@@ -38,12 +38,12 @@ void QosCollector::updateChart(void)
   m_chartBase.updateStatsData(statsData, statCount);
 
   NodeT rootSrv = rootNode();
-  m_qosInfo.timestamp = time(NULL);
+  m_qosInfo.timestamp = time(nullptr);
   m_qosInfo.view_name = rootSrv.name.toStdString();
   m_qosInfo.status    = rootSrv.sev;
-  m_qosInfo.normal    = m_chartBase.statusRatio(ngrt4n::Normal);
-  m_qosInfo.minor     = m_chartBase.statusRatio(ngrt4n::Minor);
-  m_qosInfo.major     = m_chartBase.statusRatio(ngrt4n::Major);
-  m_qosInfo.critical  = m_chartBase.statusRatio(ngrt4n::Critical);
-  m_qosInfo.unknown   = m_chartBase.statusRatio(ngrt4n::Unknown);
+  m_qosInfo.normal    = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Normal));
+  m_qosInfo.minor     = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Minor));
+  m_qosInfo.major     = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Major));
+  m_qosInfo.critical  = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Critical));
+  m_qosInfo.unknown   = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Unknown));
 }

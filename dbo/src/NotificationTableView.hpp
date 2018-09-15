@@ -1,5 +1,5 @@
 /*
-# LdapUserManager.hpp
+# NotificationManager.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Last Update: 07-12-2014                                                  #
@@ -22,50 +22,36 @@
 #--------------------------------------------------------------------------#
  */
 
+#ifndef NOTIFICATIONMANAGER_HPP
+#define NOTIFICATIONMANAGER_HPP
 
-#ifndef LDAPUSERMANAGER_HPP
-#define LDAPUSERMANAGER_HPP
-
-
-#include "LdapHelper.hpp"
-#include "dbo/DbObjects.hpp"
-#include "dbo/DbSession.hpp"
+#include "Base.hpp"
+#include "dbo/src/DbSession.hpp"
+#include "dbo/src/DbObjects.hpp"
 #include <Wt/WTableView>
-#include <Wt/WContainerWidget>
-#include <Wt/WSignal>
-#include <QString>
+#include <Wt/WStandardItemModel>
+#include <Wt/WStandardItem>
 
-class LdapUserManager : public Wt::WTableView
+class NotificationTableView : public Wt::WTableView
 {
 public:
-  enum EnableOperationT {
-    EnableAuthSuccess,
-    DisableAuthSuccess,
-    GenericError
-  };
-
-  LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent = 0);
-  int updateUserList(void);
-  std::string lastError(void) const {return m_lastError.toStdString();}
-
-  Wt::Signal<int, std::string>& userEnableStatusChanged(void) {return m_userEnableStatusChanged;}
+  NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent = nullptr);
+  int update(void);
+  std::string lastError(void) const {return m_lastError;}
+  void clearAllServicesData(void) { m_services.clear(); }
+  void updateServiceData(const NodeT& node) { m_services[node.name] = node; }
 
 private:
-  /** Signals **/
-  Wt::Signal<int, std::string> m_userEnableStatusChanged;
-
   /** other members **/
-  QString m_lastError;
+  std::string m_lastError;
   Wt::WStandardItemModel* m_model;
   DbSession* m_dbSession;
-  LdapUserMapT m_users;
-  std::string m_ldapUidField;
+  NodeListT m_services;
 
   void addEvent(void);
   void setModelHeader(void);
-  void addUserRow(const LdapUserAttrsT& userInfo, bool imported);
-  void handleImportationAction(Wt::WStandardItem* item);
-  int insertIntoDatabase(const LdapUserAttrsT& userInfo);
+  void handleAckStatusChanged(Wt::WStandardItem* item);
+  void addServiceEntry(const NodeT& service, bool hasNotification, const NotificationT& notification);
 };
 
-#endif // LDAPUSERMANAGER_HPP
+#endif // NOTIFICATIONMANAGER_HPP

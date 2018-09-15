@@ -23,7 +23,7 @@
  */
 
 #include "WebAuthSettings.hpp"
-#include "dbo/UserManagement.hpp"
+#include "dbo/src/UserManagement.hpp"
 #include "AuthModelProxy.hpp"
 #include "WebUtils.hpp"
 #include "Validators.hpp"

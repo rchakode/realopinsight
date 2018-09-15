@@ -20,10 +20,12 @@
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.    #
 #--------------------------------------------------------------------------#
 
+WT_ROOT = $$(WT_ROOT)
 QT	+= core xml network script
 
 CONFIG += no_keywords
 TEMPLATE = app
+RESOURCES += ngrt4n.qrc
 
 REALOPINSIGHT_CORE_VERSION=3.5.0
 VERSION = "-$${REALOPINSIGHT_CORE_VERSION}"
@@ -53,9 +55,10 @@ TRANSLATIONS += i18n/ngrt4n_fr.ts
 CODECFORSRC = UTF-8
 CODECFORTR  = UTF-8
 
-INCLUDEPATH += $(WT_HOME)/include \
-               web/src
-
+INCLUDEPATH += $(WT_ROOT)/include \
+                dbo/src \
+                core/src/\
+                web/src
 
 HEADERS += \
     core/src/Base.hpp \
@@ -85,10 +88,12 @@ HEADERS += \
     web/src/utils/smtpclient/qxtmailattachment.h \
     web/src/utils/smtpclient/MailSender.hpp \
     web/src/utils/Logger.hpp \
-    web/src/dbo/DbSession.hpp \
-    web/src/dbo/DbObjects.hpp \
-    web/src/dbo/ViewAclManagement.hpp \
-    web/src/dbo/UserManagement.hpp \
+    dbo/src/DbSession.hpp \
+    dbo/src/DbObjects.hpp \
+    dbo/src/ViewAclManagement.hpp \
+    dbo/src/UserManagement.hpp \
+    dbo/src/LdapUserManager.hpp \
+    dbo/src/NotificationTableView.hpp \
     web/src/WebDashboard.hpp \
     web/src/WebMap.hpp \
     web/src/WebTree.hpp \
@@ -102,8 +107,6 @@ HEADERS += \
     web/src/QosCollector.hpp \
     web/src/Applications.hpp \
     web/src/Notificator.hpp \
-    web/src/dbo/LdapUserManager.hpp \
-    web/src/dbo/NotificationTableView.hpp \
     web/src/WebCsvReportResource.hpp \
     web/src/WebBiDateFilter.hpp \
     web/src/WebBiDashlet.hpp \
@@ -136,6 +139,11 @@ SOURCES +=  core/src/Base.cpp \
     core/src/OpManagerHelper.cpp  \
     core/src/BaseSettings.cpp \
     core/src/SettingFactory.cpp \
+    dbo/src/LdapUserManager.cpp \
+    dbo/src/NotificationTableView.cpp \
+    dbo/src/DbSession.cpp \
+    dbo/src/UserManagement.cpp \
+    dbo/src/ViewAclManagement.cpp \
     web/src/utils/wtwithqt/DispatchThread.C \
     web/src/utils/wtwithqt/WQApplication.C \
     web/src/utils/smtpclient/qxthmac.cpp \
@@ -144,9 +152,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/utils/smtpclient/qxtsmtp.cpp \
     web/src/utils/smtpclient/MailSender.cpp \
     web/src/utils/Logger.cpp \
-    web/src/dbo/DbSession.cpp \
-    web/src/dbo/UserManagement.cpp \
-    web/src/dbo/ViewAclManagement.cpp \
     web/src/QosCollector.cpp \
     web/src/WebDashboard.cpp \
     web/src/WebMap.cpp \
@@ -158,8 +163,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/LdapHelper.cpp \
     web/src/AuthModelProxy.cpp \
     web/src/Notificator.cpp \
-    web/src/dbo/LdapUserManager.cpp \
-    web/src/dbo/NotificationTableView.cpp \
     web/src/WebCsvReportResource.cpp \
     web/src/WebBiDashlet.cpp \
     web/src/WebBiDateFilter.cpp \
@@ -177,7 +180,7 @@ SOURCES +=  core/src/Base.cpp \
     core/src/K8sHelper.cpp
 
 
-LIBS += -L"$(WT_HOME)/lib" \
+LIBS += -L"$(WT_ROOT)/lib" \
         -lwt \
         -lwtdbo \
         -lwtdbosqlite3 \
@@ -192,15 +195,15 @@ LIBS += -L"$(WT_HOME)/lib" \
         -lboost_date_time \
         -lldap
 
+reportd {
+  SOURCES += web/src/ngrt4n-reportd.cpp
+  TARGET = realopinsight-reportd
+}
+
 webd {
   SOURCES += web/src/ngrt4n-web.cpp
   TARGET = realopinsight-server
   LIBS += -lwthttp
-}
-
-reportd {
-  SOURCES += web/src/ngrt4n-reportd.cpp
-  TARGET = realopinsight-reportd
 }
 
 setupdb {
@@ -226,16 +229,10 @@ TARGET.files = $${TARGET}
 INSTALLS += TARGET
 
 
-INCLUDEPATH += core/src/
-RESOURCES += ngrt4n.qrc
-
-
 DEFINES *= REALOPINSIGHT_WEB
 DEFINES *= WT_NO_SLOT_MACROS
 DEFINES *= BOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 DEFINES *= QT_USE_QSTRINGBUILDER
-
-
 DEFINES *= "REALOPINSIGHT_BUILD_DATE=\"`date +%s`\""
 DEFINES *= "REALOPINSIGHT_APPLICATION_NAME='\"RealOpInsight\"'"
 DEFINES *= "REALOPINSIGHT_CORE_VERSION='\"$${REALOPINSIGHT_CORE_VERSION}\"'"

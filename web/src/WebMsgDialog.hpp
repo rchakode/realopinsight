@@ -27,8 +27,8 @@
 #include <QMap>
 #include <Wt/WDialog>
 #include "Base.hpp"
-#include "dbo/DbSession.hpp"
-#include "dbo/NotificationTableView.hpp"
+#include "dbo/src/DbSession.hpp"
+#include "dbo/src/NotificationTableView.hpp"
 
 class WebMsgDialog : public Wt::WDialog
 {

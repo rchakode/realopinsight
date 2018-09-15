@@ -25,7 +25,7 @@
 #ifndef WEBBISLACHART_HPP
 #define WEBBISLACHART_HPP
 
-#include "dbo/DbObjects.hpp"
+#include "dbo/src/DbObjects.hpp"
 
 class WebBiSlaDataAggregator
 {

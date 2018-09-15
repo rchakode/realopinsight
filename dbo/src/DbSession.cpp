@@ -576,15 +576,21 @@ int DbSession::checkUserCookie(const DboLoginSession& session)
 
 int DbSession::addQosData(const QosDataT& qosData)
 {
-  int retValue = -1;
+  REPORTD_LOG("info", QObject::tr("Adding QoS entry: %1").arg(qosData.toString().c_str()));
+
+  int retValue = ngrt4n::RcGenericFailure;
   dbo::Transaction transaction(*this);
   try {
-    DboQosData* ptr_qosDboData = new DboQosData();
-    ptr_qosDboData->setData(qosData);
-    ptr_qosDboData->view = find<DboView>().where("name=?").bind(qosData.view_name);;
-    dbo::ptr<DboQosData> dboEntry = add(ptr_qosDboData);
-    retValue = 0;
-    REPORTD_LOG("error", QObject::tr("QoS entry added: %1").arg(dboEntry->toString().c_str()));
+    DboQosData* qosDataDbo = new DboQosData();
+    qosDataDbo->setData(qosData);
+    qosDataDbo->view = find<DboView>().where("name=?").bind(qosData.view_name);
+    if (qosDataDbo->view.get() != nullptr) {
+      dbo::ptr<DboQosData> dboEntry = add(qosDataDbo);
+      retValue = ngrt4n::RcSuccess;
+    } else {
+      retValue = ngrt4n::RcDbError;
+      REPORTD_LOG("error", QObject::tr("%1: Cannot find view: %2").arg(Q_FUNC_INFO, qosData.view_name.c_str()).toStdString());
+    }
   } catch (const dbo::Exception& ex) {
     REPORTD_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }

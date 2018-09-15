@@ -54,11 +54,11 @@ public:
 
   std::string problemsDetailsText(void) {
     auto&& nbProblems = problemCount();
-    return QObject::tr("%1 problem%2/%3 probe%4")
-        .arg(QString::number(nbProblems))
-        .arg(nbProblems > 1? "s": "")
+    return QObject::tr("%1 probe%2 - %3 problem%4")
         .arg(QString::number(m_dataCount))
         .arg(m_dataCount > 1? "s": "")
+        .arg(QString::number(nbProblems))
+        .arg(nbProblems > 1? "s": "")
         .toStdString();
   }
 
