@@ -25,6 +25,7 @@
 #include "WebBiDashlet.hpp"
 #include "WebBiRawChart.hpp"
 #include <ctime>
+#include <regex>
 
 
 WebBiDashlet::WebBiDashlet()
@@ -54,19 +55,25 @@ void WebBiDashlet::initialize(const DbViewsT& viewList)
   int row = 0;
   m_layout->addWidget(&m_filterHeader, row, 0, 1, 2, Wt::AlignRight);
   for (const auto& view : viewList) {
+    auto viewDashboardAliasName = view.name;
+    std::smatch regexMatch;
+    if (std::regex_match(view.name, regexMatch, std::regex("Source[0-9]:(.+)"))) {
+      viewDashboardAliasName = regexMatch[1].str();
+    }
+
     //FIXME: dont use pointer for chart widgets or think of deleting explicitely chart objects
-    m_slaChartTitleMap.insert(view.name, createTitleWidget(view.name));
-    m_csvExportLinkMap.insert(view.name, new WebCsvExportIcon());
-    m_itProblemChartMap.insert(view.name, new WebBiRawChart(view.name));
-    m_slaPieChartMap.insert(view.name, new WebPieChart(ChartBase::SLAData));
+    m_slaChartTitleMap.insert(viewDashboardAliasName, createTitleWidget(viewDashboardAliasName));
+    m_csvExportLinkMap.insert(viewDashboardAliasName, new WebCsvExportIcon());
+    m_itProblemChartMap.insert(viewDashboardAliasName, new WebBiRawChart(viewDashboardAliasName));
+    m_slaPieChartMap.insert(viewDashboardAliasName, new WebPieChart(ChartBase::SLAData));
 
     ++row;
-    m_layout->addWidget(m_slaChartTitleMap[view.name], row, 0);
-    m_layout->addWidget(m_csvExportLinkMap[view.name], row, 1, Wt::AlignRight);
+    m_layout->addWidget(m_slaChartTitleMap[viewDashboardAliasName], row, 0);
+    m_layout->addWidget(m_csvExportLinkMap[viewDashboardAliasName], row, 1, Wt::AlignRight);
 
     ++row;
-    m_layout->addWidget(m_itProblemChartMap[view.name], row, 0);
-    m_layout->addWidget(m_slaPieChartMap[view.name], row, 1);
+    m_layout->addWidget(m_itProblemChartMap[viewDashboardAliasName], row, 0);
+    m_layout->addWidget(m_slaPieChartMap[viewDashboardAliasName], row, 1);
   }
 }
 

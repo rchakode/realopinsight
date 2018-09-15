@@ -42,7 +42,7 @@ K8sHelper::K8sHelper(const QString& apiUrl, bool verifySslPeer)
 }
 
 
-std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_namespace, const QString& in_sourceId, CoreDataT& out_cdata)
+std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_namespace, CoreDataT& out_cdata)
 {
   // process services
   auto resultRequestServicesData = requestNamespacedItemsData(in_namespace, "services");
@@ -78,7 +78,7 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_namespace
   NodeT rootNode;
   rootNode.id = ngrt4n::ROOT_ID;
   rootNode.parents.clear();
-  rootNode.name = QString("%1:%2").arg(in_sourceId, in_namespace);
+  rootNode.name = in_namespace;
   rootNode.parents = QSet<QString>{""};
   rootNode.type = NodeType::BusinessService;
   rootNode.sev = ngrt4n::Unknown;

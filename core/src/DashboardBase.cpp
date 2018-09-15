@@ -156,7 +156,7 @@ void DashboardBase::runK8sDataSourceUpdate(const SourceT& srcInfo)
   auto k8sNs = rootNode().name;
   K8sHelper k8s(srcInfo.mon_url, srcInfo.verify_ssl_peer);
   CoreDataT cdata4Update;
-  auto&& outLoadNsView = k8s.loadNamespaceView(k8sNs, srcInfo.id, cdata4Update);
+  auto&& outLoadNsView = k8s.loadNamespaceView(k8sNs, cdata4Update);
   if (outLoadNsView.second != ngrt4n::RcSuccess) {
     updateDashboardOnError(srcInfo, outLoadNsView.first);
   } else {

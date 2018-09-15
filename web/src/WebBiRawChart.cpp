@@ -46,7 +46,7 @@ WebBiRawChart::WebBiRawChart(const std::string& viewName)
 
 void WebBiRawChart::setChartTitle(void)
 {
-  setTitle(Q_TR("Trends - % IT Problems"));
+  setTitle(Q_TR("Trends - % Problems"));
 }
 
 void WebBiRawChart::updateData(const QosDataList& data)

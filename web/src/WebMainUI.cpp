@@ -414,15 +414,15 @@ void WebMainUI::handleRefresh(void)
     dashboard->updateAllNodesStatus(m_dbSession);
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
-    NodeT rootService = dashboard->rootNode();
-    int platformSeverity = qMin(rootService.sev, static_cast<int>(ngrt4n::Unknown));
+    NodeT currentRootNode = dashboard->rootNode();
+    int platformSeverity = qMin(currentRootNode.sev, static_cast<int>(ngrt4n::Unknown));
     if (platformSeverity != ngrt4n::Normal) {
       ++problemTypeCount[platformSeverity];
       if (m_notificationManager) {
-        m_notificationManager->updateServiceData(rootService);
+        m_notificationManager->updateServiceData(currentRootNode);
       }
     }
-    std::string viewName =  rootService.name.toStdString();
+    std::string viewName = currentRootNode.name.toStdString();
     ThumbnailMapT::Iterator thumbnailItem = m_thumbsWidgets.find(viewName);
     if (thumbnailItem != m_thumbsWidgets.end()) {
       (*thumbnailItem)->setStyleClass(dashboard->thumbnailCssClass());
@@ -644,7 +644,6 @@ void WebMainUI::setupUploadForm(void)
 
 WebDashboard* WebMainUI::loadView(const std::string& path)
 {
-  showMessage(ngrt4n::OperationInProgress, Q_TR("Loading view..."));
   if (path.empty()) {
     showMessage(ngrt4n::OperationFailed, Q_TR("Cannot open empty path"));
     return nullptr;
@@ -688,7 +687,6 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     showMessage(ngrt4n::OperationFailed, errorMsg);
     return nullptr;
   }
-  showMessage(ngrt4n::OperationSucceeded, Q_TR("View loaded"));
   return dashboard;
 }
 

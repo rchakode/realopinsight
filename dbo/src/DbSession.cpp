@@ -30,6 +30,7 @@
 #include <Wt/Auth/Identity>
 #include <Wt/Auth/PasswordStrengthValidator>
 #include <Wt/Dbo/Exception>
+#include <regex>
 
 namespace Wt {
   namespace Dbo {
@@ -624,6 +625,7 @@ int DbSession::addQosDataList(const QosDataList& qosDataList)
 
 int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
 {
+  qDebug() << "listQosData" << viewId.c_str();
   int count = 0;
   dbo::Transaction transaction(*this);
   try {
@@ -642,10 +644,14 @@ int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewI
 
     qosDataMap.clear();
     for (auto& entry : dbEntries) {
-      qosDataMap[entry->view->name].push_back(entry->data());
+      auto viewDashboardAliasName = entry->view->name;
+      std::smatch regexMatch;
+      if (std::regex_match(entry->view->name, regexMatch, std::regex("Source[0-9]:(.+)"))) {
+        viewDashboardAliasName = regexMatch[1].str();
+      }
+      qosDataMap[viewDashboardAliasName].push_back(entry->data());
       ++count;
     }
-
   } catch (const dbo::Exception& ex) {
     count = -1;
     m_lastError = "Failed to fetch QoS entries, please check the log file";

@@ -75,6 +75,9 @@ void runCollector(int period)
       collector.initSettings(&settings);
       collector.updateAllNodesStatus(&dbSession);
       QosDataT qosData = collector.qosInfo();
+      if (qosData.view_name != view.name && std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
+        qosData.view_name = view.name;
+      }
       qosData.timestamp = time(nullptr); // now
       qosDataList.push_back(qosData);
       rootNodes[qosData.view_name.c_str()] = collector.rootNode();

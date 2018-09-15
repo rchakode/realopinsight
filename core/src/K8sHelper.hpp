@@ -37,7 +37,7 @@ class K8sHelper : public QNetworkAccessManager
 
 public:
   K8sHelper(const QString& apiUrl, bool verifySslPeer);
-  std::pair<QString, int> loadNamespaceView(const QString& in_namespace, const QString& in_sourceId, CoreDataT& out_cdata);
+  std::pair<QString, int> loadNamespaceView(const QString& in_namespace, CoreDataT& out_cdata);
   std::pair<QStringList, int> listNamespaces();
   std::pair<QByteArray, int> requestNamespacedItemsData(const QString& in_namespace, const QString& in_itemType);
   std::tuple<int,  std::string, std::string> extractStateInfo(const QJsonObject& state);
