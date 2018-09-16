@@ -53,48 +53,50 @@ void WebBiDashlet::addEvent(void)
 void WebBiDashlet::initialize(const DbViewsT& viewList)
 {
   int row = 0;
-  m_layout->addWidget(&m_filterHeader, row, 0, 1, 2, Wt::AlignRight);
+  m_layout->addWidget(&m_filterHeader, row, 0, 1, 2, Wt::AlignCenter);
   for (const auto& view : viewList) {
     auto viewDashboardAliasName = view.name;
     std::smatch regexMatch;
     if (std::regex_match(view.name, regexMatch, std::regex("Source[0-9]:(.+)"))) {
       viewDashboardAliasName = regexMatch[1].str();
+      m_viewDashboardAliasNames[viewDashboardAliasName] = view.name;
     }
 
     //FIXME: dont use pointer for chart widgets or think of deleting explicitely chart objects
-    m_slaChartTitleMap.insert(viewDashboardAliasName, createTitleWidget(viewDashboardAliasName));
-    m_csvExportLinkMap.insert(viewDashboardAliasName, new WebCsvExportIcon());
-    m_itProblemChartMap.insert(viewDashboardAliasName, new WebBiRawChart(viewDashboardAliasName));
-    m_slaPieChartMap.insert(viewDashboardAliasName, new WebPieChart(ChartBase::SLAData));
+    m_slaChartTitles.insert(viewDashboardAliasName, createTitleWidget(viewDashboardAliasName));
+    m_csvExportLinks.insert(viewDashboardAliasName, new WebCsvExportIcon());
+    m_itProblemCharts.insert(viewDashboardAliasName, new WebBiRawChart(viewDashboardAliasName));
+    m_slaPieCharts.insert(viewDashboardAliasName, new WebPieChart(ChartBase::SLAData));
 
     ++row;
-    m_layout->addWidget(m_slaChartTitleMap[viewDashboardAliasName], row, 0);
-    m_layout->addWidget(m_csvExportLinkMap[viewDashboardAliasName], row, 1, Wt::AlignRight);
+    m_layout->addWidget(m_slaChartTitles[viewDashboardAliasName], row, 0);
+    m_layout->addWidget(m_csvExportLinks[viewDashboardAliasName], row, 1, Wt::AlignRight);
 
     ++row;
-    m_layout->addWidget(m_itProblemChartMap[viewDashboardAliasName], row, 0);
-    m_layout->addWidget(m_slaPieChartMap[viewDashboardAliasName], row, 1);
+    m_layout->addWidget(m_itProblemCharts[viewDashboardAliasName], row, 0);
+    m_layout->addWidget(m_slaPieCharts[viewDashboardAliasName], row, 1);
   }
 }
 
 
 Wt::WText* WebBiDashlet::createTitleWidget(const std::string& viewName)
 {
-  Wt::WString title = Wt::WString("<h5>{1}</h5>").arg(viewName);
+  Wt::WString title = Wt::WString("<legend>{1}</legend><hr />").arg(viewName);
   return new Wt::WText(title, Wt::XHTMLText);
 }
 
 
 void WebBiDashlet::updateChartsByViewName(const std::string& viewName, const QosDataListMapT& qosDataMap)
 {
-  QosDataListMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewName);
+  auto viewDashboardAliasName = m_viewDashboardAliasNames[viewName];
+  QosDataListMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewDashboardAliasName);
   if (iterQosDataSet ==  qosDataMap.end()) {
     return; // return if view not found
   }
 
   // process update since view found
-  QMap<std::string, WebPieChart*>::iterator iterSlaPiechart = m_slaPieChartMap.find(viewName);
-  if (iterSlaPiechart != m_slaPieChartMap.end()) {
+  QMap<std::string, WebPieChart*>::iterator iterSlaPiechart = m_slaPieCharts.find(viewName);
+  if (iterSlaPiechart != m_slaPieCharts.end()) {
     WebBiSlaDataAggregator slaData(*iterQosDataSet);
     (*iterSlaPiechart)->setSeverityData(slaData.normalDuration(),
                                         slaData.minorDuration(),
@@ -105,14 +107,14 @@ void WebBiDashlet::updateChartsByViewName(const std::string& viewName, const Qos
   }
 
   // update IT problem chart when applicable
-  QMap<std::string, WebBiRawChart*>::iterator iterProblemTrendsChart = m_itProblemChartMap.find(viewName);
-  if (iterProblemTrendsChart != m_itProblemChartMap.end()) {
+  QMap<std::string, WebBiRawChart*>::iterator iterProblemTrendsChart = m_itProblemCharts.find(viewName);
+  if (iterProblemTrendsChart != m_itProblemCharts.end()) {
     (*iterProblemTrendsChart)->updateData(*iterQosDataSet);
   }
 
   // update QoS data for export
-  QMap<std::string, WebCsvExportIcon*>::iterator iterCsvExportItem = m_csvExportLinkMap.find(viewName);
-  if (iterCsvExportItem != m_csvExportLinkMap.end()) {
+  QMap<std::string, WebCsvExportIcon*>::iterator iterCsvExportItem = m_csvExportLinks.find(viewName);
+  if (iterCsvExportItem != m_csvExportLinks.end()) {
     (*iterCsvExportItem)->updateData(viewName, *iterQosDataSet);
   }
 }

@@ -625,7 +625,6 @@ int DbSession::addQosDataList(const QosDataList& qosDataList)
 
 int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate, long toDate)
 {
-  qDebug() << "listQosData" << viewId.c_str();
   int count = 0;
   dbo::Transaction transaction(*this);
   try {
@@ -644,11 +643,11 @@ int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewI
 
     qosDataMap.clear();
     for (auto& entry : dbEntries) {
-      auto viewDashboardAliasName = entry->view->name;
-      std::smatch regexMatch;
-      if (std::regex_match(entry->view->name, regexMatch, std::regex("Source[0-9]:(.+)"))) {
-        viewDashboardAliasName = regexMatch[1].str();
-      }
+      auto viewDashboardAliasName = entry->data().view_name;
+//      std::smatch regexMatch;
+//      if (std::regex_match(viewDashboardAliasName, regexMatch, std::regex("Source[0-9]:(.+)"))) {
+//        viewDashboardAliasName = regexMatch[1].str();
+//      }
       qosDataMap[viewDashboardAliasName].push_back(entry->data());
       ++count;
     }

@@ -24,6 +24,7 @@
 
 #include "WebBiRawChart.hpp"
 #include <Wt/WStandardItemModel>
+#include <Wt/WFont>
 
 
 namespace {
@@ -34,7 +35,7 @@ namespace {
 WebBiRawChart::WebBiRawChart(const std::string& viewName)
   : Wt::Chart::WCartesianChart(0),
     m_viewName(viewName),
-    m_dataModel(NULL)
+    m_dataModel(nullptr)
 {
   setStyleClass("bi-chart");
   setLegendEnabled(false);
@@ -55,7 +56,7 @@ void WebBiRawChart::updateData(const QosDataList& data)
   setMargin(0, Wt::Top);
   setPlotAreaPadding(50, Wt::Top);
 
-  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(data.size(), 7, this);
+  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(static_cast<int>(data.size()), 7, this);
   model->setHeaderData(0, Q_TR("Date/time"));
   model->setHeaderData(1, Q_TR("Status"));
   model->setHeaderData(2, Q_TR("% Normal"));
@@ -98,7 +99,7 @@ void WebBiRawChart::updateData(const QosDataList& data)
     serie.setPen(color);
     serie.setBrush(color);
     serie.setStacked(true);
-    serie.setFillRange(Wt::Chart::MinimumValueFill);
+    serie.setFillRange(Wt::Chart::MaximumValueFill);
     addSeries(serie);
   }
   setChartTitle();
@@ -108,6 +109,8 @@ void WebBiRawChart::updateData(const QosDataList& data)
 void WebBiRawChart::resetDataModel(Wt::WStandardItemModel* model)
 {
   setModel(model);
-  if (m_dataModel) delete m_dataModel;
+  if (m_dataModel) {
+    delete m_dataModel;
+  }
   m_dataModel = model;
 }

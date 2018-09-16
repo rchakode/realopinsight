@@ -58,10 +58,11 @@ Q_SIGNALS:
 private:
   Wt::WGridLayout* m_layout;
   WebBiDateFilter m_filterHeader;
-  QMap<std::string, Wt::WText*> m_slaChartTitleMap;
-  QMap<std::string, WebPieChart*> m_slaPieChartMap;
-  QMap<std::string, WebBiRawChart*> m_itProblemChartMap;
-  QMap<std::string, WebCsvExportIcon*> m_csvExportLinkMap;
+  QMap<std::string, Wt::WText*> m_slaChartTitles;
+  QMap<std::string, WebPieChart*> m_slaPieCharts;
+  QMap<std::string, WebBiRawChart*> m_itProblemCharts;
+  QMap<std::string, WebCsvExportIcon*> m_csvExportLinks;
+  QMap<std::string, std::string> m_viewDashboardAliasNames;
 
   void addEvent(void);
   Wt::WText* createTitleWidget(const std::string& viewName);
