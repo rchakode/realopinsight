@@ -27,13 +27,8 @@
 #include <Wt/WFont>
 
 
-namespace {
-  const double BI_RAW_CHART_AREA_WIDTH = 400;
-  const double BI_RAW_CHART_AREA_HEIGHT = 175;
-}
-
 WebBiRawChart::WebBiRawChart(const std::string& viewName)
-  : Wt::Chart::WCartesianChart(0),
+  : Wt::Chart::WCartesianChart(nullptr),
     m_viewName(viewName),
     m_dataModel(nullptr)
 {
@@ -52,11 +47,7 @@ void WebBiRawChart::setChartTitle(void)
 
 void WebBiRawChart::updateData(const QosDataList& data)
 {
-  resize(BI_RAW_CHART_AREA_WIDTH, BI_RAW_CHART_AREA_HEIGHT);
-  setMargin(0, Wt::Top);
-  setPlotAreaPadding(50, Wt::Top);
-
-  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(static_cast<int>(data.size()), 7, this);
+  Wt::WStandardItemModel* model = new Wt::WStandardItemModel(static_cast<int>(data.size()), 9, this);
   model->setHeaderData(0, Q_TR("Date/time"));
   model->setHeaderData(1, Q_TR("Status"));
   model->setHeaderData(2, Q_TR("% Normal"));
@@ -64,13 +55,15 @@ void WebBiRawChart::updateData(const QosDataList& data)
   model->setHeaderData(4, Q_TR("% Major"));
   model->setHeaderData(5, Q_TR("% Critical"));
   model->setHeaderData(6, Q_TR("% Unknown"));
+  model->setHeaderData(7, Q_TR("placeholder for 0% value"));
+  model->setHeaderData(8, Q_TR("placeholder for 100% value"));
 
   int row = 0;
   for (const auto& entry : data) {
     Wt::WDateTime date;
     date.setTime_t(entry.timestamp);
-    model->setData(row, 0, date);
 
+    model->setData(row, 0, date);
     model->setData(row, 1, entry.status);
 
     float sev = entry.normal;
@@ -87,19 +80,23 @@ void WebBiRawChart::updateData(const QosDataList& data)
 
     sev += entry.unknown;
     model->setData(row, 6, sev);
+
+    // placeholders
+    model->setData(row, 7, 0.0);
+    model->setData(row, 8, 100.0);
     ++row;
   }
 
   resetDataModel(model);
 
   setXSeriesColumn(0);
-  for (int i = 6; i >= 2; --i) {
+  for (int i = 8; i >= 2; --i) {
     Wt::Chart::WDataSeries serie(i, Wt::Chart::LineSeries);
     Wt::WColor color = ngrt4n::severityWColor(i - 2);
     serie.setPen(color);
     serie.setBrush(color);
     serie.setStacked(true);
-    serie.setFillRange(Wt::Chart::MaximumValueFill);
+    serie.setFillRange(Wt::Chart::MinimumValueFill);
     addSeries(serie);
   }
   setChartTitle();

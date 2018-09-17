@@ -653,7 +653,6 @@ int DbSession::listQosData(QosDataListMapT& qosDataMap, const std::string& viewI
     }
   } catch (const dbo::Exception& ex) {
     count = -1;
-    m_lastError = "Failed to fetch QoS entries, please check the log file";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();

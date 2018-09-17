@@ -67,14 +67,12 @@ void WebBiDashlet::initialize(const DbViewsT& viewList)
     m_csvExportLinks.insert(viewDashboardAliasName, new WebCsvExportIcon());
     m_itProblemCharts.insert(viewDashboardAliasName, new WebBiRawChart(viewDashboardAliasName));
     m_slaPieCharts.insert(viewDashboardAliasName, new WebPieChart(ChartBase::SLAData));
-
-    ++row;
-    m_layout->addWidget(m_slaChartTitles[viewDashboardAliasName], row, 0);
-    m_layout->addWidget(m_csvExportLinks[viewDashboardAliasName], row, 1, Wt::AlignRight);
-
     ++row;
     m_layout->addWidget(m_itProblemCharts[viewDashboardAliasName], row, 0);
     m_layout->addWidget(m_slaPieCharts[viewDashboardAliasName], row, 1);
+    ++row;
+    m_layout->addWidget(m_slaChartTitles[viewDashboardAliasName], row, 0);
+    m_layout->addWidget(m_csvExportLinks[viewDashboardAliasName], row, 1, Wt::AlignRight);
   }
 }
 

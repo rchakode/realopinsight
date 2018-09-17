@@ -130,8 +130,10 @@ std::string ngrt4n::severityHtmlColor(int severity)
       color = "#ff0000";
       break;
     case ngrt4n::Unknown:
-    default:
       color = "#c0c0c0";
+      break;
+    default:
+      color = "#ffffff";
       break;
   }
   return color;
