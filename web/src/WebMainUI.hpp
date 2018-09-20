@@ -215,7 +215,7 @@ private:
   void setInternalPath(const std::string& path);
   void startDashbaordUpdate(void);
   void hideAdminSettingsMenu(void);
-  void showConditionalUiWidgets(void);
+  void showConditionalUiWidgets(const DbViewsT& views);
   void setupSettingsPage(void);
   void configureDialogWidget(void);
   void setupMainUI(void);

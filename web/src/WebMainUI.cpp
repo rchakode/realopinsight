@@ -527,8 +527,9 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
 {
   QosDataListMapT qosDataMap;
   fetchQosData(qosDataMap, start, end);
-  Q_FOREACH(const std::string& viewName, qosDataMap.keys())
+  for (const auto& viewName : qosDataMap.keys()) {
     m_biDashlet.updateChartsByViewName(viewName, qosDataMap);
+  }
   showMessage(ngrt4n::OperationSucceeded, Q_TR("Reports updated: ")
               .append(ngrt4n::wHumanTimeText(start).toUTF8())
               .append(" - ")
@@ -956,9 +957,9 @@ void WebMainUI::initOperatorDashboard(void)
 {
   bindExecutiveViewWidgets();
 
-  auto vlist = m_dbSession->listViewListByAssignedUser(m_dbSession->loggedUser().username);
+  auto userViews = m_dbSession->listViewListByAssignedUser(m_dbSession->loggedUser().username);
 
-  if (vlist.size() == 0) {
+  if (userViews.size() == 0) {
     showMessage(ngrt4n::OperationFailed, Q_TR("No view loaded"));
     return ;
   }
@@ -967,7 +968,7 @@ void WebMainUI::initOperatorDashboard(void)
   int thumbIndex = 0;
   int thumbPerRow = m_dbSession->dashboardTilesPerRow();
   std::string failedViews = "";
-  for (const auto& view : vlist) {
+  for (const auto& view : userViews) {
     WebDashboard* dashboardItem = loadView(view.path);
     if (! dashboardItem) {
       failedViews.append(" ").append(view.name);
@@ -984,13 +985,13 @@ void WebMainUI::initOperatorDashboard(void)
     ++thumbIndex;
   }
 
-  showConditionalUiWidgets();
+  showConditionalUiWidgets(userViews);
 
   if (thumbIndex > 0) {
     startDashbaordUpdate();
   }
 
-  if (thumbIndex != static_cast<int>(vlist.size())) {
+  if (thumbIndex != static_cast<int>(userViews.size())) {
     showMessage(ngrt4n::OperationFailed, QObject::tr("Failed while loading views: %1").arg(failedViews.c_str()).toStdString());
   }
 }
@@ -1013,10 +1014,10 @@ void WebMainUI::clearThumbnailTemplate(Wt::WTemplate* tpl)
   tpl->takeWidget("thumb-image");
 }
 
-void WebMainUI::showConditionalUiWidgets(void)
+void WebMainUI::showConditionalUiWidgets(const DbViewsT& views)
 {
   if (m_dbSession->isCompleteUserDashboard()) {
-    m_biDashlet.initialize(m_dbSession->listViews());
+    m_biDashlet.initialize(views);
     m_operatorHomeTpl.bindString("bi-report-title", Q_TR("Reports"));
     m_operatorHomeTpl.bindWidget("bi-report-dashlet", &m_biDashlet);
   } else {
