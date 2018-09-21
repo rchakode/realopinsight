@@ -301,8 +301,11 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
     // add pod node
     auto&& podStatusData = podData["status"].toObject();
     auto&& podPhaseStatus = podStatusData["phase"].toString();
+    auto podStatusConditions = podStatusData["conditions"].toArray();
+    const auto StatusPhase = convertToPodPhaseStatusEnum(podPhaseStatus);
 
-    switch (convertToPodPhaseStatusEnum(podPhaseStatus)) {
+
+    switch (StatusPhase) {
       // handle Failed and CrashLoopBackoff pods as IT services
       case ngrt4n::K8sPodPhaseFailed:
       case ngrt4n::K8sPodPhaseCrashLoopBackoff:
@@ -313,12 +316,30 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
         podNode.check.host_groups = podFqdn.toStdString();
         podNode.check.status = ngrt4n::K8sFailed;
         podNode.check.last_state_change = ngrt4n::convertToTimet(podCreationTime, "yyyy-MM-ddThh:mm:ssZ");
-        podNode.check.alarm_msg = QString("pod is %1 since %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
+        podNode.check.alarm_msg = QString("pod is %1 because %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
         out_cnodes.insert(podNode.id, podNode);
-        continue;
+        continue; // since there is not containerStatuses object to process
         break;
         // handle Pending, Running and Succeeded pods as business process nodes
       case ngrt4n::K8sPodPhasePending:
+        podNode.type = NodeType::ITService;
+        podNode.child_nodes = podFqdn;
+        podNode.check.id = podNode.child_nodes.toStdString();
+        podNode.check.host = podFqdn.toStdString();
+        podNode.check.host_groups = podFqdn.toStdString();
+        podNode.check.status = ngrt4n::K8sFailed;
+
+        if (! podStatusConditions.empty()) {
+          auto lastStatusCondition = podStatusConditions[0].toObject();
+          podNode.check.last_state_change = ngrt4n::convertToTimet(lastStatusCondition["lastTransitionTime"].toString(), "yyyy-MM-ddThh:mm:ssZ");
+          podNode.check.alarm_msg = QString("pod is %1 since %2 (%3)").arg(podPhaseStatus, lastStatusCondition["reason"].toString(), lastStatusCondition["message"].toString()).toLower().toStdString();
+        } else { // unexpected situation
+          podNode.check.last_state_change = "0";
+          podNode.check.alarm_msg = "cannot get condition for pending state";
+        }
+
+        out_cnodes.insert(podNode.id, podNode);
+        break;
       case ngrt4n::K8sPodPhaseRunning:
       case ngrt4n::K8sPodPhaseSucceeded:
         podNode.type = NodeType::BusinessService;
