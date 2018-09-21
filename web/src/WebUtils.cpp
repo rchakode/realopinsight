@@ -115,7 +115,7 @@ std::string ngrt4n::severityCssClass(int severity)
 
 std::string ngrt4n::severityHtmlColor(int severity)
 {
-  std::string color = "#000000";
+  std::string color = "#ffffff";
   switch (static_cast<ngrt4n::SeverityT>(severity)) {
     case ngrt4n::Normal:
       color = "#00ff00";

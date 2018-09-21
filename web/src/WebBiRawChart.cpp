@@ -90,9 +90,22 @@ void WebBiRawChart::updateData(const QosDataList& data)
   resetDataModel(model);
 
   setXSeriesColumn(0);
+
+  const QMap<int, int> SerieSeverities = {
+    {0, ngrt4n::Unset},
+    {1, ngrt4n::Unset},
+    {2, ngrt4n::Normal},
+    {3, ngrt4n::Minor},
+    {4, ngrt4n::Major},
+    {5, ngrt4n::Critical},
+    {6, ngrt4n::Unknown},
+    {7, ngrt4n::Unset},
+    {8, ngrt4n::Unset},
+  };
+
   for (int i = 8; i >= 2; --i) {
     Wt::Chart::WDataSeries serie(i, Wt::Chart::LineSeries);
-    Wt::WColor color = ngrt4n::severityWColor(i - 2);
+    Wt::WColor color = ngrt4n::severityWColor(SerieSeverities[i]);
     serie.setPen(color);
     serie.setBrush(color);
     serie.setStacked(true);
