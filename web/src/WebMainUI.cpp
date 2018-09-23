@@ -440,7 +440,6 @@ void WebMainUI::handleRefresh(void)
       m_notificationBoxes[severityEntry.first]->setText(QString::number(severityEntry.second).toStdString());
       m_notificationBoxes[severityEntry.first]->setHidden(severityEntry.second <= 0);
     }
-    updateEventFeeds();
   }
 
   startTimer();
@@ -1088,12 +1087,6 @@ void WebMainUI::startDashbaordUpdate(void)
   tmpTimer->start();
   tmpTimer->timeout().connect(std::bind([=](){tmpTimer->stop();
     delete tmpTimer; handleRefresh();}));
-}
-
-
-void WebMainUI::updateEventFeeds(void)
-{
-  //FIXME: m_eventFeedLayout->addWidget(createEventFeedItem());
 }
 
 

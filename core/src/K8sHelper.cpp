@@ -332,7 +332,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
         if (! podStatusConditions.empty()) {
           auto lastStatusCondition = podStatusConditions[0].toObject();
           podNode.check.last_state_change = ngrt4n::convertToTimet(lastStatusCondition["lastTransitionTime"].toString(), "yyyy-MM-ddThh:mm:ssZ");
-          podNode.check.alarm_msg = QString("pod is %1 since %2 (%3)").arg(podPhaseStatus, lastStatusCondition["reason"].toString(), lastStatusCondition["message"].toString()).toLower().toStdString();
+          podNode.check.alarm_msg = QString("pod is %1 because %2 (%3)").arg(podPhaseStatus, lastStatusCondition["reason"].toString(), lastStatusCondition["message"].toString()).toLower().toStdString();
         } else { // unexpected situation
           podNode.check.last_state_change = "0";
           podNode.check.alarm_msg = "cannot get condition for pending state";

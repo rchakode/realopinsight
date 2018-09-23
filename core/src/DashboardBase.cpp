@@ -39,6 +39,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <regex>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #   include <QUrlQuery>
@@ -153,23 +154,20 @@ void DashboardBase::signalUpdateProcessing(const SourceT& src)
 
 void DashboardBase::runK8sDataSourceUpdate(const SourceT& srcInfo)
 {
-  auto k8sNs = rootNode().name;
-  K8sHelper k8s(srcInfo.mon_url, srcInfo.verify_ssl_peer);
-  CoreDataT cdata4Update;
-  auto&& outLoadNsView = k8s.loadNamespaceView(k8sNs, cdata4Update);
+  CoreDataT newCData;
+  auto&& outLoadNsView = K8sHelper(srcInfo.mon_url, srcInfo.verify_ssl_peer).loadNamespaceView(rootNode().name, newCData);
   if (outLoadNsView.second != ngrt4n::RcSuccess) {
     updateDashboardOnError(srcInfo, outLoadNsView.first);
-  } else {
-    for (const auto& cnodeUpdated: cdata4Update.cnodes) {
-      auto cnode = m_cdata.cnodes.find(cnodeUpdated.id);
-      if (cnode != m_cdata.cnodes.end()) {
-        cnode->check = cnodeUpdated.check;
-        updateNodeStatusInfo(*cnode, srcInfo);
-        updateDashboard(*cnode);
-        cnode->monitored = true;
-      } else {
-        qDebug() << "Seems like pod changed:" << cnodeUpdated.name << cnodeUpdated.child_nodes;
-      }
+    return ;
+  }
+
+  for (const auto& newCNode: newCData.cnodes) {
+    auto cnode = m_cdata.cnodes.find(newCNode.id);
+    if (cnode != m_cdata.cnodes.end()) { // pod may disappear due to restart, but a notification should be displayed in event feed.
+      cnode->check = newCNode.check;
+      updateNodeStatusInfo(*cnode, srcInfo);
+      updateDashboard(*cnode);
+      cnode->monitored = true;
     }
   }
 }
@@ -437,13 +435,28 @@ void DashboardBase::computeFirstSrcIndex(void)
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
   for (auto& cnode: m_cdata.cnodes) {
-    QString srcPrefix = QString("%1:").arg(src.id);
-    if (! cnode.monitored && cnode.child_nodes.startsWith(srcPrefix, Qt::CaseInsensitive)) {
-      ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode.child_nodes), cnode.check);
-      updateNodeStatusInfo(cnode, src);
-      updateDashboard(cnode);
+    if (cnode.monitored) {
+      cnode.monitored = false;
+      continue;
     }
-    cnode.monitored = false;
+
+    switch (src.mon_type) {
+      case MonitorT::Kubernetes:
+        cnode.sev = ngrt4n::Critical;
+        cnode.check.status = ngrt4n::K8sFailed;
+        cnode.check.alarm_msg = QObject::tr("Pod %1 seems to no longer exist").arg(cnode.child_nodes).toStdString();
+        cnode.check.last_state_change = QString::number(std::time(nullptr)).toStdString(); //now
+        updateNodeStatusInfo(cnode, src);
+        updateDashboard(cnode);
+        break;
+      default:
+        if (std::regex_match(cnode.child_nodes.toStdString(), std::regex(QString("%1:.+").arg(src.id).toStdString()))) {
+          ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode.child_nodes), cnode.check);
+          updateNodeStatusInfo(cnode, src);
+          updateDashboard(cnode);
+        }
+        break;
+    }
   }
 }
 

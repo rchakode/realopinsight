@@ -180,7 +180,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
     delete *feed;
     m_eventFeedItems.erase(feed);
   }
-  // FIXME: need optimization to avoid removing and readding the same item
+
   if (node.sev != ngrt4n::Normal) {
     Wt::WWidget* widget = createEventFeedTpl(node);
     m_eventFeedLayout.insertWidget(0, widget);

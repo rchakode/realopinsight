@@ -178,7 +178,6 @@ private:
 
 
   /** callbacks */
-  void updateEventFeeds(void);
   void handleAuthSystemChanged(int authSystem);
   void handleLdapUsersMenu(void);
   void handleBuiltInUsersMenu(void);
