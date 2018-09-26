@@ -93,7 +93,7 @@ public:
 
   bool loadSource(const QString& str_sourceId, SourceT& sinfo);
 
-  bool setSource(const QString& sourceData, SourceT& sinfo);
+  bool bindSourceInfo(const QString& sourceData, SourceT& sinfo);
 
   static QString language(void);
 

@@ -201,8 +201,7 @@
 <div class="ngrt4n-gradient login-container">
  <legend><img src="/images/built-in/logo.png" /></legend>
     <p>${tr:Wt.Auth.login-form-info}</p>
-
-    <div class="form-horizontal">
+      <div class="form-horizontal">
         ${<if:passwords>}
         <div class="col-sm-12 form-group">
           <label for="${id:user-name}" class="control-label">
@@ -223,13 +222,13 @@
           </div>
         </div>
         ${</if:oauth>}
-
+      <div class="clear"></div>
       <div class="form-actions">
         <span>${login class="btn-primary"}</span>
         <span>${lost-password class="btn-link"} ${sep}
           ${register class="btn-link"}</span>
       </div>
-    </div>
+      </div>
       ${block:copyright-info}
   </div>
 </message>

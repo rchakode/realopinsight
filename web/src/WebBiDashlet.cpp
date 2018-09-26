@@ -60,6 +60,8 @@ void WebBiDashlet::initialize(const DbViewsT& viewList)
     if (std::regex_match(view.name, regexMatch, std::regex("Source[0-9]:(.+)"))) {
       viewDashboardAliasName = regexMatch[1].str();
       m_viewDashboardAliasNames[viewDashboardAliasName] = view.name;
+    } else {
+      m_viewDashboardAliasNames[view.name] = view.name;
     }
 
     //FIXME: dont use pointer for chart widgets or think of deleting explicitely chart objects
@@ -89,7 +91,7 @@ void WebBiDashlet::updateChartsByViewName(const std::string& viewName, const Qos
   auto viewDashboardAliasName = m_viewDashboardAliasNames[viewName];
   QosDataListMapT::ConstIterator iterQosDataSet = qosDataMap.find(viewDashboardAliasName);
   if (iterQosDataSet ==  qosDataMap.end()) {
-    return; // return if view not found
+    return; /** return if view not found **/
   }
 
   // process update since view found

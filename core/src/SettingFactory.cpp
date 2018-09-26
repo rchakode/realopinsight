@@ -139,16 +139,18 @@ void SettingFactory::setEntry(const QString& key, const QString& value)
 
 bool SettingFactory::loadSource(qint32 in_sourceIndex, SourceT& out_sinfo)
 {
-  return setSource(QSettings::value(ngrt4n::sourceKey(in_sourceIndex)).toString(), out_sinfo);
+  auto sourceKey = ngrt4n::sourceKey(in_sourceIndex);
+  return bindSourceInfo(QSettings::value(sourceKey).toString(), out_sinfo);
 }
 
 bool SettingFactory::loadSource(const QString& in_sourceId, SourceT& out_sinfo)
 {
-  return setSource(QSettings::value(ngrt4n::sourceKey(in_sourceId)).toString(), out_sinfo);
+  auto sourceKey = ngrt4n::sourceKey(in_sourceId);
+  return bindSourceInfo(QSettings::value(sourceKey).toString(), out_sinfo);
 }
 
 
-bool SettingFactory::setSource(const QString& sourceData, SourceT& sinfo)
+bool SettingFactory::bindSourceInfo(const QString& sourceData, SourceT& sinfo)
 {
   if (sourceData.isEmpty()) {
     return false;

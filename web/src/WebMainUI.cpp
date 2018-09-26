@@ -407,7 +407,7 @@ void WebMainUI::handleRefresh(void)
   }
 
   QosDataListMapT qosDataMap;
-  fetchQosData(qosDataMap, m_biDashlet.startTime(), m_biDashlet.endTime());
+  m_dbSession->listQosData(qosDataMap,"" /* empty view name means all views */, m_biDashlet.startTime(), m_biDashlet.endTime());
   int currentView = 1;
   for (auto& dashboard : m_dashboardMap) {
     dashboard->initSettings(& m_dataSourceSettings);
@@ -525,7 +525,7 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 void WebMainUI::handleReportPeriodChanged(long start, long end)
 {
   QosDataListMapT qosDataMap;
-  fetchQosData(qosDataMap, start, end);
+  m_dbSession->listQosData(qosDataMap, "" /** empty view name means all views **/, start, end);
   for (const auto& viewName : qosDataMap.keys()) {
     m_biDashlet.updateChartsByViewName(viewName, qosDataMap);
   }
@@ -1263,16 +1263,6 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
     showMessage(ngrt4n::OperationSucceeded, msg);
     CORE_LOG("info", msg);
   }
-}
-
-
-
-void WebMainUI::fetchQosData(QosDataListMapT& qosDataMap, long start, long end)
-{
-  m_dbSession->listQosData(qosDataMap,
-                           "", // empty view name means all views **/
-                           start,
-                           end);
 }
 
 

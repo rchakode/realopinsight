@@ -150,7 +150,7 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
 std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, CoreDataT& out_cdata)
 {
   if (in_xmlNodes.size() != 1) {
-    return std::make_pair(ngrt4n::RcParseError, QObject::tr("Unexpected number of nodes in Kubernetes service file: %1").arg(in_xmlNodes.size()));
+    return std::make_pair(ngrt4n::RcParseError, QObject::tr("unexpected number of nodes in Kubernetes service file: %1").arg(in_xmlNodes.size()));
   }
 
   QDomElement xmlNode = in_xmlNodes.item(0).toElement();
@@ -161,7 +161,7 @@ std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, 
 
   SourceT sinfo;
   if (! m_settings->loadSource(sourceId, sinfo)) {
-    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Failed loading Kubernetes data source: %1").arg(sourceId));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed loading source settings on %1").arg(sourceId));
   }
 
   auto outK8sLoadNsView = K8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer).loadNamespaceView(ns, out_cdata);

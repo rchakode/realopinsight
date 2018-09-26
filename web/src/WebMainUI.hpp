@@ -231,7 +231,6 @@ private:
   void unbindStackedWidgets(void);
   void saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path);
   void clearThumbnailTemplate(Wt::WTemplate* tpl);
-  void fetchQosData(QosDataListMapT& qosDataMap, long start, long end);
   bool createDirectory(const std::string& path, bool cleanContent);
   void resetFileUploader(void);
   WebDashboard* loadView(const std::string& path);

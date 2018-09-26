@@ -108,15 +108,8 @@ body, html {
 }
 
 .ngrt4n-gradient {
-  background: -moz-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
-#9DC6DD);
-  background: -webkit-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
-#9DC6DD);
-  background: -ms-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
-#9DC6DD);
-  background: -o-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, 
-#9DC6DD);
-  background: -linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 25%, #FFBB69 40%, #F1F1F1 55%, #9DC6DD);
+  background: #F1F1F1;
+  background: -webkit-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 50%, #FFBB69 75%, #F1F1F1 55%, #9DC6DD);
 }
 
 
