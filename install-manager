@@ -69,17 +69,17 @@ prompt_copyright()
 
 check_prerequisites()
 {
-  echo -n "[DEBUG] Checking if is QT_HOME set... "
-  [ -z $QT_HOME ] && echo "[ERROR] QT_HOME environment variable not set." && exit 1
+  echo -n "[DEBUG] Checking if is QT_ROOT set... "
+  [ -z $QT_ROOT ] && echo "[ERROR] QT_ROOT environment variable not set." && exit 1
   echo "done"
   
   
-  QMAKE=${QT_HOME}/bin/qmake
+  QMAKE=${QT_ROOT}/bin/qmake
   echo -n "[DEBUG] Checking qmake at ${QMAKE}... "
   [ ! -e $QMAKE ] && echo "[ERROR] qmake not found." && exit 1
   echo "done"
   
-  QLRELEASE=${QT_HOME}/bin/lrelease
+  QLRELEASE=${QT_ROOT}/bin/lrelease
   echo -n "[DEBUG] Checking lrelease at ${QRELEASE}... "
   [ ! -e $QLRELEASE ] && echo "[ERROR] lrelease not found." && exit 1
   echo "done" 
@@ -108,13 +108,13 @@ check_prerequisites()
 
 
 build_web_server_binary() {
-  echo "[DEBUG] Building RealOpInsight Ultimate http server..."
+  echo "[DEBUG] Building RealOpInsight http server..."
   ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 build_dbsetup_binary() {
-  echo "[DEBUG] Building RealOpInsight Ultimate http server..."
+  echo "[DEBUG] Building RealOpInsight http server..."
   ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=setupdb ${dflag}
   make -j${NCPU} 1>>install.log
 }
@@ -127,7 +127,7 @@ build_reportd_binary() {
 }
 
 install_ultimate() {
-  echo "==>Installing RealOpInsight Ultimate..."
+  echo "==>Installing RealOpInsight..."
 
   if [ `id -u` -ne 0 ]; then 
     echo "[ERROR] root privileges are required"
@@ -163,17 +163,19 @@ install_ultimate() {
   install -d ${REALOPINSIGHT_WWW}/resources/themes/bootstrap/img  # for missing glyphicons-halflings.png
 
 
-  echo "[DEBUG] Installing binaries and init.d scripts..."
+  echo "[DEBUG] Installing binaries and init scripts..."
   
   install -m 755 realopinsight-server ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 realopinsight-setupdb ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
   install -m 755 realopinsight-reportd ${REALOPINSIGHT_INSTALL_PREFIX}/sbin
+    
+  install -m 644 contribs/systemd/realopinsight-server.service         /lib/systemd/system/
+  install -m 644 contribs/systemd/realopinsight-reportd.service        /lib/systemd/system/
+  install -m 644 contribs/systemd/realopinsight-server.service.env     ${REALOPINSIGHT_INSTALL_PREFIX}/etc
+  install -m 644 contribs/systemd/realopinsight-reportd.service.env    ${REALOPINSIGHT_INSTALL_PREFIX}/etc
   
-  install -m 755 contribs/init.d/realopinsight-server.debian /etc/init.d/realopinsight-server
-  install -m 755 contribs/init.d/realopinsight-reportd.debian /etc/init.d/realopinsight-reportd
-  
-  update-rc.d realopinsight-server defaults
-  update-rc.d realopinsight-reportd defaults
+  systemctl enable realopinsight-server.service
+  systemctl enable realopinsight-reportd.service  
 
   install -m 755 contribs/backup/realopinsight-backup ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
   install -m 755 contribs/backup/realopinsight-restore ${REALOPINSIGHT_INSTALL_PREFIX}/bin/
@@ -193,8 +195,8 @@ install_ultimate() {
 
   
   echo "[DEBUG] Starting services..."
-  service realopinsight-server restart
-  service realopinsight-reportd restart
+  systemctl start realopinsight-server.service
+  systemctl start realopinsight-reportd.service  
 }
 
 
