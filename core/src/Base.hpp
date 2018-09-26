@@ -37,7 +37,7 @@
   app->installTranslator(&translator); \
   QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
 
-const QString APP_NAME = QObject::tr("%1 Ultimate").arg(REALOPINSIGHT_APPLICATION_NAME);
+const QString APP_NAME = REALOPINSIGHT_APPLICATION_NAME;
 const int MAX_FILE_UPLOAD = 4 * 1024; // 4MB => see also max-request-size wt config file
 
 const QString COMPANY = "RealOpInsight Labs";
