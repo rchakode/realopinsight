@@ -939,7 +939,6 @@ Wt::WDialog* WebMainUI::createAboutDialog(void)
   closeButton->clicked().connect(dialog, &Wt::WDialog::accept);
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("about-tpl"), dialog->contents());
 
-  tpl->bindString("software", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
   tpl->bindString("corelib-version", ngrt4n::libVersion().toStdString());
   tpl->bindString("codename", REL_NAME.toStdString());

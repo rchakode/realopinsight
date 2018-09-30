@@ -130,10 +130,8 @@ std::string ngrt4n::severityHtmlColor(int severity)
       color = "#ff0000";
       break;
     case ngrt4n::Unknown:
-      color = "#c0c0c0";
-      break;
     default:
-      color = "#000";
+      color = "#c0c0c0";
       break;
   }
   return color;
@@ -175,7 +173,7 @@ std::string ngrt4n::thumbnailCssClass(int severity)
 Wt::WWidget* ngrt4n::footer(void)
 {
   Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));
-  tpl->bindString("software", APP_NAME.toStdString());
+  tpl->bindString("software-name", APP_NAME.toStdString());
   tpl->bindString("version", PKG_VERSION.toStdString());
   tpl->bindString("package-url", PKG_URL.toStdString());
   tpl->bindString("release-year", REL_YEAR.toStdString());

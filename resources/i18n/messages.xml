@@ -372,7 +372,7 @@
 
 
 <message id="copyright-footer.tpl">
-    ${software} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
+    ${software-name} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
     <br />Version ${version}
     - <a href="http://docs.realopinsight.com/">Help</a>
     - <a href="https://github.com/RealOpInsightLabs/realopinsight-ultimate/blob/master/LICENSE" target="_blank">Terms &amp; Conditions</a>
@@ -537,7 +537,6 @@
 
 
 <message id="about-tpl">
-<legend>${software}</legend>
 <div>
     <p class="pull-left">
      <img src="/images/built-in/logo.png" />
@@ -553,7 +552,7 @@
  <div>
    <h3>Copyrights</h3>
    <p>
-   Copyrights &copy; 2010-${release-year} RealOpInsight Labs and/or its affiliates. All rights reserved. <br />
+   Copyrights &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved. <br />
    <a href="http://legal.realopinsight.com/" target="_blank">Terms of Use</a>
    </p>
 </div>
