@@ -296,7 +296,7 @@ ZbxHelper::processTriggerData(ChecksT& checks)
     check.check_command = triggerName.toStdString();
     check.status = triggerJsonData.property("value").toInt32();
     if (check.status == ngrt4n::ZabbixClear) {
-      check.alarm_msg = "OK ("+triggerName.toStdString()+")";
+      check.alarm_msg = "OK ("+QString(triggerName).replace("{HOST.NAME}", check.host.c_str()).toStdString()+")";
     } else {
       check.alarm_msg = triggerJsonData.property("error").toString().toStdString();
       check.status = static_cast<int>(triggerJsonData.property("priority").toInteger());
@@ -312,6 +312,9 @@ ZbxHelper::processTriggerData(ChecksT& checks)
         QScriptValue itemData = item.value();
         check.last_state_change = itemData.property("lastclock").toString().toStdString();
       }
+    }
+    if (std::stoi(check.last_state_change, nullptr, 10) == 0) {
+      check.last_state_change = QString::number(time(nullptr)).toStdString();
     }
     check.id = ID_PATTERN.arg(check.host.c_str(), triggerName).toStdString();
     checks.insert(triggerId.toStdString(), check);
