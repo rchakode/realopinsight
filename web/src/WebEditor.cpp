@@ -48,8 +48,8 @@
 
 
 const QMap<int, std::string> WebEditor::MENU_LABELS = {
-  {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add sub service")},
-  {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete sub service")}
+  {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add sub service (Shift + C)")},
+  {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete sub service (Shift + X)")}
 };
 
 WebEditor::WebEditor(void) :
@@ -91,9 +91,9 @@ void  WebEditor::handleOpenViewButton(void)
   // view name starting with "Source?:" must not be edited. E.g. Kubernetes view
   DbViewsT viewList;
   for (auto && view: m_dbSession->listViews()) {
-      if (! std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
-        viewList.push_back(view);
-      }
+    if (! std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
+      viewList.push_back(view);
+    }
   }
   m_openViewDialog.updateContentWithViewList(viewList);
   m_openViewDialog.show();
@@ -495,13 +495,13 @@ QList<NodeT> WebEditor::findDescendantNodes(const QString& nodeId) {
   QList<NodeT> descendants;
 
   for (const auto& node:  m_cdata.bpnodes) {
-    if (*node.parents.begin() == nodeId) {
+    if (! node.parents.empty() && *node.parents.begin() == nodeId) {
       descendants.append(node);
     }
   }
 
   for (const auto& node:  m_cdata.cnodes) {
-    if (*node.parents.begin() == nodeId) {
+    if (! node.parents.empty() && *node.parents.begin() == nodeId) {
       descendants.append(node);
     }
   }
@@ -533,11 +533,15 @@ void WebEditor::bindParentChildEdges(void)
 {
   m_cdata.edges.clear();
   for (const auto& node:  m_cdata.bpnodes) {
-    m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
+    if (! node.parents.empty()) {
+      m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
+    }
   }
 
   for (const auto& node:  m_cdata.cnodes) {
-    m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
+    if (! node.parents.empty()) {
+      m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
+    }
   }
 
 }
