@@ -445,7 +445,6 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
         cnode.sev = ngrt4n::Critical;
         cnode.check.status = ngrt4n::K8sFailed;
         cnode.check.alarm_msg = QObject::tr("Pod %1 seems to no longer exist").arg(cnode.child_nodes).toStdString();
-        cnode.check.last_state_change = QString::number(std::time(nullptr)).toStdString(); //now
         updateNodeStatusInfo(cnode, src);
         updateDashboard(cnode);
         break;
