@@ -56,19 +56,19 @@ const size_t BUFFER_SIZE = 1024 * 1024; // 1 Mo
 class RawSocket
 {
 public:
-  RawSocket(const QString& host, int port);
+  RawSocket(const QString& host, uint16_t port);
   ~RawSocket();
   int setupSocket();
-  void cleanUp(void);
   int makeRequest(const QByteArray& data);
   QString& lastResult(void) {return m_lastResult;}
   QString lastError(void) const {return m_lastError;}
+  QString socketAddr(void) const {return QString("%1:%2").arg(m_host, QString::number(m_port));}
 
 private:
   QString m_lastError;
   QString m_lastResult;
   QString m_host;
-  int m_port;
+  uint16_t m_port;
   SOCKADDR_IN m_sockAddr;
 
   void buildErrorString(void);

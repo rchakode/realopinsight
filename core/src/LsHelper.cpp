@@ -22,6 +22,7 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "Base.hpp"
 #include "LsHelper.hpp"
 #include "utilsCore.hpp"
 #include "utilsCore.hpp"
@@ -31,7 +32,7 @@
 #include <QDir>
 #include <QScriptValueIterator>
 
-LsHelper::LsHelper(const QString& host, int port)
+LsHelper::LsHelper(const QString& host, uint16_t port)
   : m_socketHandler(new RawSocket(host, port))
 {
 }
@@ -44,72 +45,49 @@ LsHelper::~LsHelper()
 int LsHelper::setupSocket(void)
 {
   if (m_socketHandler->setupSocket()) {
-    m_lastError = QString("%1: %2").arg(Q_FUNC_INFO, m_socketHandler->lastError());
-    return -1;
+    return ngrt4n::RcRpcError;
   }
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
-QByteArray LsHelper::prepareRequestData(const QString& hostgroupFilter, ReqTypeT requestType)
+QByteArray LsHelper::prepareRequestData(ReqTypeT requestType)
 {
-  QString data = "";
+  QString request = "";
   switch(requestType) {
-  case LsHelper::Host:
-    data = "GET hosts\n"
-           "Columns: name state last_state_change check_command plugin_output groups\n"
-           "OutputFormat: json\n";
-    break;
-  case LsHelper::Service:
-    data = "GET services\n"
-           "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
-           "OutputFormat: json\n";
-    break;
-  default:
-    break;
-  }
-
-  if (! hostgroupFilter.isEmpty()) {
-    QString filterPattern;
-    switch(requestType) {
     case LsHelper::Host:
-      filterPattern =
-          "Filter: name = %1\n"
-          "Filter: host_groups ~ %1\n"
-          "Or: 2\n";
+      request = "GET hosts\n"
+                "Columns: name state last_state_change check_command plugin_output groups\n"
+                "OutputFormat: json\n";
       break;
     case LsHelper::Service:
-      filterPattern =
-          "Filter: host_name = %1\n"
-          "Filter: host_groups ~ %1\n"
-          "Or: 2\n";
+      request = "GET services\n"
+                "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
+                "OutputFormat: json\n";
       break;
     default:
       break;
-    }
-    data.append(filterPattern.arg(hostgroupFilter));
   }
-  return ngrt4n::toByteArray(data.append("\n"));
+  return ngrt4n::toByteArray(request.append("\n"));
 }
 
 int LsHelper::loadChecks(const QString& hostgroupFilter, ChecksT& checks)
 {
+  m_hostOrGroupFilter = hostgroupFilter.toStdString();
   checks.clear();
-
-  if (makeRequest(prepareRequestData(hostgroupFilter, LsHelper::Host), checks) != 0)
-    return -1;
-
-  return makeRequest(prepareRequestData(hostgroupFilter, LsHelper::Service), checks);
+  if (makeRequest(prepareRequestData(LsHelper::Host), checks) != 0) {
+    return ngrt4n::RcRpcError;
+  }
+  return makeRequest(prepareRequestData(LsHelper::Service), checks);
 }
 
 
 int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
 {
   if (m_socketHandler->makeRequest(data) != 0) {
-    m_lastError = QString("%1: %2").arg(Q_FUNC_INFO, m_socketHandler->lastError());
-    return -1;
+    return ngrt4n::RcRpcError;
   }
   parseResult(checks);
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 
@@ -120,7 +98,9 @@ void LsHelper::parseResult(ChecksT& checks)
   QScriptValueIterator entryIter(json.data());
   while (entryIter.hasNext()) {
     entryIter.next();
-    if (entryIter.flags() & QScriptValue::SkipInEnumeration) continue;
+    if (entryIter.flags() & QScriptValue::SkipInEnumeration) {
+      continue;
+    }
     QScriptValueIterator fieldIter(entryIter.value());
 
     QStringList fields;
@@ -133,31 +113,37 @@ void LsHelper::parseResult(ChecksT& checks)
 
     CheckT check;
     switch( fields.size() ) {
-    case 6: // host
-      check.id = check.host = fields[0].toStdString();
-      check.status = fields[1].toInt();
-      check.last_state_change = fields[2].toStdString();
-      check.check_command = fields[3].toStdString();
-      check.alarm_msg = fields[4].toStdString();
-      check.host_groups = fields[5].toStdString();
-      break;
+      case 6: // host
+        check.host = fields[0].toStdString();
+        check.status = fields[1].toInt();
+        check.last_state_change = fields[2].toStdString();
+        check.check_command = fields[3].toStdString();
+        check.alarm_msg = fields[4].toStdString();
+        check.host_groups = fields[5].toStdString();
+        check.id = check.host;
+        break;
 
-    case 7: // service
-      check.host = fields[0].toStdString();
-      check.id = ID_PATTERN.arg(check.host.c_str(), fields[1]).toLower().toStdString();
-      check.status = fields[2].toInt();
-      check.last_state_change = fields[3].toStdString();
-      check.check_command = fields[4].toStdString();
-      check.alarm_msg = fields[5].toStdString();
-      check.host_groups = fields[6].toStdString();
-      break;
+      case 7: // service
+        check.host = fields[0].toStdString();
+        check.id = ID_PATTERN.arg(check.host.c_str(), fields[1]).toLower().toStdString();
+        check.status = fields[2].toInt();
+        check.last_state_change = fields[3].toStdString();
+        check.check_command = fields[4].toStdString();
+        check.alarm_msg = fields[5].toStdString();
+        check.host_groups = fields[6].toStdString();
+        break;
 
-    default:
-      qDebug()<< "unexpected entry: "<< entryIter.value().toString();
-      continue;
-      break;
+      default:
+        qDebug() << "Nagios parser: unexpected status entry =>" << entryIter.value().toString();
+        continue;
+        break;
     }
 
-    checks.insert(check.id, check);
+    if (m_hostOrGroupFilter.empty() ||
+        (! m_hostOrGroupFilter.empty() && m_hostOrGroupFilter == check.host ) ||
+        (! m_hostOrGroupFilter.empty() && m_hostOrGroupFilter == check.host_groups )) {
+      checks.insert(check.id, check);
+    }
+
   }
 }

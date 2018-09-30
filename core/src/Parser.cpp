@@ -98,7 +98,8 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
     node.parents.clear();
     node.monitored = false;
     node.id = xmlNode.attribute("id").trimmed();
-    node.sev = node.sev_prop = ngrt4n::Unknown;
+    node.sev = ngrt4n::Unknown;
+    node.sev_prop = ngrt4n::Unknown;
     node.sev_crule = xmlNode.attribute("statusCalcRule").toInt();
     node.sev_prule = xmlNode.attribute("statusPropRule").toInt();
     node.icon = xmlNode.firstChildElement("Icon").text().trimmed();

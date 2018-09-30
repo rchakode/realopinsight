@@ -293,13 +293,12 @@ void WebEditor::bindFormWidgets(void)
 void WebEditor::handleNewViewButton(void)
 {
   m_cdata.clear();
-
   NodeT node;
-
   node.id = ngrt4n::ROOT_ID;
   node.name = QObject::tr("New service view");
   node.type = NodeType::BusinessService;
   node.parents.clear();
+  node.sev = ngrt4n::Unknown;
   node.sev_prule = PropRules::Unchanged;
   node.sev_crule = CalcRules::Worst;
   node.weight = ngrt4n::WEIGHT_UNIT;
@@ -314,7 +313,6 @@ void WebEditor::handleNewViewButton(void)
 void WebEditor::rebuiltTree(void)
 {
   m_tree.build();
-
   auto rnode = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
   if (rnode != m_cdata.bpnodes.end()) {
     fillInEditorFromNodeInfo(*rnode);
@@ -834,6 +832,7 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return  ;
   }
+  ngrt4n::fixupDependencies(cdata);
 
   m_currentFilePath.clear();
 
@@ -901,9 +900,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
   }
 
   m_dataPointListModel->setStringList(m_dataPointsListBySource[srcId]);
-
   m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for %1").arg(srcId).toStdString());
-
   m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Import completed"));
 }
 
@@ -947,6 +944,7 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
   rootSrv.id = ngrt4n::ROOT_ID;
   rootSrv.name = QObject::tr("Nagios BPI Services"); //FIXME added a prefix ?
   rootSrv.type = NodeType::BusinessService;
+  rootSrv.sev = ngrt4n::Unknown;
 
   CoreDataT cdata;
   while (static_cast<void>(line = streamReader.readLine()), ! line.isNull()) {

@@ -296,18 +296,19 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
   
   if (node->child_nodes.isEmpty()) {
     status2Propagate.sev = ngrt4n::Unknown;
+
     return status2Propagate;
   }
   
   // if IT service handle it directly
   if (node->type == NodeType::ITService) {
     status2Propagate.sev = node->sev_prop;
+
     return status2Propagate;
   }
 
   // if external service handle it through last status fetched from database
   if (node->type == NodeType::ExternalService) {
-
     constexpr long intervalDurationSec = 10 * 60;
     long toDate = std::time(nullptr);
     long fromDate = toDate - intervalDurationSec;
@@ -320,7 +321,6 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
 
     auto externalServiceName = node->child_nodes.toStdString();
     int rc = p_dbSession->listQosData(qosMap, externalServiceName, fromDate, toDate);
-
     if (rc > 0) {
       node->sev = qosMap[externalServiceName].back().status;
     } else {
@@ -339,7 +339,6 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
 
 
   StatusAggregator severityAggregator;
-  
   for (auto&& childId: node->child_nodes.split(ngrt4n::CHILD_Q_SEP)) {
     status2Propagate = computeBpNodeStatus(childId, p_dbSession);
     severityAggregator.addSeverity(status2Propagate.sev, status2Propagate.weight);
@@ -435,6 +434,7 @@ void DashboardBase::computeFirstSrcIndex(void)
 void DashboardBase::finalizeUpdate(const SourceT& src)
 {
   for (auto& cnode: m_cdata.cnodes) {
+
     if (cnode.monitored) {
       cnode.monitored = false;
       continue;
@@ -456,6 +456,7 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
         }
         break;
     }
+
   }
 }
 

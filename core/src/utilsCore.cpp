@@ -364,40 +364,37 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
 
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;
+  rootService.weight = ngrt4n::WEIGHT_UNIT;
   rootService.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MONITOR_NAME) : filter;
   rootService.type = NodeType::BusinessService;
+  rootService.sev_crule = CalcRules::Worst;
+  rootService.sev_prule = PropRules::Unchanged;
 
   NodeT hostNode;
-  NodeT triggerNode;
+  NodeT itemNode;
   hostNode.type = NodeType::BusinessService;
-  triggerNode.type = NodeType::ITService;
+  itemNode.type = NodeType::ITService;
 
   for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
     hostNode.parents = QSet<QString>{ rootService.id };
     hostNode.name = hostNode.description = QString::fromStdString(check->host);
     hostNode.id = "";
+    hostNode.weight = ngrt4n::WEIGHT_UNIT;
+    hostNode.sev_crule = CalcRules::Worst;
+    hostNode.sev_prule = PropRules::Unchanged;
 
     Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
 
     QString checkId = QString::fromStdString(check->id);
-    triggerNode.id = ngrt4n::generateId();
-    triggerNode.parents = QSet<QString>{ hostNode.id };
-    triggerNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
-    triggerNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
-
-    NodeListT::Iterator hostNodeIter =  cdata.bpnodes.find(hostNode.id);
-    if (hostNodeIter != cdata.bpnodes.end()) {
-      hostNodeIter->child_nodes.append(ngrt4n::CHILD_Q_SEP).append(triggerNode.id);
-    } else {
-      hostNode.child_nodes = triggerNode.id;
-      if (rootService.child_nodes.isEmpty()) {
-        rootService.child_nodes = hostNode.id;
-      } else {
-        rootService.child_nodes.append(ngrt4n::CHILD_Q_SEP).append(hostNode.id);
-      }
-      cdata.bpnodes.insert(hostNode.id, hostNode);
-    }
-    cdata.cnodes.insert(triggerNode.id, triggerNode);
+    itemNode.weight = ngrt4n::WEIGHT_UNIT;
+    itemNode.sev_crule = CalcRules::Worst;
+    itemNode.sev_prule = PropRules::Unchanged;
+    itemNode.id = ngrt4n::generateId();
+    itemNode.parents.insert(hostNode.id);
+    itemNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+    itemNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
+    cdata.bpnodes.insert(hostNode.id, hostNode);
+    cdata.cnodes.insert(itemNode.id, itemNode);
   }
 
   // finally insert the root node and update UI widgets
@@ -412,7 +409,7 @@ std::pair<int, QString> ngrt4n::loadDataPoints(const SourceT& srcInfo, const QSt
   // Nagios
   if (srcInfo.mon_type == MonitorT::Nagios) {
     int retcode = ngrt4n::RcGenericFailure;
-    LsHelper handler(srcInfo.ls_addr, srcInfo.ls_port);
+    LsHelper handler(srcInfo.ls_addr, static_cast<uint16_t>(srcInfo.ls_port));
     if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
       retcode = ngrt4n::RcSuccess;
     }

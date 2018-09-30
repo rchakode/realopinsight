@@ -36,20 +36,20 @@ public:
     Service = 1
   };
 
-  LsHelper(const QString& host, int port);
+  LsHelper(const QString& host, uint16_t port);
   ~LsHelper();
 
   int makeRequest(const QByteArray& data, ChecksT& checks);
   int loadChecks(const QString& hostgroupFilter, ChecksT& checks);
-  QString lastError(void) const {return m_lastError;}
+  QString lastError(void) const {return m_socketHandler->lastError();}
   int setupSocket(void);
 
   void parseResult(ChecksT& checks);
-  static QByteArray prepareRequestData(const QString& hostgroupFilter, ReqTypeT requestType);
+  static QByteArray prepareRequestData(ReqTypeT requestType);
 
 private:
-  QString m_lastError;
   RawSocket* m_socketHandler;
+  std::string m_hostOrGroupFilter;
 };
 
 #endif // MKLSHELPER_HPP

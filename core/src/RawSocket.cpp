@@ -23,11 +23,12 @@
  */
 
 
+#include "Base.hpp"
 #include "RawSocket.hpp"
 #include <cerrno>
 #include <QDebug>
 
-RawSocket::RawSocket(const QString& host, int port)
+RawSocket::RawSocket(const QString& host, uint16_t port)
   : m_host(host),
     m_port(port)
 {
@@ -35,34 +36,17 @@ RawSocket::RawSocket(const QString& host, int port)
 
 RawSocket::~RawSocket()
 {
-  cleanUp();
 }
 
 
 int RawSocket::setupSocket(void)
 {
-#ifdef WIN32
-  WSADATA wsa;
-  int err = WSAStartup(MAKEWORD(2, 2), &wsa);
-  if(err < 0) {
-    m_lastError = QObject::tr("WSAStartup failed ");
-    return -1;
-  }
-#endif
-
   m_sockAddr.sin_addr.s_addr = inet_addr(m_host.toStdString().c_str());
   m_sockAddr.sin_family = AF_INET;
-  m_sockAddr.sin_port = htons(m_port);
-
-  return 0;
+  m_sockAddr.sin_port = (htons)( m_port );
+  return ngrt4n::RcSuccess;
 }
 
-void RawSocket::cleanUp(void)
-{
-#ifdef WIN32
-  WSACleanup();
-#endif
-}
 
 int RawSocket::makeRequest(const QByteArray& data)
 {
@@ -70,66 +54,53 @@ int RawSocket::makeRequest(const QByteArray& data)
 
   if (connect(sock, (SOCKADDR *)&m_sockAddr, sizeof(m_sockAddr)) == SOCKET_ERROR) {
     buildErrorString();
-    return -1;
+    return ngrt4n::RcRpcError;
   }
 
-  if (send(sock, data.data(), data.size(), 0) < data.size()) {
+  if (send(sock, data.data(), static_cast<size_t>(data.size()), 0) < data.size()) {
     buildErrorString();
-    return -1;
+    return ngrt4n::RcRpcError;
   }
 
   char buffer[BUFFER_SIZE];
-  int count = 0;
+  ssize_t count = 0;
   m_lastResult.clear();
-  while ((count = recv(sock, buffer, BUFFER_SIZE -1, 0)) > 0) {
-    m_lastResult.append(QString::fromUtf8(buffer, count));
+  while ((count = recv(sock, buffer, static_cast<size_t>(BUFFER_SIZE - 1), 0)) > 0) {
+    m_lastResult.append(QString::fromUtf8(buffer, static_cast<int>(count)));
   }
 
   if (count < 0) {
     m_lastError = QObject::tr("Failed receiving data");
-    return -1;
+    return ngrt4n::RcRpcError;
   }
 
   closesocket(sock);
-  return 0;
+  return ngrt4n::RcSuccess;
 }
 
 void RawSocket::buildErrorString(void)
 {
-  int errorCode = -1;
-#ifdef WIN32
-  errorCode = WSAGetLastError();
-#else
-  errorCode = errno;
-#define WSAEHOSTDOWN EHOSTUNREACH
-#define WSAETIMEDOUT ETIMEDOUT
-#define WSAEADDRNOTAVAIL EADDRNOTAVAIL
-#define WSAENETDOWN ENETDOWN
-#define WSAECONNRESET ECONNRESET
-#define WSAECONNREFUSED ECONNREFUSED
-#endif
-
-  switch (errorCode) {
-  case WSAEHOSTDOWN:
-    m_lastError = QObject::tr("Host down or unreachable %1").arg(m_host);
-    break;
-  case WSAETIMEDOUT:
-    m_lastError = QObject::tr("Connection failed due to timeout %1:%2").arg(m_host, QString::number(m_port));
-    break;
-  case WSAEADDRNOTAVAIL:
-    m_lastError = QObject::tr("Cannot assign requested address %1:%2").arg(m_host, QString::number(m_port));
-    break;
-  case WSAENETDOWN:
-    m_lastError = QObject::tr("Network is down");
-    break;
-  case WSAECONNRESET:
-    m_lastError = QObject::tr("Connection reset by peer");
-    break;
-  case WSAECONNREFUSED:
-    m_lastError = QObject::tr("Connection refused");
-    break;
-  default:
-    m_lastError = QObject::tr("Socket operation failed with error %1").arg(errorCode);
-    break;
+  switch (errno) {
+    case EHOSTUNREACH:
+      m_lastError = QObject::tr("%1: host down or unreachable %1").arg(socketAddr());
+      break;
+    case ETIMEDOUT:
+      m_lastError = QObject::tr("%1: connection failed due to timeout %1:%2").arg(socketAddr());
+      break;
+    case EADDRNOTAVAIL:
+      m_lastError = QObject::tr("%1: cannot assign requested address").arg(socketAddr());
+      break;
+    case ENETDOWN:
+      m_lastError = QObject::tr("%1: network is down (%1)").arg(socketAddr());
+      break;
+    case ECONNRESET:
+      m_lastError = QObject::tr("%1: connection reset by peer").arg(socketAddr());
+      break;
+    case ECONNREFUSED:
+      m_lastError = QObject::tr("%1: connection refused").arg(socketAddr());
+      break;
+    default:
+      m_lastError = QObject::tr("Socket operation failed with error %1").arg(errno);
+      break;
   }
 }
