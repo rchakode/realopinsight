@@ -149,7 +149,7 @@ private:
   void handleTreeItemSelectionChanged(void);
   void handleNodeLabelChanged(void);
   void handleDataPointChanged(void);
-  void handleNodeTypeChanged(void);
+  void handleNodeTypeChanged(int index);
   void handleNewViewButton(void);
   void handleSaveViewButton(void);
   void handleOpenViewButton(void);

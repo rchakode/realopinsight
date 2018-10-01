@@ -226,7 +226,8 @@ void WebEditor::bindFormWidgets(void)
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
   // bind signal
-  m_typeField.changed().connect(this, &WebEditor::handleNodeTypeChanged);
+  //m_typeField.changed().connect(this, &WebEditor::handleNodeTypeChanged);
+  m_typeField.activated().connect(this, &WebEditor::handleNodeTypeChanged);
 
   // set icon type values
   for (const auto& icon: ngrt4n::NodeIcons.keys()) {
@@ -565,10 +566,11 @@ void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
 {
   m_nameField.setText(ninfo.name.toStdString());
   m_descField.setText(ninfo.description.toStdString());
-  m_typeField.setCurrentIndex(ninfo.type);
   m_iconBox.setCurrentIndex(m_iconIndexMap[ninfo.icon]);
   m_calcRuleBox.setCurrentIndex(ninfo.sev_crule);
   m_propRuleBox.setCurrentIndex(ninfo.sev_prule);
+  m_typeField.setCurrentIndex(ninfo.type);
+  m_typeField.activated().emit(ninfo.type);
 
   switch (ninfo.type) {
     case NodeType::ITService:
@@ -651,22 +653,10 @@ void WebEditor::handleDataPointChanged(void)
 }
 
 
-void WebEditor::handleNodeTypeChanged(void)
+void WebEditor::handleNodeTypeChanged(int index)
 {
-  const int newNodeType = m_typeField.currentIndex();
-
-  bool isItService = (newNodeType == NodeType::ITService);
-  m_nameField.setDisabled(isItService);
-  m_dataPointItemsContainer.setDisabled(! isItService);
-
-  m_typeExternalServiceSelectorField.setHidden(newNodeType != NodeType::ExternalService);
-
-  if (isItService) {
-    m_nameField.setText("");
-    m_nameField.setPlaceholderText(Q_TR("Service name will be automatically computed from the selected data point"));
-  } else {
-    m_nameField.setPlaceholderText(Q_TR("Set service name"));
-  }
+  m_dataPointItemsContainer.setDisabled(index != NodeType::ITService);
+  m_typeExternalServiceSelectorField.setHidden(index != NodeType::ExternalService);
 
   QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
   NodeListT::ConstIterator ninfoIt;
@@ -675,15 +665,16 @@ void WebEditor::handleNodeTypeChanged(void)
     return ;
   }
 
-  if ( QSet<int>{NodeType::ITService, NodeType::ExternalService}.contains(newNodeType) ) {
+  if ( QSet<int>{NodeType::ITService, NodeType::ExternalService}.contains(index) ) {
     if (! findDescendantNodes(nodeId).empty()) {
       m_typeField.setCurrentIndex(ninfoIt->type);
+      m_typeField.activated().emit(ninfoIt->type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
       return ;
     }
   }
 
-  if (newNodeType == ninfoIt->type) {
+  if (index == ninfoIt->type) {
     return ; // nothing to do
   }
 
@@ -692,7 +683,7 @@ void WebEditor::handleNodeTypeChanged(void)
   const int oldNodeType = ninfoCopy.type;
   ninfoCopy.child_nodes.clear();
 
-  switch (newNodeType) {
+  switch (index) {
     case NodeType::ITService:
       if (m_cdata.bpnodes.remove(ninfoCopy.id) > 0) {
         m_cdata.cnodes.insert(ninfoCopy.id, ninfoCopy);

@@ -323,12 +323,13 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
     int rc = p_dbSession->listQosData(qosMap, externalServiceName, fromDate, toDate);
     if (rc > 0) {
       node->sev = qosMap[externalServiceName].back().status;
+      node->actual_msg = QObject::tr("external service - %1").arg(node->child_nodes);
     } else {
       node->sev = ngrt4n::Unknown;
       status2Propagate.sev = ngrt4n::Unknown;
-      node->actual_msg = QObject::tr("No status found in the last %1 minute(s) for external service: %2")
-                         .arg(intervalDurationSec / 60)
-                         .arg(node->child_nodes);
+      node->actual_msg = QObject::tr("external service - %1 - no status found in last %2 minute(s)")
+                         .arg(node->child_nodes
+                         .arg(intervalDurationSec / 60));
     }
 
     status2Propagate.sev = StatusAggregator::propagate(node->sev, node->sev_prule);

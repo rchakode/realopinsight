@@ -510,6 +510,7 @@ std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const
 
 QString ngrt4n::generateNodeXml(const NodeT& node)
 {
+  qDebug() << node.child_nodes;
   QString xml = QString("<Service id=\"%1\" "
                         " type=\"%2\" "
                         " statusCalcRule=\"%3\" "
@@ -542,7 +543,9 @@ void ngrt4n::fixupDependencies(CoreDataT& cdata)
 {
   // First clear all existing children for bpnodes
   for (auto& node: cdata.bpnodes) {
-    node.child_nodes.clear();
+    if (node.type != NodeType::ExternalService) {
+      node.child_nodes.clear();
+    }
   }
 
   // bpnodes
