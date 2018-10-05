@@ -46,12 +46,12 @@ public:
   };
 
   WebBaseSettings(void);
-  int getDbType(void) const { return m_settingFactory->keyValue(SettingFactory::DB_TYPE).toInt();}
-  std::string getDbServerAddr(void) const { return m_settingFactory->keyValue(SettingFactory::DB_SERVER_ADDR).toStdString();}
-  int getDbServerPort(void) const { return m_settingFactory->keyValue(SettingFactory::DB_SERVER_PORT).toInt();}
-  std::string getDbName(void) const { return m_settingFactory->keyValue(SettingFactory::DB_NAME).toStdString();}
-  std::string getDbUser(void) const { return m_settingFactory->keyValue(SettingFactory::DB_USER).toStdString();}
-  std::string getDbPassword(void) const { return m_settingFactory->keyValue(SettingFactory::DB_PASSWORD).toStdString();}
+  int getDbType(void) const;
+  std::string getDbServerAddr(void) const;
+  int getDbServerPort(void) const;
+  std::string getDbName(void) const;
+  std::string getDbUser(void) const;
+  std::string getDbPassword(void) const;
   std::string getDbConnectionString(void) const;
 
   std::string getLdapServerUri(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SERVER_URI).toStdString();}

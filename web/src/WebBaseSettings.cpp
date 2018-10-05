@@ -74,18 +74,76 @@ int WebBaseSettings::activeSourceIds(QVector<std::string>& result)
   return result.size();
 }
 
+int WebBaseSettings::getDbType(void) const
+{
+  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_TYPE") );
+  if (! configValueStr.isEmpty()) {
+    return configValueStr.toInt();
+  }
+  return m_settingFactory->keyValue(SettingFactory::DB_TYPE).toInt();
+}
+
+std::string WebBaseSettings::getDbServerAddr(void) const
+{
+  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_SERVER_ADDR") );
+  if (! configValueStr.isEmpty()) {
+    return configValueStr.toStdString();
+  }
+  return m_settingFactory->keyValue(SettingFactory::DB_SERVER_ADDR).toStdString();
+}
+
+
+int WebBaseSettings::getDbServerPort(void) const
+{
+  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_SERVER_PORT") );
+  if (! configValueStr.isEmpty()) {
+    return configValueStr.toInt();
+  }
+  return m_settingFactory->keyValue(SettingFactory::DB_SERVER_PORT).toInt();
+}
+
+
+std::string WebBaseSettings::getDbName(void) const
+{
+  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_NAME") );
+  if (! configValueStr.isEmpty()) {
+    return configValueStr.toStdString();
+  }
+  return m_settingFactory->keyValue(SettingFactory::DB_NAME).toStdString();
+}
+
+
+std::string WebBaseSettings::getDbUser(void) const
+{
+  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_USER") );
+  if (! configValueStr.isEmpty()) {
+    return configValueStr.toStdString();
+  }
+  return m_settingFactory->keyValue(SettingFactory::DB_USER).toStdString();
+}
+
+
+std::string WebBaseSettings::getDbPassword(void) const
+{
+  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_PASSWORD") );
+  if (! configValueStr.isEmpty()) {
+    return configValueStr.toStdString();
+  }
+  return m_settingFactory->keyValue(SettingFactory::DB_PASSWORD).toStdString();
+}
+
 std::string WebBaseSettings::getDbConnectionString(void) const
 {
   std::string connectionString = "";
   if (getDbType() == PostgresqlDb) {
     CORE_LOG("info", Q_TR("Using PostgreSQL database"));
     connectionString = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
-        .arg(getDbServerAddr())
-        .arg(getDbServerPort())
-        .arg(getDbName())
-        .arg(getDbUser())
-        .arg(getDbPassword())
-        .toUTF8();
+                       .arg(getDbServerAddr())
+                       .arg(getDbServerPort())
+                       .arg(getDbName())
+                       .arg(getDbUser())
+                       .arg(getDbPassword())
+                       .toUTF8();
   } else { // use Sqlite3 as default database
     CORE_LOG("info", Q_TR("Using Sqlite3 database"));
     connectionString = ngrt4n::sqliteDbPath();

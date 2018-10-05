@@ -118,16 +118,16 @@ std::string ngrt4n::severityHtmlColor(int severity)
   std::string color = "#ffffff";
   switch (static_cast<ngrt4n::SeverityT>(severity)) {
     case ngrt4n::Normal:
-      color = "#00ff00";
+      color = "#4b7";
       break;
     case ngrt4n::Minor:
-      color ="#ffff00";
+      color ="#fa4";
       break;
     case ngrt4n::Major:
       color = "#ffa500";
       break;
     case ngrt4n::Critical:
-      color = "#ff0000";
+      color = "#f56";
       break;
     case ngrt4n::Unknown:
     default:
