@@ -45,6 +45,7 @@ namespace ngrt4n
   const QString DEFAULT_ICON = "Business Process";
   const QString CONTAINER_ICON = "Container";
   const QString APPLICATION_ICON = "Application";
+  const QString GENERIC_CHECK_ICON = "Other Check";
   const QString K8S_POD = "Kubernetes Pod";
   const QString K8S_SVC = "Kubernetes Service";
   const QString K8S_NS = "Kubernetes Namespace";

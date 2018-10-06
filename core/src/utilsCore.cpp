@@ -364,6 +364,7 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
 
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;
+  rootService.icon = MONITOR_NAME;
   rootService.weight = ngrt4n::WEIGHT_UNIT;
   rootService.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MONITOR_NAME) : filter;
   rootService.type = NodeType::BusinessService;
@@ -383,9 +384,13 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
     hostNode.sev_crule = CalcRules::Worst;
     hostNode.sev_prule = PropRules::Unchanged;
 
-    Q_FOREACH(QChar c, hostNode.name) { if (c.isLetterOrNumber()) { hostNode.id.append(c); } }
-
+    for (auto c : hostNode.name) {
+      if (c.isLetterOrNumber()) {
+        hostNode.id.append(c);
+      }
+    }
     QString checkId = QString::fromStdString(check->id);
+    itemNode.icon = ngrt4n::GENERIC_CHECK_ICON;
     itemNode.weight = ngrt4n::WEIGHT_UNIT;
     itemNode.sev_crule = CalcRules::Worst;
     itemNode.sev_prule = PropRules::Unchanged;

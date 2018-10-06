@@ -134,7 +134,7 @@ void LsHelper::parseResult(ChecksT& checks)
         break;
 
       default:
-        qDebug() << "Nagios parser: unexpected status entry =>" << entryIter.value().toString();
+        qDebug() << "Livestatus parser: unexpected status entry =>" << entryIter.value().toString();
         continue;
         break;
     }
