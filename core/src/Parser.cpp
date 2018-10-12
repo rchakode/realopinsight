@@ -209,7 +209,9 @@ void Parser::fixupVisilityAndDependenciesGraph(void)
 
 void Parser::bindGraphDependencies(const NodeT& node)
 {
-  auto&& nodeGraphId = escapeId4Graphviz(node.id);
+  m_dotContent.append( QString("\tedge [len=%1]\n").arg(NEATO_EDGE_LENGTH) );
+
+  auto nodeGraphId = escapeId4Graphviz(node.id);
   for (const auto& parentId: node.parents) {
     NodeListT::Iterator parentRef;
     if (ngrt4n::findNode(m_cdata, parentId, parentRef)) {
@@ -285,7 +287,8 @@ int Parser::computeCoordinates(void)
 
   const ScaleFactors SCALE_FACTORS(m_settings->getGraphLayout());
   m_cdata->graph_mode = static_cast<qint8>(m_settings->getGraphLayout());
-  m_cdata->map_width = splitedLine[2].trimmed().toDouble() * SCALE_FACTORS.x();
+  auto maxWidthRaw = splitedLine[2].trimmed().toDouble();
+  m_cdata->map_width = maxWidthRaw * SCALE_FACTORS.x() + NEATO_X_TRANSLATION_FACTOR * maxWidthRaw;
   m_cdata->map_height = splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
   m_cdata->min_x = 0;
   m_cdata->min_y = 0;
@@ -301,12 +304,16 @@ int Parser::computeCoordinates(void)
       NodeListT::Iterator node;
       QString nid = splitedLine[1].trimmed();
       if (ngrt4n::findNode(m_cdata, nid, node)) {
-        node->pos_x = splitedLine[x_index].trimmed().toDouble() * SCALE_FACTORS.x();
-        node->pos_y =  splitedLine[y_index].trimmed().toDouble() * SCALE_FACTORS.y();
+        auto posXRaw = splitedLine[x_index].trimmed().toDouble();
+        node->pos_x =  posXRaw * SCALE_FACTORS.x() + NEATO_X_TRANSLATION_FACTOR * posXRaw;
+        node->pos_y = splitedLine[y_index].trimmed().toDouble() * SCALE_FACTORS.y();
+
         node->text_w = splitedLine[4].trimmed().toDouble() * SCALE_FACTORS.x();
         node->text_h = splitedLine[5].trimmed().toDouble() * SCALE_FACTORS.y();
+
         m_cdata->min_x = qMin<double>(m_cdata->min_x, node->pos_x);
         m_cdata->min_y = qMin<double>(m_cdata->min_y, node->pos_y);
+
         max_text_w = qMax(max_text_w, node->text_w);
         max_text_h = qMax(max_text_h, node->text_h);
       }

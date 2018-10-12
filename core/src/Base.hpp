@@ -39,6 +39,8 @@
 
 const QString APP_NAME = REALOPINSIGHT_APPLICATION_NAME;
 const int MAX_FILE_UPLOAD = 4 * 1024; // 4MB => see also max-request-size wt config file
+const int NEATO_EDGE_LENGTH = 3;
+const double NEATO_X_TRANSLATION_FACTOR = 50;
 
 const QString COMPANY = "RealOpInsight Labs";
 const QString USER_BN = "ngrt4n";
@@ -396,7 +398,7 @@ public:
     const double GREAT_SCALE_FACTOR = 100;
     switch (graphLayout) {
       case ngrt4n::NeatoLayout:
-        m_factors = {5 * GREAT_SCALE_FACTOR, 5 * GREAT_SCALE_FACTOR};
+        m_factors = {GREAT_SCALE_FACTOR, GREAT_SCALE_FACTOR};
         break;
       case ngrt4n::DotLayout:
       default:
