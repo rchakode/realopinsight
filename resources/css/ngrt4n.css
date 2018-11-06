@@ -276,14 +276,14 @@ legend {
 .btn-critical {
   color: #fff !important;
   background-color: #f56 !important;
-  border-color: #c71c22;
+  border-color: #f56;
 }
 
 /* orange button */
 .btn-major {
   color: #fff !important;
-  background-color: #dd5600 !important;
-  border-color: #dd5600;
+  background-color: #ffa500 !important;
+  border-color: #ffa500;
 }
 
 
@@ -291,7 +291,7 @@ legend {
 .btn-normal {
   color: #fff !important;
   background-color: #4b7 !important;
-  border-color: #00c642;
+  border-color: #4b7;
 }
 
 
@@ -299,7 +299,7 @@ legend {
 .btn-minor {
   color: #fff !important;
   background-color: #fa4 !important;
-  border-color: #f5e625;
+  border-color: #fa4;
 }
 
 
