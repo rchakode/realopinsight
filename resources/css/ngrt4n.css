@@ -298,7 +298,7 @@ legend {
 /* yellow button */
 .btn-minor {
   color: #fff !important;
-  background-image: #fa4 !important;
+  background-color: #fa4 !important;
   border-color: #f5e625;
 }
 
