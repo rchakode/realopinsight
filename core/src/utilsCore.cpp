@@ -361,12 +361,13 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
 
   cdata.clear();
   cdata.monitor = MonitorT::Any;
+  static uint64_t importIndex = 0;
 
   NodeT rootService;
   rootService.id = ngrt4n::ROOT_ID;
   rootService.icon = MONITOR_NAME;
   rootService.weight = ngrt4n::WEIGHT_UNIT;
-  rootService.name = filter.isEmpty() ? QObject::tr("%1 Services").arg(MONITOR_NAME) : filter;
+  rootService.name = filter.isEmpty() ? QObject::tr("%1 Services (%2)").arg(MONITOR_NAME).arg(++importIndex) : filter;
   rootService.type = NodeType::BusinessService;
   rootService.sev_crule = CalcRules::Worst;
   rootService.sev_prule = PropRules::Unchanged;
@@ -515,7 +516,6 @@ std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const
 
 QString ngrt4n::generateNodeXml(const NodeT& node)
 {
-  qDebug() << node.child_nodes;
   QString xml = QString("<Service id=\"%1\" "
                         " type=\"%2\" "
                         " statusCalcRule=\"%3\" "
