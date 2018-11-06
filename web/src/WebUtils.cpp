@@ -160,8 +160,6 @@ std::string ngrt4n::thumbnailCssClass(int severity)
       cssClass.append("btn btn-critical");
       break;
     case ngrt4n::Unknown:
-      cssClass.append("btn btn-unknown");
-      break;
     default:
       cssClass.append("btn btn-unknown");
       break;

@@ -546,7 +546,7 @@ void WebMainUI::handleDataSourceSettings(void)
 void WebMainUI::handleNewViewSelected(void)
 {
   std::string selectedEntry = m_selectViewBox->currentText().toUTF8();
-  DashboardMapT::Iterator dashboardIter = m_dashboardMap.find(selectedEntry.c_str());
+  auto dashboardIter = m_dashboardMap.find(selectedEntry.c_str());
   if (dashboardIter != m_dashboardMap.end()) {
     setDashboardAsFrontStackedWidget(*dashboardIter);
     m_displayOnlyTroubleEventsBox->setHidden(false);
@@ -665,11 +665,15 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     }
 
     QString viewName = dashboard->rootNode().name;
-    DashboardMapT::Iterator result = m_dashboardMap.find(viewName);
-    if (result != m_dashboardMap.end()) {
-      showMessage(ngrt4n::OperationFailed, tr("A console with the same name is already loaded (%1)").arg(viewName).toStdString());
-      delete dashboard;
-      return nullptr;
+    auto loadedDashboardItem = m_dashboardMap.find(viewName);
+    if (loadedDashboardItem != m_dashboardMap.end()) {
+      // cleanup the existing dashboard before to reload it
+      m_dashboardStackedContents.removeWidget(*loadedDashboardItem);
+      m_dashboardMap.remove(viewName);
+      delete *loadedDashboardItem;
+//      showMessage(ngrt4n::OperationFailed, tr("A console with the same name is already loaded (%1)").arg(viewName).toStdString());
+//      delete dashboard;
+//      return nullptr;
     }
 
     m_dashboardMap.insert(viewName, dashboard);
@@ -1143,11 +1147,11 @@ void  WebMainUI::handleViewAclMenu(void)
 
 void WebMainUI::handleDeleteView(const std::string& viewName)
 {
-  DashboardMapT::Iterator dashboardIter = m_dashboardMap.find(viewName.c_str());
-  if (dashboardIter != m_dashboardMap.end()) {
-    WebDashboard* dashboard = *dashboardIter;
+  auto loadedDashboardItem = m_dashboardMap.find(viewName.c_str());
+  if (loadedDashboardItem != m_dashboardMap.end()) {
+    WebDashboard* dashboard = *loadedDashboardItem;
     m_dashboardStackedContents.removeWidget(dashboard);
-    delete (*dashboardIter);
+    delete (*loadedDashboardItem);
     m_dashboardMap.remove(viewName.c_str());
   }
 }
@@ -1194,9 +1198,9 @@ void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
 
 void WebMainUI::handleDashboardSelected(std::string viewName)
 {
-  DashboardMapT::Iterator iterDashboardItem = m_dashboardMap.find(viewName.c_str());
-  if (iterDashboardItem != m_dashboardMap.end()) {
-    setDashboardAsFrontStackedWidget(*iterDashboardItem);
+  auto loadedDashboardItem = m_dashboardMap.find(viewName.c_str());
+  if (loadedDashboardItem != m_dashboardMap.end()) {
+    setDashboardAsFrontStackedWidget(*loadedDashboardItem);
   }
 }
 

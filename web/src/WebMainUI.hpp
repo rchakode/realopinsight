@@ -115,7 +115,6 @@ private:
   };
   /** Signals */
   Wt::Signal<void> sessionTerminated;
-  typedef QMap<QString, WebDashboard*> DashboardMapT;
   typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
 
 
@@ -155,7 +154,7 @@ private:
   Wt::WStackedWidget m_adminStackedContents;
   Wt::WStackedWidget m_dashboardStackedContents;
 
-  DashboardMapT m_dashboardMap;
+  QMap<QString, WebDashboard*> m_dashboardMap;
   Wt::WText m_adminPanelTitle;
   InputSelector m_previewSelectorDialog;
 
