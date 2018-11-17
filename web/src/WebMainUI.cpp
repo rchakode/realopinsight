@@ -961,7 +961,9 @@ void WebMainUI::initOperatorDashboard(void)
 
   auto userViews = m_dbSession->listViewListByAssignedUser(m_dbSession->loggedUser().username);
 
-  if (userViews.size() == 0) {
+  if (userViews.empty()) {
+    m_operatorHomeTpl.bindEmpty("bi-report-title");
+    m_operatorHomeTpl.bindEmpty("bi-report-dashlet");
     showMessage(ngrt4n::OperationFailed, Q_TR("No view loaded"));
     return ;
   }
