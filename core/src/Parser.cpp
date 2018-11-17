@@ -103,11 +103,11 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
     node.sev_crule = xmlNode.attribute("statusCalcRule").toInt();
     node.sev_prule = xmlNode.attribute("statusPropRule").toInt();
     node.icon = xmlNode.firstChildElement("Icon").text().trimmed();
-    node.name = xmlNode.firstChildElement("Name").text().trimmed();
-    node.description = xmlNode.firstChildElement("Description").text().trimmed();
-    node.alarm_msg = xmlNode.firstChildElement("AlarmMsg").text().trimmed();
-    node.notification_msg = xmlNode.firstChildElement("NotificationMsg").text().trimmed();
-    node.child_nodes = xmlNode.firstChildElement("SubServices").text().trimmed();
+    node.name = ngrt4n::decodeXml( xmlNode.firstChildElement("Name").text().trimmed() );
+    node.description = ngrt4n::decodeXml( xmlNode.firstChildElement("Description").text().trimmed() );
+    node.alarm_msg = ngrt4n::decodeXml( xmlNode.firstChildElement("AlarmMsg").text().trimmed() );
+    node.notification_msg = ngrt4n::decodeXml( xmlNode.firstChildElement("NotificationMsg").text().trimmed() );
+    node.child_nodes = ngrt4n::decodeXml( xmlNode.firstChildElement("SubServices").text().trimmed() );
     node.weight = (m_cdata->format_version >= 3.1) ? xmlNode.attribute("weight").toDouble() : ngrt4n::WEIGHT_UNIT;
 
     if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {

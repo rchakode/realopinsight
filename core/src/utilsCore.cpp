@@ -367,7 +367,7 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
   rootService.id = ngrt4n::ROOT_ID;
   rootService.icon = MONITOR_NAME;
   rootService.weight = ngrt4n::WEIGHT_UNIT;
-  rootService.name = filter.isEmpty() ? QObject::tr("%1 Services (%2)").arg(MONITOR_NAME).arg(++importIndex) : filter;
+  rootService.name = filter.isEmpty() ? QObject::tr("Application Service (%1)").arg(++importIndex) : filter;
   rootService.type = NodeType::BusinessService;
   rootService.sev_crule = CalcRules::Worst;
   rootService.sev_prule = PropRules::Unchanged;
@@ -527,12 +527,12 @@ QString ngrt4n::generateNodeXml(const NodeT& node)
                               QString::number(node.sev_prule),
                               QString::number(node.weight));
 
-  xml.append( QString(" <Name>%1</Name>\n").arg(node.name) )
+  xml.append( QString(" <Name>%1</Name>\n").arg( encodeXml(node.name) ) )
       .append( QString(" <Icon>%1</Icon>\n").arg(node.icon) )
-      .append( QString(" <Description>%1</Description>\n").arg(node.description) )
-      .append( QString(" <AlarmMsg>%1</AlarmMsg>\n").arg(node.alarm_msg) )
-      .append( QString(" <NotificationMsg>%1</NotificationMsg>\n").arg(node.notification_msg) )
-      .append( QString(" <SubServices>%1</SubServices>\n").arg(node.child_nodes) ) ;
+      .append( QString(" <Description>%1</Description>\n").arg( encodeXml(node.description) ) )
+      .append( QString(" <AlarmMsg>%1</AlarmMsg>\n").arg( encodeXml(node.alarm_msg) ) )
+      .append( QString(" <NotificationMsg>%1</NotificationMsg>\n").arg( encodeXml(node.notification_msg) ) )
+      .append( QString(" <SubServices>%1</SubServices>\n").arg( encodeXml(node.child_nodes) ) ) ;
 
   if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
     xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)) );
@@ -581,4 +581,43 @@ void ngrt4n::setParentChildDependency(const QString& childId, const QString& par
   } else {
     parentRef->child_nodes += QString("%1%2").arg(ngrt4n::CHILD_Q_SEP, childId);
   }
+}
+
+
+QString ngrt4n::encodeXml(const QString& data)
+{
+  QString encodedData("");
+  for(const auto& character : data) {
+    switch (character.unicode())
+    {
+      case '&':
+        encodedData += "&amp;";
+        break;
+      case '\'':
+        encodedData += "&apos;";
+        break;
+      case '"':
+        encodedData += "&quot;"; break;
+      case '<':
+        encodedData += "&lt;";
+        break;
+      case '>':
+        encodedData += "&gt;";
+        break;
+      default:
+        encodedData += character;
+        break;
+    }
+  }
+  return encodedData;
+}
+
+QString ngrt4n::decodeXml(const QString& data)
+{
+  return QString(data)
+      .replace("&amp;", "&")
+      .replace("&apos;", "'")
+      .replace("&quot;", "\"")
+      .replace("&lt;", "<")
+      .replace("&gt;", ">");
 }

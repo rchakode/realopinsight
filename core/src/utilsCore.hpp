@@ -183,6 +183,10 @@ namespace ngrt4n
 
   void setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes);
 
+  QString encodeXml(const QString& data);
+
+  QString decodeXml(const QString& data);
+
 } //NAMESPACE
 
 #endif // UTILS_CLIENT_HPP
