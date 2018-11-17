@@ -615,7 +615,7 @@
         <span>${description-field}</span>
       </div>
       <div class="col-sm-12 form-group">
-        <label class="control-label">Monitoring Data&nbsp;</label>
+        <label class="control-label">Monitored Item&nbsp;</label>
         <span>${monitoring-item-field}</span>
       </div>
     </fieldset>
