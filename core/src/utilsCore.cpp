@@ -63,9 +63,9 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
   if (monitorType == MonitorT::Zabbix) {
     switch(statusValue) {
       case ngrt4n::ZabbixClear:
+      case ngrt4n::ZabbixInfo:
         criticity = ngrt4n::Normal;
         break;
-      case ngrt4n::ZabbixInfo:
       case ngrt4n::ZabbixWarn:
         criticity = ngrt4n::Minor;
         break;
