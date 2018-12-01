@@ -85,7 +85,7 @@ private:
   Wt::WComboBox m_iconBox;
   Wt::WComboBox m_calcRuleBox;
   Wt::WComboBox m_propRuleBox;
-  Wt::WTextArea m_descField;
+  Wt::WLineEdit m_descField;
 
   // node type-related field and widgets
   Wt::WComboBox m_typeField;
