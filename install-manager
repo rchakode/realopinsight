@@ -109,13 +109,13 @@ check_prerequisites()
 
 build_web_server_binary() {
   echo "[DEBUG] Building RealOpInsight http server..."
-  ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=webd ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=webd ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
 build_dbsetup_binary() {
   echo "[DEBUG] Building RealOpInsight http server..."
-  ${QMAKE} -config debug $QT_PROJECT_FILE CONFIG+=setupdb ${dflag}
+  ${QMAKE} -config release $QT_PROJECT_FILE CONFIG+=setupdb ${dflag}
   make -j${NCPU} 1>>install.log
 }
 
@@ -136,9 +136,6 @@ install_ultimate() {
 
   # create $REALOPINSIGHT_USER user if not exist
   id $REALOPINSIGHT_USER || useradd $REALOPINSIGHT_USER
-  
-  #echo "[DEBUG] Installing Wt and other dependencies..."
-  #install_wt
   
   # check dependencies
   check_prerequisites

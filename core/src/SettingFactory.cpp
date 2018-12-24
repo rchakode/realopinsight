@@ -95,20 +95,6 @@ void SettingFactory::init(void)
   if (updateInterval.isEmpty()) {
     QSettings::setValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, QString::number(ngrt4n::DefaultUpdateInterval));
   }
-  if (admUser.isEmpty()) {
-    QSettings::setValue(SettingFactory::AUTH_ADM_UNSERNAME_KEY, ngrt4n::AdmUser.c_str());
-  }
-  if (admPasswd.isEmpty()) {
-    QString passwd = QCryptographicHash::hash(ngrt4n::AdmUser.c_str(), QCryptographicHash::Md5) ;
-    QSettings::setValue(SettingFactory::AUTH_ADM_PASSWD_KEY, passwd);
-  }
-  if (opUser.isEmpty()) {
-    QSettings::setValue(SettingFactory::AUTH_OP_UNSERNAME_KEY, ngrt4n::OpUser.c_str());
-  }
-  if (opPasswd.isEmpty()) {
-    QString passwd = QCryptographicHash::hash(ngrt4n::OpUser.c_str(), QCryptographicHash::Md5) ;
-    QSettings::setValue(SettingFactory::AUTH_OP_PASSWD_KEY, passwd);
-  }
 
   sync();
 }
