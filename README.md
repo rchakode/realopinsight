@@ -133,19 +133,19 @@ To integrate RealOpInsight with these systems, you have to proceed as follows:
     ```
     service livestatus
     {
-      type				= UNLISTED
-      port		    = 6558
-      socket_type	= stream
-      protocol	  = tcp
-      wait		    = no
+      type        = UNLISTED
+      port        = 6558
+      socket_type = stream
+      protocol    = tcp
+      wait        = no
       cps         = 100 3
       instances   = 500
       per_source  = 250
       flags       = NODELAY
-      user		    = nagios
-      server		  = /usr/bin/unixcat
+      user        = nagios
+      server      = /usr/bin/unixcat
       server_args = /var/lib/nagios/rw/live
-      disable		  = no
+      disable     = no
     }
     ```
 * Log into RealOpInsight as administrator (default credentials: `admin`/`password`).
