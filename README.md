@@ -72,15 +72,89 @@ You can then move to the Getting Started section for more instructions.
 * When prompted, you must accept the license terms in order to move forward.
 * When prompted to select the type of installation you want to perform.
     * Type `n` to proceed with a new installation.
-    * Type `u` to proceed with an installation update.
-    This process is interactive, you may be prompted to provide additional information regarding your existing installation.
+    * Type `u` to proceed with an installation update; you will be then prompted to provide additional information regarding your existing installation.
 * Once the virtual machine started, the RealOpinsight web interface can be accessed on on your local machine at [http://<HOST_ADDR>:4583/realopinsight](http://VM_ADDR:4583/realopinsight/) (replace `<HOST_ADDR>` by the IP address or the hostname of your the installation server).
 
 You can then move to the Getting Started section for more instructions.
-
 
 # Getting Started using RealOpInsight
 
 According to the installation option you selected, open the RealOpInsight web interface and login as administrator (username: `admin`, password: `password`).
 
 For production use, the default password must be changed password as soon as possible for security reasons.
+
+## Getting Started with Kubernetes
+For an integration with Kubernetes, you will need, off course, a running Kubernetes cluster; a Minikube installation should do the trick.
+
+Then proceed as the follows:
+
+* Install kubectl on the machine running RealOpInsight; if you opted for a containerized instance, kubectl should be installed on the Docker host.
+* Open a proxied access to Kubernetes API:
+  ```
+    $ kubectl proxy
+  ```
+* Log into RealOpInsight as administrator (default credentials: `admin`/`password`).
+* Select the menu `Monitoring Sources` to fill in the monitoring source settings.
+* Set the field `Monitoring Source Type` to `Kubernetes`.
+* Set the field `Monitor API Base URL` to `http://127.0.0.1:8000/` (assuming that you started a proxy access to Kubernetes API with default options).
+* Leave the other fields as is.
+* Click on the button `Add as source`.
+* When prompted, select `Source0` as `Source Id`.
+* Click on `Apply` to save the changes.
+* On success you shall see a message confirming that.
+
+
+## Getting Started with Zabbix
+You will need, off course, a running Zabbix installation with its JSON-RPC API enabled. Zabbix version 1.8 or higher is required.
+
+Then proceed as follows:
+
+* Log into RealOpInsight as administrator.
+* Select the menu `Monitoring Sources` to fill in the monitoring source settings.
+* Set the property `Monitoring Source Type` to `Zabbix`.
+* Set the property `Monitor API Base URL` with the URL of Zabbix web interface (e.g. _https://zabbix-server/zabbix/_, assuming that Zabbix is installed on a server named `zabbix-server` and accessible over HTTPS).
+* Check the property `Don't verify SSL certificate` **only** if you use a self-signed certificate.
+* Set the property `Auth String` with a string `username:password` corresponding to the credentials to connect to Zabbix API. Note the colon `:` between username and password.
+* Click on the button `Add as source`.
+* When prompted, select `Source0` as `Source Id`.
+* Click on `Apply` to save the changes.
+* On success you shall see a message confirming that.
+
+## Getting Started with Nagios and related systems
+The below steps apply to all systems based on Nagios concepts, i.e Nagios itself, Centreon, Icinga, Op5 Monitor, etc.
+
+To integrate RealOpInsight with these systems, you have to proceed as follows:
+
+* Install a networked [Livestatus service](https://mathias-kettner.com/cms_livestatus.html) over your monitoring data. Note that Icinga 2 provides a reimplementation of the Livestatus protocol that can be easily [setup over an Icinga2 installation](https://icinga.com/docs/icinga2/latest/doc/14-features/#livestatus).
+* For a sake of simplicity for the rest of this document we assume that the networked Livestatus service uses the following configuratin for xinetd. According to your installation you may likely need to modify the following: `server_args` that points to the Livestatus socket, `server` pointing to the unixcat binary, `user` defining a user having read permissions to the Livestatus socket.
+
+  You can modify these settings, save the resulting configuration in a file located at `/etc/xinetd.d/livestatus`, and restart xinetd.
+
+    ```
+    service livestatus
+    {
+    	type				= UNLISTED
+    	port		    = 6558
+    	socket_type	= stream
+    	protocol	  = tcp
+    	wait		    = no
+    	cps         = 100 3
+      instances   = 500
+      per_source  = 250
+    	flags       = NODELAY
+    	user		    = nagios
+    	server		  = /usr/bin/unixcat
+    	server_args = /var/lib/nagios/rw/live
+    	disable		  = no
+    }
+    ```
+* Log into RealOpInsight as administrator (default credentials: `admin`/`password`).
+* Select the menu `Monitoring Sources` to fill in the monitoring source settings.
+* Set the property `Monitoring Source Type` to `Nagios`.
+* Set the property `Livestatus Host ` with the hostname or the IP address of the Livestatus network listener. This would be typically the address of your monitoring server, but you can also imagine a tunnelled remote access from another machine (e.g. RealOpInsight host).
+* Set the property `Livestatus Port ` with the port of the Livestatus network listener (e.g. _6558_ with is the default port used set by MK Livestatus and Icinga).
+* Leave all the other properties as is.
+* Click on the button `Add as source`.
+* When prompted, select `Source0` as `Source Id`.
+* Click on `Apply` to save the changes.
+* On success you shall see a message confirming that.
