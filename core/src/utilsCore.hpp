@@ -94,7 +94,7 @@ namespace ngrt4n
     {"Tree", "images/hierarchy.png"}
   };
 
-  const QStringList MonitorSourceIndexes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+  const QStringList DataSourceIndices = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
   const QStringList MonitorSourceTypes = {MonitorT::toString(MonitorT::Kubernetes),
                                    MonitorT::toString(MonitorT::OpManager),
                                    MonitorT::toString(MonitorT::Pandora),
@@ -153,8 +153,6 @@ namespace ngrt4n
 
   bool findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node);
 
-  QString sourceData2Json(const SourceT& src);
-
   void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
 
   StringPairT splitDataPointInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
@@ -162,8 +160,6 @@ namespace ngrt4n
   StringPairT splitSourceDataPointInfo(const QString& info); /* return <source, hostaddr> */
 
   QString getSourceIdFromStr(const QString& str);
-
-  QPair<bool, int> checkSourceId(const QString& id);
 
   inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
 

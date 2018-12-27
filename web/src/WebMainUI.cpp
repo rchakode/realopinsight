@@ -64,6 +64,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_notificationSection(nullptr),
     m_eventFeedLayout(nullptr)
 {
+  m_dataSourceSettings.setDbSession(m_dbSession);
   // export configuration environment variables
   qputenv("REALOPINSIGHT_ROOT_DIR", m_rootDir.toUtf8());
   qputenv("REALOPINSIGHT_CONFIG_DIR", m_configDir.toUtf8());
@@ -410,6 +411,7 @@ void WebMainUI::handleRefresh(void)
   m_dbSession->listQosData(qosDataMap,"" /* empty view name means all views */, m_biDashlet.startTime(), m_biDashlet.endTime());
   int currentView = 1;
   for (auto& dashboard : m_dashboardMap) {
+    dashboard->setDbSession(m_dbSession);
     dashboard->initSettings(& m_dataSourceSettings);
     dashboard->updateAllNodesStatus(m_dbSession);
     dashboard->updateMap();
@@ -501,8 +503,7 @@ void WebMainUI::handleUserProfileSettings(void)
 
 void WebMainUI::handleUpdateUserAccount(const DboUserT& userToUpdate)
 {
-  int ret = m_dbSession->updateUser(userToUpdate);
-  handleErrcode(ret);
+  handleErrcode(m_dbSession->updateUser(userToUpdate).first);
 }
 
 
@@ -516,8 +517,7 @@ void WebMainUI::handleDisplayChangePassword(void)
 
 void WebMainUI::handleChangePassword(const std::string& login, const std::string& lastpass, const std::string& pass)
 {
-  int ret = m_dbSession->updatePassword(login, lastpass, pass);
-  handleErrcode(ret);
+  handleErrcode(m_dbSession->updatePassword(login, lastpass, pass).first);
 }
 
 
@@ -671,9 +671,9 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
       m_dashboardStackedContents.removeWidget(*loadedDashboardItem);
       m_dashboardMap.remove(viewName);
       delete *loadedDashboardItem;
-//      showMessage(ngrt4n::OperationFailed, tr("A console with the same name is already loaded (%1)").arg(viewName).toStdString());
-//      delete dashboard;
-//      return nullptr;
+      //      showMessage(ngrt4n::OperationFailed, tr("A console with the same name is already loaded (%1)").arg(viewName).toStdString());
+      //      delete dashboard;
+      //      return nullptr;
     }
 
     m_dashboardMap.insert(viewName, dashboard);
@@ -884,7 +884,7 @@ void WebMainUI::handleErrcode(int errcode)
 void WebMainUI::handleUserUpdatedCompleted(int errcode)
 {
   if (errcode != 0) {
-    showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+    showMessage(ngrt4n::OperationFailed, "update failed: check log for details");
   } else {
     showMessage(ngrt4n::OperationSucceeded, Q_TR("Updated successfully"));
     m_dbUserManager->resetUserForm();
@@ -1234,7 +1234,11 @@ void WebMainUI::handleImportDescriptionFile(void)
   CORE_LOG("info", QObject::tr("Parse uploaded file: %1").arg(tmpFileName).toStdString());
 
   CoreDataT cdata;
-  Parser parser(&cdata, Parser::ParsingModeEditor, &m_settings);
+  Parser parser{&cdata,
+        Parser::ParsingModeEditor,
+        &m_settings,
+        m_dbSession};
+
   auto&& outParser = parser.parse(tmpFileName);
   if (outParser.first != ngrt4n::RcSuccess) {
     showMessage(ngrt4n::OperationFailed, outParser.second.toStdString());
@@ -1257,8 +1261,9 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
   view.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
   view.path = path.toStdString();
 
-  if (m_dbSession->addView(view) != ngrt4n::RcSuccess){
-    showMessage(ngrt4n::OperationFailed, m_dbSession->lastError());
+  auto addViewOut = m_dbSession->addView(view);
+  if (addViewOut.first != ngrt4n::RcSuccess){
+    showMessage(ngrt4n::OperationFailed, addViewOut.second.toStdString());
   } else {
     QString viewName(view.name.c_str());
     QString viewPath(view.path.c_str());
@@ -1269,7 +1274,6 @@ void WebMainUI::saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& 
     CORE_LOG("info", msg);
   }
 }
-
 
 
 void WebMainUI::resetFileUploader(void)

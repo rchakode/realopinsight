@@ -35,7 +35,6 @@ class SettingFactory : public QSettings
   Q_OBJECT
 public:
   static const QString GLOBAL_LANGUAGE_KEY;
-  static const QString GLOBAL_SRC_BUCKET_KEY;
   static const QString GLOBAL_DB_STATE_KEY;
   static const QString GLOBAL_GRAPH_LAYOUT;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
@@ -47,10 +46,6 @@ public:
   static const QString DB_USER;
   static const QString DB_PASSWORD;
 
-  static const QString AUTH_ADM_UNSERNAME_KEY;
-  static const QString AUTH_OP_UNSERNAME_KEY;
-  static const QString AUTH_ADM_PASSWD_KEY;
-  static const QString AUTH_OP_PASSWD_KEY;
   static const QString AUTH_MODE_KEY;
   static const QString AUTH_LDAP_SERVER_URI;
   static const QString AUTH_LDAP_BIND_USER_DN;
@@ -88,12 +83,6 @@ public:
   void setEntry(const QString& key, const QString& value);
 
   QString entry(const QString& key) const {return QSettings::value(key).toString();}
-
-  bool loadSource(qint32 sourceIndex, SourceT& sinfo);
-
-  bool loadSource(const QString& str_sourceId, SourceT& sinfo);
-
-  bool bindSourceInfo(const QString& sourceData, SourceT& sinfo);
 
   static QString language(void);
 

@@ -63,17 +63,6 @@ std::string WebBaseSettings::getLdapIdField(void) const
 }
 
 
-int WebBaseSettings::activeSourceIds(QVector<std::string>& result)
-{
-  result.clear();
-  for (int i = 0; i < MAX_SRCS; ++i) {
-    if (m_sourceStates.at(i)) {
-      result.push_back(ngrt4n::sourceId(i).toStdString());
-    }
-  }
-  return result.size();
-}
-
 int WebBaseSettings::getDbType(void) const
 {
   QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_TYPE") );

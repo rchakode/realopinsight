@@ -32,10 +32,14 @@
 #include <cassert>
 
 
-Parser::Parser(CoreDataT* _cdata, int _parsingMode, const BaseSettings* settings)
+Parser::Parser(CoreDataT* _cdata,
+               int _parsingMode,
+               const BaseSettings* settings,
+               DbSession* dbSession)
   : m_cdata(_cdata),
     m_parsingMode(_parsingMode),
-    m_settings(settings)
+    m_settings(settings),
+    m_dbSession(dbSession)
 {
 }
 
@@ -160,14 +164,14 @@ std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, 
 
   out_cdata.sources.insert(sourceId);
 
-  SourceT sinfo;
-  if (! m_settings->loadSource(sourceId, sinfo)) {
+  auto findSourceOut = m_dbSession->findSourceById(sourceId);
+  if (! findSourceOut.first) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed loading source settings on %1").arg(sourceId));
   }
 
-  auto outK8sLoadNsView = K8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer).loadNamespaceView(ns, out_cdata);
+  auto outK8sLoadNsView = K8sHelper(findSourceOut.second.mon_url, findSourceOut.second.verify_ssl_peer).loadNamespaceView(ns, out_cdata);
   if (outK8sLoadNsView.second != ngrt4n::RcSuccess) {
-    auto m_lastErrorMsg = QObject::tr("%1: %2").arg(sinfo.id, outK8sLoadNsView.first);
+    auto m_lastErrorMsg = QObject::tr("%1: %2").arg(findSourceOut.second.id, outK8sLoadNsView.first);
     return std::make_pair(outK8sLoadNsView.second, m_lastErrorMsg);
   }
 

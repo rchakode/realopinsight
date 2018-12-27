@@ -323,9 +323,9 @@ void UserFormView::process(void)
 void UserFormView::handleDeleteRequest(void)
 {
   Wt::WMessageBox *confirmationBox = new Wt::WMessageBox
-      ("Warning !",
-       "<p>Do you really want to delete this user?</p>",
-       Wt::Information, Wt::Yes | Wt::No);
+                                     ("Warning !",
+                                      "<p>Do you really want to delete this user?</p>",
+                                      Wt::Information, Wt::Yes | Wt::No);
   confirmationBox->setModal(false);
   confirmationBox->buttonClicked().connect(std::bind([=] () {
     if (confirmationBox->buttonResult() == Wt::Yes) {
@@ -428,7 +428,11 @@ DbUserManager::DbUserManager(DbSession* dbSession)
 {
   m_dbUserListWidget->bindString("title", Q_TR("User list"));
   m_dbUserListWidget->bindWidget("user-list", m_usersListContainer);
-  m_userForm->validated().connect(std::bind([=](DboUserT user) { m_updateCompleted.emit(m_dbSession->addUser(user));}, std::placeholders::_1));
+  m_userForm->validated().connect(std::bind([=](DboUserT user) {
+    auto addUserOut = m_dbSession->addUser(user);
+    m_updateCompleted.emit(addUserOut.first);
+  },
+  std::placeholders::_1));
 }
 
 DbUserManager::~DbUserManager(void)
@@ -458,15 +462,16 @@ Wt::WPanel* DbUserManager::createUserPanel(const DboUserT& user)
 
   // connect signal for add user
   form->validated().connect(std::bind([=](DboUserT userToUpdate) {
-    m_dbSession->updateUser(userToUpdate);
-    m_updateCompleted.emit(m_dbSession->updateUser(userToUpdate));
+    auto updateUserOut = m_dbSession->updateUser(userToUpdate);
+    m_updateCompleted.emit(updateUserOut.first);
   }, std::placeholders::_1));
 
   // connect signal for change password
   form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
                                                     const std::string& currentPass,
                                                     const std::string& newPass) {
-    m_updateCompleted.emit(m_dbSession->updatePassword(login, currentPass, newPass));
+    auto updatePasswordOut = m_dbSession->updatePassword(login, currentPass, newPass);
+    m_updateCompleted.emit(updatePasswordOut.first);
   }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
   // connect signal for delete user

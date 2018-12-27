@@ -33,7 +33,8 @@
 WebDataSourceSettings::WebDataSourceSettings()
   : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("data-source-settings-form.tpl")),
-    m_operationCompleted(this)
+    m_operationCompleted(this),
+    m_dbSession(nullptr)
 {
   createFormWidgets();
   bindFormWidgets();
@@ -159,12 +160,16 @@ bool WebDataSourceSettings::validateSourceSettingsFields(void)
 
 void WebDataSourceSettings::applyChanges(void)
 {
+  applyChangesByIndex(m_sourceSelectionBox.currentIndex());
+}
+
+void WebDataSourceSettings::applyChangesByIndex(int index)
+{
   if (! validateSourceSettingsFields()) {
     return ;
   }
 
-  auto sourceIndex = currentSourceIndex();
-  if (! ngrt4n::MonitorSourceIndexes.contains(QString::number(sourceIndex)) ) {
+  if (! ngrt4n::DataSourceIndices.contains(QString::number(index)) ) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Invalid monitor source index"));
     return;
   }
@@ -172,11 +177,12 @@ void WebDataSourceSettings::applyChanges(void)
   auto&& monitorLabel = QString::fromStdString(m_monitorTypeField.currentText().toUTF8());
   QString validationErrorMsg = "";
   if (monitorLabel.contains(MonitorT::toString(MonitorT::Kubernetes))) {
-    saveK8sDataSource(sourceIndex);
+    saveK8sDataSource(index);
   } else {
-    saveAsSource(sourceIndex, monitorLabel);
+    saveAsSource(index);
   }
 }
+
 
 
 void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
@@ -187,11 +193,11 @@ void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
   K8sHelper k8s(k8sProxyUrl, verifySslPeer);
   auto outListNamespaces = k8s.listNamespaces();
   if (outListNamespaces.second != ngrt4n::RcSuccess) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Failed when connecting to data source (%1)").arg(outListNamespaces.first.at(0)).toStdString());
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("failed connecting to Kubernetes API (%1)").arg(outListNamespaces.first.at(0)).toStdString());
     return ;
   }
 
-  saveAsSource(sourceIndex, MonitorT::toString(MonitorT::Kubernetes));
+  saveAsSource(sourceIndex);
 
   WebBaseSettings settings;
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
@@ -222,8 +228,9 @@ void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
       vinfo.name = QString("%1:%2").arg(nsNode.id, nsNode.name).toStdString();
       vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
       vinfo.path = destPath.toStdString();
-      if (dbSession.addView(vinfo) != ngrt4n::RcSuccess) {
-        CORE_LOG("error", dbSession.lastError());
+      auto addViewOut = dbSession.addView(vinfo);
+      if (addViewOut.first != ngrt4n::RcSuccess) {
+        CORE_LOG("error", addViewOut.second.toStdString());
       }
     }
   }
@@ -232,39 +239,55 @@ void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
 
 void WebDataSourceSettings::addAsSource(void)
 {
-  if (validateSourceSettingsFields())
-    m_sourceIndexSelector.show();
+  if (! validateSourceSettingsFields()) {
+    return;
+  }
+  m_sourceIndexSelector.show();
 }
 
 
 
 void WebDataSourceSettings::deleteSource(void)
 {
-  auto currentIndex = currentSourceIndex();
-  if ( ngrt4n::MonitorSourceIndexes.contains(QString::number(currentIndex)) ) {
-    m_sourceBoxModel.removeRow(currentIndex);
-    setSourceState(currentIndex, false);
-    setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
-    sync();
-    updateFields();
+  if (! m_dbSession) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("no valid db session provided"));
+    return;
   }
+
+  auto currentIndex = m_sourceSelectionBox.currentIndex();
+  if ( ! ngrt4n::DataSourceIndices.contains(QString::number(currentIndex)) ) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("cannot delete source (no valid source id)"));
+    return;
+  }
+
+  auto deleteSourceOut = m_dbSession->deleteSource( ngrt4n::sourceId(currentIndex) );
+  if (deleteSourceOut.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, deleteSourceOut.second.toStdString());
+    return ;
+  }
+
+  m_sourceBoxModel.removeRow(currentIndex);
+  updateFields();
 }
 
 
 void WebDataSourceSettings::updateAllSourceWidgetStates(void)
 {
+  if (! m_dbSession) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("no valid db session"));
+    return;
+  }
+
   std::vector< Wt::WString > activeSourceLabels;
-  std::vector< int > activeSourceIndexes;
-  for (int index = 0; index< MAX_SRCS; ++index) {
-    if ( isSetSource(index) ) {
-      activeSourceLabels.push_back( ngrt4n::sourceId(index).toStdString() );
-      activeSourceIndexes.push_back(index);
-    }
+  std::vector< int > activeSourceIndices;
+  for (const auto& src: m_dbSession->listSources(MonitorT::Any)) {
+    activeSourceLabels.push_back(src.id.toStdString());
+    activeSourceIndices.push_back(QString(src.id.at(src.id.size() - 1)).toInt());
   }
 
   m_sourceBoxModel.setStringList( activeSourceLabels );
   for (size_t i = 0; i < activeSourceLabels.size(); ++i) {
-    m_sourceBoxModel.setData(static_cast<int>(i), 0, activeSourceIndexes[i], Wt::UserRole);
+    m_sourceBoxModel.setData(static_cast<int>(i), 0, activeSourceIndices[i], Wt::UserRole);
   }
 
   m_sourceBoxModel.sort(0);
@@ -273,18 +296,22 @@ void WebDataSourceSettings::updateAllSourceWidgetStates(void)
 
 void WebDataSourceSettings::updateFields(void)
 {
-  setCurrentSourceIndex(firstSourceSet());
-  int curIndex = currentSourceIndex();
-  if ( ngrt4n::MonitorSourceIndexes.contains(QString::number(curIndex)) ) {
+  int curIndex = m_sourceSelectionBox.currentIndex();
+  if ( ngrt4n::DataSourceIndices.contains(QString::number(curIndex)) ) {
     m_sourceSelectionBox.setCurrentIndex(curIndex);
     fillFromSource(curIndex);
   }
 }
 
 
-void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& sourceLabel)
+void WebDataSourceSettings::saveAsSource(qint32 index)
 {
-  // global settings
+  if (! m_dbSession) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("no valid db session provided"));
+    return;
+  }
+
+  // set global settings
   setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
 
   // extract settings from  UI
@@ -296,54 +323,68 @@ void WebDataSourceSettings::saveAsSource(const qint32& index, const QString& sou
   srcInfo.auth = QString( m_authStringField.text().toUTF8().c_str() );
   srcInfo.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
 
-  if (sourceLabel.contains("Nagios")) {
+  auto sourceName = QString( m_monitorTypeField.currentText().toUTF8().c_str() );
+  if (sourceName.contains("Nagios")) {
     srcInfo.mon_type = MonitorT::Nagios;
-  } else if (sourceLabel.contains("Zabbix")) {
+  } else if (sourceName.contains("Zabbix")) {
     srcInfo.mon_type = MonitorT::Zabbix;
-  } else if (sourceLabel.contains("Zenoss")) {
+  } else if (sourceName.contains("Zenoss")) {
     srcInfo.mon_type = MonitorT::Zenoss;
-  } else if (sourceLabel.contains("OpManager")) {
+  } else if (sourceName.contains("OpManager")) {
     srcInfo.mon_type = MonitorT::OpManager;
-  } else if (sourceLabel.contains("Kubernetes")) {
+  } else if (sourceName.contains("Kubernetes")) {
     srcInfo.mon_type = MonitorT::Kubernetes;
   } else {
     srcInfo.mon_type = MonitorT::Any;
   }
 
-  // save changes
-  setKeyValue(ngrt4n::sourceKey(index), ngrt4n::sourceData2Json(srcInfo));
-  setSourceState(index, true);
-  setKeyValue(SettingFactory::GLOBAL_SRC_BUCKET_KEY, sourceStatesSerialized());
-  sync();
+  auto addSourceOut = m_dbSession->addSource(srcInfo);
+  if (addSourceOut.first == ngrt4n::RcDbDuplicationError) {
+    addSourceOut = m_dbSession->updateSource(srcInfo);
+  }
 
-  // emit signal a finilize
+  if (addSourceOut.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, addSourceOut.second.toStdString());
+    return;
+  }
+
+  // signal the change to other components
   Q_EMIT timerIntervalChanged(1000 * QString(m_updateIntervalField.text().toUTF8().c_str()).toInt());
+
   addToSourceBox(index);
   m_sourceSelectionBox.setCurrentIndex(findSourceIndexInBox(index));
   m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
 }
 
 
-void WebDataSourceSettings::fillFromSource(int _configIndex)
+void WebDataSourceSettings::fillFromSource(int srcIndex)
 {
-  if (_configIndex >= 0 && _configIndex < MAX_SRCS) {
-    SourceT src;
-    loadSource(_configIndex, src);
-
-    m_sourceSelectionBox.setValueText(ngrt4n::sourceId(_configIndex).toStdString());
-    m_monitorUrlField.setText(src.mon_url.toStdString());
-    m_livestatusHostField.setText(src.ls_addr.toStdString());
-    m_livestatusPortField.setText(QString::number(src.ls_port).toStdString());
-    m_authStringField.setText(src.auth.toStdString());
-    m_monitorTypeField.setCurrentIndex( m_monitorTypeField.findText( MonitorT::toString(src.mon_type).toStdString() ) );
-    m_dontVerifyCertificateField.setCheckState(src.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
-    m_updateIntervalField.setValue(updateInterval());
-
-    updateComponentsVisibiliy(m_monitorTypeField.currentIndex());
-
-    // this triggers a signal
-    setCurrentSourceIndex(_configIndex);
+  if (! m_dbSession) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("no valid db session"));
+    return;
   }
+
+  if (srcIndex < 0 || srcIndex >= MAX_SRCS) {
+    return;
+  }
+
+  auto findSourceOut = m_dbSession->findSourceById(ngrt4n::sourceId(srcIndex));
+  if (! findSourceOut.first) {
+    return ;
+  }
+
+  m_sourceSelectionBox.setValueText(ngrt4n::sourceId(srcIndex).toStdString());
+  m_monitorUrlField.setText(findSourceOut.second.mon_url.toStdString());
+  m_livestatusHostField.setText(findSourceOut.second.ls_addr.toStdString());
+  m_livestatusPortField.setText(QString::number(findSourceOut.second.ls_port).toStdString());
+  m_authStringField.setText(findSourceOut.second.auth.toStdString());
+  m_monitorTypeField.setCurrentIndex( m_monitorTypeField.findText( MonitorT::toString(findSourceOut.second.mon_type).toStdString() ) );
+  m_dontVerifyCertificateField.setCheckState(findSourceOut.second.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
+  m_updateIntervalField.setValue(updateInterval());
+
+  updateComponentsVisibiliy(m_monitorTypeField.currentIndex());
+
+  m_sourceSelectionBox.setCurrentIndex(srcIndex);
 }
 
 
@@ -356,20 +397,20 @@ void WebDataSourceSettings::renderSourceIndexSelector(void)
   m_sourceIndexSelector.titleBar()->setStyleClass("titlebar");
   m_sourceIndexSelector.setWindowTitle(Q_TR("Select the source index"));
 
-  //FIXME: check if this cause memory leak ?
-  Wt::WComboBox* inputField = new Wt::WComboBox(m_sourceIndexSelector.contents());
-  for (const auto& src : ngrt4n::MonitorSourceIndexes) {
-    inputField->addItem(src.toStdString());
+  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the oject
+  Wt::WComboBox* sourceIndexField = new Wt::WComboBox(m_sourceIndexSelector.contents());
+  for (const auto& src : ngrt4n::DataSourceIndices) {
+    sourceIndexField->addItem(src.toStdString());
   }
 
-  //FIXME: check if this cause memory leak ?
-  Wt::WPushButton *ok = new Wt::WPushButton("OK", m_sourceIndexSelector.footer());
-  ok->clicked().connect(std::bind(&WebDataSourceSettings::handleAddAsSourceOkAction, this, inputField));
-  ok->setDefault(true);
+  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the oject
+  Wt::WPushButton *sourceIndexValidationBtn = new Wt::WPushButton("OK", m_sourceIndexSelector.footer());
+  sourceIndexValidationBtn->clicked().connect(std::bind(&WebDataSourceSettings::handleAddAsSourceOkAction, this, sourceIndexField));
+  sourceIndexValidationBtn->setDefault(true);
 
-  //FIXME: check if this cause memory leak ?
-  Wt::WPushButton *cancel = new Wt::WPushButton("Cancel", m_sourceIndexSelector.footer());
-  cancel->clicked().connect(&m_sourceIndexSelector, &Wt::WDialog::reject);
+  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the oject
+  Wt::WPushButton *sourceIndexCancellationBtn = new Wt::WPushButton("Cancel", m_sourceIndexSelector.footer());
+  sourceIndexCancellationBtn->clicked().connect(&m_sourceIndexSelector, &Wt::WDialog::reject);
 }
 
 
@@ -380,12 +421,8 @@ void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
   bool isValidIndex;
   int index = QString::fromStdString( inputBox->currentText().toUTF8() ).toInt(&isValidIndex);
   if (isValidIndex) {
-    setCurrentSourceIndex(index);
-  } else {
-    setCurrentSourceIndex(-1);
+    applyChangesByIndex(index);
   }
-  applyChanges();
-
 }
 
 
@@ -393,7 +430,6 @@ void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
 int WebDataSourceSettings::getSourceGlobalIndex(int sourceBoxIndex)
 {
   boost::any value = static_cast<Wt::WAbstractItemModel*>(&m_sourceBoxModel)->data(sourceBoxIndex, 0, Wt::UserRole);
-
   return boost::any_cast<int>(value);
 }
 

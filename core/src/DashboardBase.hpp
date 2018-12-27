@@ -55,6 +55,7 @@ public:
   qint32 timerInterval(void) const {return m_interval;}
   NodeT rootNode(void);
   int extractStatsData(CheckStatusCountT& statsData);
+  void setDbSession(DbSession* dbSession) {m_dbSession = dbSession;}
 
 public Q_SLOTS:
   void updateAllNodesStatus(DbSession* dbSession);
@@ -63,7 +64,6 @@ public Q_SLOTS:
   void runK8sDataSourceUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
-  void checkStandaloneSourceType(SourceT& src);
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
   qint32 userRole(void) const {return m_userRole;}
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
@@ -75,7 +75,6 @@ Q_SIGNALS:
   void sortEventConsole(void);
   void updateMessageChanged(const std::string& msg);
   void settingsLoaded(void);
-  void updateSourceUrl(void);
   void timerIntervalChanged(qint32 interval);
   void dashboardLinkSelected(void);
   void updateFinished(void);
@@ -109,11 +108,11 @@ protected:
   void resetInterval(BaseSettings* p_settings);
   void updateCNodesWithCheck(const CheckT & check, const SourceT& src);
   void updateCNodesWithChecks(const ChecksT& checks, const SourceT& src);
-  QStringList getAuthInfo(int srcId);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
 
 private:
+  DbSession* m_dbSession;
   void signalUpdateProcessing(const SourceT& src);
 };
 

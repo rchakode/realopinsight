@@ -140,7 +140,7 @@ void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
         if (m_dbSession->deleteUser(username) == ngrt4n::RcSuccess) {
           m_userEnableStatusChanged.emit(DisableAuthSuccess, username);
         } else {
-          m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
+          m_userEnableStatusChanged.emit(GenericError, Q_TR("failed creating user"));
         }
       }
     } else {
@@ -168,11 +168,12 @@ int LdapUserManager::insertIntoDatabase(const LdapUserAttrsT& userInfo)
   dbUser.role = DboUser::OpRole;
   dbUser.authsystem = WebBaseSettings::LDAP;
 
-  if (m_dbSession->addUser(dbUser) == ngrt4n::RcSuccess) {
+  auto addUserOut = m_dbSession->addUser(dbUser);
+  if (addUserOut.first == ngrt4n::RcSuccess) {
     m_userEnableStatusChanged.emit(EnableAuthSuccess, dbUser.username);
     retCode = 0;
   } else {
-    m_userEnableStatusChanged.emit(GenericError, m_dbSession->lastError());
+    m_userEnableStatusChanged.emit(GenericError, addUserOut.second.toStdString());
   }
 
   return retCode;

@@ -240,26 +240,6 @@ bool ngrt4n::findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::
 }
 
 
-QString ngrt4n::sourceData2Json(const SourceT& src)
-{
-  return QString("{\"sid\":\"%1\","
-                 "\"mon_type\":\"%2\","
-                 "\"mon_url\":\"%3\","
-                 "\"ls_addr\":\"%4\","
-                 "\"ls_port\":\"%5\","
-                 "\"auth\":\"%6\","
-                 "\"verify_ssl_peer\":\"%7\""
-                 "}").arg(src.id,
-                          QString::number(src.mon_type),
-                          src.mon_url,
-                          src.ls_addr,
-                          QString::number(src.ls_port),
-                          src.auth,
-                          QString::number(src.verify_ssl_peer));
-}
-
-
-
 void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
 {
   invalidCheck.status = status;
@@ -302,22 +282,6 @@ QString ngrt4n::getSourceIdFromStr(const QString& str)
   }
   return srcid;
 }
-
-QPair<bool, int> ngrt4n::checkSourceId(const QString &id)
-{
-  int index = -1;
-  bool valid = false;
-  if (! id.isEmpty()) {
-    QString idStr = id.at(id.size()-1);
-    if (id == SRC_BASENAME%idStr) {
-      valid = true;
-      index = idStr.toInt();
-    }
-  }
-  return QPair<bool, int>(valid, index);
-}
-
-
 
 
 QStringList ngrt4n::getAuthInfo(const QString& authString)

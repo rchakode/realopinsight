@@ -78,7 +78,8 @@ StringMapT DashboardBase::calcRules() {
 DashboardBase::DashboardBase(void)
   : m_timerId(-1),
     m_updateCounter(0),
-    m_showOnlyTroubles(false)
+    m_showOnlyTroubles(false),
+    m_dbSession(nullptr)
 {
   resetStatData();
 }
@@ -97,10 +98,14 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Empty description file"));
   }
 
-  Parser parser(&m_cdata, Parser::ParsingModeDashboard, p_settings);
-  auto outParsing = parser.parse(viewFile);
-  if (outParsing.first != ngrt4n::RcSuccess) {
-    return std::make_pair(outParsing.first, outParsing.second);
+  Parser parser{&m_cdata,
+        Parser::ParsingModeDashboard,
+        p_settings,
+        m_dbSession};
+
+  auto parseOut = parser.parse(viewFile);
+  if (parseOut.first != ngrt4n::RcSuccess) {
+    return std::make_pair(parseOut.first, parseOut.second);
   }
 
   initSettings(p_settings);
@@ -329,7 +334,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
       status2Propagate.sev = ngrt4n::Unknown;
       node->actual_msg = QObject::tr("external service - %1 - no status found in last %2 minute(s)")
                          .arg(node->child_nodes
-                         .arg(intervalDurationSec / 60));
+                              .arg(intervalDurationSec / 60));
     }
 
     status2Propagate.sev = StatusAggregator::propagate(node->sev, node->sev_prule);
@@ -359,15 +364,6 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
   return status2Propagate;
 }
 
-QStringList DashboardBase::getAuthInfo(int srcId)
-{
-  SourceListT::Iterator source = m_sources.find(srcId);
-  if (source != m_sources.end()) {
-    return ngrt4n::getAuthInfo(source->auth);
-  }
-  return QStringList();
-}
-
 
 void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& msg)
 {
@@ -387,36 +383,15 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
 
 void DashboardBase::initSettings(BaseSettings* p_settings)
 {
-  m_sources.clear();
-  SourceT src;
-  for (auto id = m_cdata.sources.begin(), end = m_cdata.sources.end(); id != end; ++id) {
-    QPair<bool, int> srcinfo = ngrt4n::checkSourceId(*id);
-    if (srcinfo.first) {
-      if (p_settings->isSetSource(srcinfo.second)) {
-        if (p_settings->loadSource(*id, src)) {
-          checkStandaloneSourceType(src);
-          m_sources.insert(srcinfo.second, src);
-        } else {
-          src.id = *id;
-          updateDashboardOnError(src, tr("Cannot set handler for %1").arg(*id));
-        }
-      } else {
-        src.id = *id;
-        updateDashboardOnError(src, tr("%1 is not set").arg(*id));
-      }
-    }
+  if (! m_dbSession) {
+    return;
   }
+  m_sources = m_dbSession->listSources(MonitorT::Any);
   resetInterval(p_settings);
   computeFirstSrcIndex();
   Q_EMIT settingsLoaded();
 }
 
-void DashboardBase::checkStandaloneSourceType(SourceT& src)
-{
-  if (m_cdata.monitor != MonitorT::Any) {
-    src.mon_type = m_cdata.monitor;
-  }
-}
 
 
 void DashboardBase::computeFirstSrcIndex(void)

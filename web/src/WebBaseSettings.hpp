@@ -75,14 +75,11 @@ public:
   std::string getSmtpPassword(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
   int getSmtpUseSsl(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
 
-  int activeSourceIds(QVector<std::string>& result);
-
-
 protected :
   virtual void fillFromSource(int srcIndex) {}
   virtual void updateAllSourceWidgetStates(void) {}
   virtual void updateFields(void) {}
-  virtual void saveAsSource(const qint32& idx, const QString& sourceLabel){}
+  virtual void saveAsSource(qint32 index){}
 
 protected Q_SLOTS:
   virtual void applyChanges(void) {}

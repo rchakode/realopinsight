@@ -213,9 +213,10 @@ void ViewAclManagement::deleteViews(void)
   for (const auto& vname : m_selectedViews) {
     DboView curView;
     if (m_dbSession->findView(vname, curView)) {
-      if (m_dbSession->deleteViewWithName(vname) != ngrt4n::RcSuccess) {
+      auto deleteViewOut = m_dbSession->deleteViewWithName(vname);
+      if (deleteViewOut.first != ngrt4n::RcSuccess) {
         outputMsg.append("- Failed to delete view: "+vname + " -");
-        CORE_LOG("warning", m_dbSession->lastError());
+        CORE_LOG("warning", deleteViewOut.second.toStdString());
       } else {
         if (! QFile(curView.path.c_str()).remove()) {
           CORE_LOG("info", "Failed to removed file: "+curView.path);
@@ -232,7 +233,7 @@ void ViewAclManagement::deleteViews(void)
 
 void ViewAclManagement::enableButtonIfApplicable(Wt::WStandardItemModel* model,
                                                 Wt::WPushButton* button,
-                                                void (ViewAclManagement::* targetSlot)(void))
+                                                void (ViewAclManagement::* )(void))
 {
   if (model->rowCount() <=0) {
     button->setEnabled(false);

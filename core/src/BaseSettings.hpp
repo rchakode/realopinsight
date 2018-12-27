@@ -48,12 +48,6 @@ public:
   BaseSettings(void);
   BaseSettings(const QString& settingFile);
   ~BaseSettings(void);
-  QBitArray getSourceStates() const { return m_sourceStates; }
-  bool isSetSource(int idx) {return (idx < MAX_SRCS)? m_sourceStates.at(idx) : false; }
-  void setSourceState(int index, int value) { m_sourceStates.setBit(index, value);}
-  virtual void updateSourceStates();
-  int activeSourcesCount(void);
-  QMap<QString, SourceT> fetchSourceList(int type);
   int getGraphLayout(void) const;
 
 
@@ -65,23 +59,16 @@ Q_SIGNALS:
 
 public Q_SLOTS:
   qint32 updateInterval(void) const;
-  bool loadSource(qint32 in_sourceIndex, SourceT& out_sinfo) const;
-  bool loadSource(const QString& in_sourceIndex, SourceT& out_sinfo) const;
 
 protected :
   virtual void fillFromSource(int sourceIndex) = 0;
   virtual void updateAllSourceWidgetStates(void) = 0;
   virtual void loadProperties(void);
   virtual void updateFields(void) = 0;
-  virtual void saveAsSource(const qint32& idx, const QString& type) = 0;
-  virtual int firstSourceSet(void);
-  QString sourceStatesSerialized(void);
-  int currentSourceIndex(void) const {return m_currentSourceIndex;}
-  void setCurrentSourceIndex(int value) {m_currentSourceIndex = value;}
+  virtual void saveAsSource(qint32 index) = 0;
   void sync(void);
   QString keyValue(const QString& key, const QString& defaultValue);
   void setKeyValue(const QString & _key, const QString & _value);
-  bool getSourceState(int index);
 
 protected Q_SLOTS:
   virtual void applyChanges(void) = 0;
@@ -91,11 +78,6 @@ protected Q_SLOTS:
 
 protected:
   SettingFactory* m_settingFactory;
-  int m_currentSourceIndex;
-  QBitArray m_sourceStates;
-
-private:
-  void resetSourceStates(void);
 };
 
 

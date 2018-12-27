@@ -31,17 +31,13 @@
 
 
 BaseSettings::BaseSettings(void)
-  : m_settingFactory(new SettingFactory()),
-    m_currentSourceIndex(0)
+  : m_settingFactory(new SettingFactory())
 {
-  updateSourceStates();
 }
 
 BaseSettings::BaseSettings(const QString& settingFile)
-  : m_settingFactory(new SettingFactory(settingFile)),
-    m_currentSourceIndex(0)
+  : m_settingFactory(new SettingFactory(settingFile))
 {
-  updateSourceStates();
 }
 
 
@@ -56,71 +52,6 @@ void BaseSettings::loadProperties(void)
   updateFields();
 }
 
-
-QString BaseSettings::sourceStatesSerialized(void)
-{
-  QString str = "";
-  for (int i = 0; i < MAX_SRCS; i++) str += m_sourceStates.at(i)? "1" : "0";
-  return str;
-}
-
-
-
-void BaseSettings::resetSourceStates(void)
-{
-  m_sourceStates.clear();
-  m_sourceStates.resize(MAX_SRCS);
-  for (int i=0; i < MAX_SRCS; ++i) {
-    m_sourceStates.setBit(i, false);
-  }
-}
-
-
-void BaseSettings::updateSourceStates(void)
-{
-  resetSourceStates();
-  QString content = m_settingFactory->value(SettingFactory::GLOBAL_SRC_BUCKET_KEY).toString();
-  if (! content.isEmpty()) {
-    for (int i=0; i < MAX_SRCS; ++i) {
-      m_sourceStates.setBit(i, content.at(i) == '1');
-    }
-  }
-}
-
-
-int BaseSettings::firstSourceSet()
-{
-  int idx = 0;
-  while (idx < MAX_SRCS && ! m_sourceStates.at(idx)) {++idx;}
-  return ((idx < MAX_SRCS)? idx : -1);
-}
-
-
-int BaseSettings::activeSourcesCount(void)
-{
-  updateSourceStates();
-  return m_sourceStates.count(true);
-}
-
-
-QMap<QString, SourceT>
-BaseSettings::fetchSourceList(int type)
-{
-  QMap<QString, SourceT> sourceList;
-  SourceT srcInfo;
-
-  updateSourceStates();
-  for (int i = 0; i< MAX_SRCS; ++i) {
-    if (loadSource(i, srcInfo)) {
-      if (srcInfo.mon_type == type || type == MonitorT::Any) {
-        sourceList.insert(srcInfo.id, srcInfo);
-      }
-    }
-  }
-
-  return sourceList;
-}
-
 int BaseSettings::getGraphLayout(void) const
 {
   return m_settingFactory->getGraphLayout();
@@ -130,17 +61,6 @@ qint32 BaseSettings::updateInterval(void) const
 {
   return m_settingFactory->updateInterval();
 }
-
-bool BaseSettings::loadSource(qint32 in_sourceIndex, SourceT& out_sinfo) const
-{
-  return m_settingFactory->loadSource(in_sourceIndex, out_sinfo);
-}
-
-bool BaseSettings::loadSource(const QString& in_sourceIndex, SourceT& out_sinfo) const
-{
-  return m_settingFactory->loadSource(in_sourceIndex, out_sinfo);
-}
-
 
 void BaseSettings::sync(void)
 {
@@ -157,8 +77,4 @@ void BaseSettings::setKeyValue(const QString & _key, const QString & _value)
   m_settingFactory->setKeyValue(_key, _value); m_settingFactory->sync();
 }
 
-bool BaseSettings::getSourceState(int index)
-{
-  return m_sourceStates.at(index);
-}
 

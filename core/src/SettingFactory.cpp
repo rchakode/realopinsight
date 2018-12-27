@@ -32,7 +32,6 @@
 const QString SettingFactory::GLOBAL_LANGUAGE_KEY = "/General/language";
 const QString SettingFactory::GLOBAL_DB_STATE_KEY = "/General/DbState";
 const QString SettingFactory::GLOBAL_GRAPH_LAYOUT = "/General/graphLayout";
-const QString SettingFactory::GLOBAL_SRC_BUCKET_KEY = "/Sources/buckets";
 const QString SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY = "/Monitor/updateInterval";
 
 const QString SettingFactory::DB_TYPE = "/Database/dbType";
@@ -43,10 +42,6 @@ const QString SettingFactory::DB_USER = "/Database/dbUser";
 const QString SettingFactory::DB_PASSWORD = "/Database/dbPassword";
 
 
-const QString SettingFactory::AUTH_ADM_UNSERNAME_KEY = "/Auth/admUser";
-const QString SettingFactory::AUTH_OP_UNSERNAME_KEY = "/Auth/opUsername";
-const QString SettingFactory::AUTH_ADM_PASSWD_KEY = "/Auth/admPasswd";
-const QString SettingFactory::AUTH_OP_PASSWD_KEY = "/Auth/opPasswd";
 const QString SettingFactory::AUTH_MODE_KEY = "/Auth/authMode";
 const QString SettingFactory::AUTH_LDAP_SERVER_URI = "/Auth/ldapServerUri";
 const QString SettingFactory::AUTH_LDAP_BIND_USER_DN = "/Auth/ldapBindUserDn";
@@ -87,15 +82,9 @@ SettingFactory::~SettingFactory(void)
 void SettingFactory::init(void)
 {
   QString updateInterval = QSettings::value(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY).toString();
-  QString admUser = QSettings::value(SettingFactory::AUTH_ADM_UNSERNAME_KEY).toString();
-  QString admPasswd = QSettings::value(SettingFactory::AUTH_ADM_PASSWD_KEY).toString();
-  QString opUser = QSettings::value(SettingFactory::AUTH_OP_UNSERNAME_KEY).toString();
-  QString opPasswd = QSettings::value(SettingFactory::AUTH_OP_PASSWD_KEY).toString();
-
   if (updateInterval.isEmpty()) {
     QSettings::setValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, QString::number(ngrt4n::DefaultUpdateInterval));
   }
-
   sync();
 }
 
@@ -121,37 +110,6 @@ qint32 SettingFactory::updateInterval() const
 void SettingFactory::setEntry(const QString& key, const QString& value)
 {
   QSettings::setValue(key, value);
-}
-
-bool SettingFactory::loadSource(qint32 in_sourceIndex, SourceT& out_sinfo)
-{
-  auto sourceKey = ngrt4n::sourceKey(in_sourceIndex);
-  return bindSourceInfo(QSettings::value(sourceKey).toString(), out_sinfo);
-}
-
-bool SettingFactory::loadSource(const QString& in_sourceId, SourceT& out_sinfo)
-{
-  auto sourceKey = ngrt4n::sourceKey(in_sourceId);
-  return bindSourceInfo(QSettings::value(sourceKey).toString(), out_sinfo);
-}
-
-
-bool SettingFactory::bindSourceInfo(const QString& sourceData, SourceT& sinfo)
-{
-  if (sourceData.isEmpty()) {
-    return false;
-  }
-
-  JsonHelper jsHelper(sourceData);
-  sinfo.id = jsHelper.getProperty("sid").toString();
-  sinfo.mon_type = static_cast<qint8>(jsHelper.getProperty("mon_type").toInt32());
-  sinfo.mon_url = jsHelper.getProperty("mon_url").toString();
-  sinfo.auth = jsHelper.getProperty("auth").toString();
-  sinfo.ls_addr = jsHelper.getProperty("ls_addr").toString();
-  sinfo.ls_port = jsHelper.getProperty("ls_port").toInt32();
-  sinfo.verify_ssl_peer = static_cast<qint8>(jsHelper.getProperty("verify_ssl_peer").toInt32());
-
-  return true;
 }
 
 QString SettingFactory::language(void)

@@ -44,15 +44,17 @@ public:
   Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
   void updateContents(void) { loadProperties();}
   void setEnabledInputs(bool enable);
+  void setDbSession(DbSession* dbSession) {m_dbSession =  dbSession;}
 
 
 protected:
   virtual void applyChanges(void);
+  void applyChangesByIndex(int index);
   void handleCancel(void) {return;}
-  virtual void fillFromSource(int _configIndex);
+  virtual void fillFromSource(int srcIndex);
   virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
-  virtual void saveAsSource(const qint32& index, const QString& sourceLabel);
+  virtual void saveAsSource(qint32 index);
   virtual void addAsSource(void);
   virtual void deleteSource(void);
 
@@ -76,6 +78,7 @@ private:
   Wt::WPushButton m_addAsSourceBtn;
   Wt::WPushButton m_deleteSourceBtn;
   Wt::WDialog m_sourceIndexSelector;
+  DbSession* m_dbSession;
 
 
   void createFormWidgets(void);

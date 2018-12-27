@@ -103,7 +103,10 @@ void  WebEditor::handleOpenViewButton(void)
 void  WebEditor::handleOpenFile(const std::string& path, const std::string&)
 {
   WebBaseSettings settings;
-  Parser parser(&m_cdata, Parser::ParsingModeEditor, &settings);
+  Parser parser{&m_cdata,
+                Parser::ParsingModeEditor,
+                &settings,
+                m_dbSession};
 
   auto&& outParser = parser.parse(path.c_str());
   if (outParser.first != ngrt4n::RcSuccess) {
@@ -625,7 +628,8 @@ void WebEditor::refreshDynamicContents(void)
   m_dataPointSourceField.clear();
 
   m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
-  for (auto&& sinfo: WebBaseSettings().fetchSourceList(MonitorT::Any)) {
+  auto sources = m_dbSession->listSources(MonitorT::Any);
+  for (const auto& sinfo: sources) {
     m_dataPointSourceField.addItem(sinfo.id.toStdString());
   }
 
@@ -753,18 +757,18 @@ std::pair<int, QString> WebEditor::registerViewWithPath(const CoreDataT& cdata, 
 
   // save view in database if it's the 1st time
   if (m_currentFilePath.empty()) {
-    int rc = m_dbSession->addView(vinfo);
-    if (rc != ngrt4n::RcSuccess) {
-      CORE_LOG("error", m_dbSession->lastError());
-      return std::make_pair(rc,  m_dbSession->lastError().c_str());
+    auto addViewOut = m_dbSession->addView(vinfo);
+    if (addViewOut.first != ngrt4n::RcSuccess) {
+      CORE_LOG("error", addViewOut.second.toStdString());
+      return addViewOut;
     }
     return std::make_pair(ngrt4n::RcSuccess, "");
   }
 
-  int rc = m_dbSession->updateViewWithPath(vinfo, destPath.toStdString());
-  if (rc !=  ngrt4n::RcSuccess) {
-    CORE_LOG("error", m_dbSession->lastError());
-    return std::make_pair(rc, m_dbSession->lastError().c_str());
+  auto updateViewOut = m_dbSession->updateViewWithPath(vinfo, destPath.toStdString());
+  if (updateViewOut.first !=  ngrt4n::RcSuccess) {
+    CORE_LOG("error", updateViewOut.second.toStdString());
+    return updateViewOut;
   }
 
   return std::make_pair(ngrt4n::RcSuccess, "");
@@ -774,8 +778,7 @@ std::pair<int, QString> WebEditor::registerViewWithPath(const CoreDataT& cdata, 
 
 void WebEditor::handleImportMonitoringConfigButton(void)
 {
-  WebBaseSettings settings;
-  auto sources = settings.fetchSourceList(MonitorT::Any);
+  auto sources = m_dbSession->listSources(MonitorT::Any);
   m_importMonitoringConfigDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithTextFilter);
   m_importMonitoringConfigDialog.show();
 }
@@ -783,16 +786,14 @@ void WebEditor::handleImportMonitoringConfigButton(void)
 
 void WebEditor::handleImportZabbixItServiceButton(void)
 {
-  WebBaseSettings settings;
-  auto sources = settings.fetchSourceList(MonitorT::Zabbix);
+  auto sources = m_dbSession->listSources(MonitorT::Zabbix);
   m_importZabbixItServicesDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceOnly);
   m_importZabbixItServicesDialog.show();
 }
 
 void WebEditor::handleImportNagiosBpiButton(void)
 {
-  WebBaseSettings settings;
-  auto sources = settings.fetchSourceList(MonitorT::Nagios);
+  auto sources = m_dbSession->listSources(MonitorT::Nagios);
   m_importNagiosBpiDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithFileFilter);
   m_importNagiosBpiDialog.show();
 }
@@ -802,26 +803,22 @@ void WebEditor::handleImportNagiosBpiButton(void)
 
 void WebEditor::importMonitoringConfig(const std::string& srcId, const std::string& groupFilter)
 {
-  WebBaseSettings settings;
-
   if (srcId.empty()) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No source selected"));
     return ;
   }
 
-  auto q_srcId = QString::fromStdString(srcId);
-  auto sources = settings.fetchSourceList(MonitorT::Any);
-  auto src = sources.constFind(q_srcId);
-  if (src == sources.cend()) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No source with id: %1").arg(q_srcId).toStdString());
+  auto findSourceOut = m_dbSession->findSourceById(srcId.c_str());
+  if (! findSourceOut.first) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No source with id: %1").arg(srcId.c_str()).toStdString());
     return ;
   }
 
   CoreDataT cdata;
-  auto importResult = ngrt4n::importHostGroupAsBusinessView(*src, groupFilter.c_str(), cdata);
+  auto importResult = ngrt4n::importHostGroupAsBusinessView(findSourceOut.second, groupFilter.c_str(), cdata);
   if (importResult.first != 0) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
-    return  ;
+    return ;
   }
   ngrt4n::fixupDependencies(cdata);
 
@@ -842,11 +839,8 @@ void WebEditor::handleDataPointSourceChanged(int index)
   m_operationCompleted.emit(ngrt4n::OperationInProgress, Q_TR("Import of monitoring data in progress..."));
 
   auto srcId = QString::fromStdString(m_dataPointSourceField.itemText(index).toUTF8());
-
-  SourceT srcInfo;
-  WebBaseSettings settings;
-
-  if (! settings.loadSource(srcId, srcInfo)) {
+  auto findSourceOut = m_dbSession->findSourceById(srcId);
+  if (! findSourceOut.first) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Cannot load source info"));
     return ;
   }
@@ -857,7 +851,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
   }
 
   ChecksT checks;
-  auto importResult = ngrt4n::loadDataPoints(srcInfo, "", checks);
+  auto importResult = ngrt4n::loadDataPoints(findSourceOut.second, "", checks);
   if (importResult.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return;
@@ -887,7 +881,6 @@ void WebEditor::handleDataPointSourceChanged(int index)
       }
       m_dataPointsListBySource[srcId].push_back(dataPoint);
     }
-
   }
 
   m_dataPointListModel->setStringList(m_dataPointsListBySource[srcId]);
@@ -1196,7 +1189,7 @@ void WebEditor::importZabbixITServices(const std::string& srcId)
 
   CoreDataT cdata;
 
-  auto allZbxSources = WebBaseSettings().fetchSourceList(MonitorT::Zabbix);
+  auto allZbxSources = m_dbSession->listSources(MonitorT::Zabbix);
   auto outLoadItServices = ZbxHelper().loadITServices(allZbxSources[srcId.c_str()], cdata);
   if (outLoadItServices.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Importation failed: %1").arg(outLoadItServices.second).toStdString());

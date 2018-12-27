@@ -67,28 +67,29 @@ void NotificationTableView::setModelHeader(void)
 
 int NotificationTableView::update(void)
 {
-  int retCode = -1;
   setDisabled(true);
   NotificationMapT notifications;
-  int result = m_dbSession->listViewRelatedNotifications(notifications, m_dbSession->loggedUser().username);
-  if (result < 0) {
-    m_lastError = m_dbSession->lastError();
-  } else {
-    m_model->clear();
-    setModelHeader();
-    for (const auto& service : m_services) {
-      NotificationMapT::Iterator notificationIter = notifications.find(service.name.toStdString());
-      bool found = (notificationIter != notifications.end());
-      if (notificationIter != notifications.end()) {
-        addServiceEntry(service, found, *notificationIter);
-      } else {
-        addServiceEntry(service, found, NotificationT());
-      }
-    }
-    retCode = 0;
+
+  auto listViewNotifs = m_dbSession->listViewRelatedNotifications(notifications, m_dbSession->loggedUser().username);
+  if (listViewNotifs.first != ngrt4n::RcSuccess) {
+    setDisabled(false);
+    return listViewNotifs.first;
   }
+
+  m_model->clear();
+  setModelHeader();
+  for (const auto& service : m_services) {
+    NotificationMapT::Iterator notificationIter = notifications.find(service.name.toStdString());
+    bool found = (notificationIter != notifications.end());
+    if (notificationIter != notifications.end()) {
+      addServiceEntry(service, found, *notificationIter);
+    } else {
+      addServiceEntry(service, found, NotificationT());
+    }
+  }
+
   setDisabled(false);
-  return retCode;
+  return ngrt4n::RcSuccess;
 }
 
 

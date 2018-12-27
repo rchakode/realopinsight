@@ -37,25 +37,13 @@
 
 namespace dbo = Wt::Dbo;
 
-/** holds View info like a wt::dbo object*/
 class DboView;
-
-/** holds User info like a wt::dbo object*/
 class DboUser;
-
-/** holds LoginSession info like a wt::dbo object*/
 class DboLoginSession;
-
-/** holds QoS data without wt::dbo specific properties*/
 struct QosDataT;
-
-/** holds QoS data info like a wt::dbo object*/
 class DboQosData;
-
-/** holds Notification info like a wt::dbo object*/
 class DboNotification;
-
-/** holds Notification info without dbo specific info*/
+class DboSource;
 struct NotificationT;
 
 namespace Wt {
@@ -69,6 +57,13 @@ namespace Wt {
 
     template<>
     struct dbo_traits<DboUser> : public dbo_default_traits {
+      typedef std::string IdType;
+      static IdType invalidId() { return std::string(); }
+      static const char* surrogateIdField() { return nullptr; }
+    };
+
+    template<>
+    struct dbo_traits<DboSource> : public dbo_default_traits {
       typedef std::string IdType;
       static IdType invalidId() { return std::string(); }
       static const char* surrogateIdField() { return nullptr; }
@@ -372,6 +367,35 @@ public:
   }
 };
 
+
+
+/** holds source info like a wt::dbo object */
+class DboSource
+{
+public:
+  std::string id;
+  int mon_type;
+  std::string mon_url;
+  std::string ls_addr;
+  int ls_port;
+  std::string auth;
+  int verify_ssl_peer;
+  std::string icon;
+
+  template<class Action>
+  void persist(Action& a) {
+    dbo::id(a, id, "id");
+    dbo::field(a, mon_type, "monitor_type");
+    dbo::field(a, mon_url, "monitor_url");
+    dbo::field(a, icon, "icon");
+    dbo::field(a, ls_addr, "livestatus_addr");
+    dbo::field(a, ls_port, "livestatus_port");
+    dbo::field(a, auth, "auth_string");
+    dbo::field(a, verify_ssl_peer, "verify_ssl_peer");
+  }
+};
+
+
 typedef std::set<std::string> UserViewsT;
 typedef std::list<DboUser> DbUsersT;
 typedef std::list<DboView> DbViewsT;
@@ -384,5 +408,6 @@ typedef dbo::collection< dbo::ptr<DboView> > DboViewCollectionT;
 typedef dbo::collection< dbo::ptr<DboQosData> > DboQosDataCollectionT;
 typedef dbo::collection< dbo::ptr<DboNotification> > DboNotificationCollectionT;
 typedef dbo::collection< dbo::ptr<DboLoginSession> > DboLoginSessionCollectionT;
+typedef dbo::collection< dbo::ptr<DboSource> > DboSourceCollectionT;
 
 #endif // USER_HPP

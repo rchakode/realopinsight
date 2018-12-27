@@ -414,7 +414,7 @@ private:
 
 
 
-typedef QHash<int, SourceT> SourceListT;
+typedef QHash<QString, SourceT> SourceListT;
 typedef QMap<QString, std::string> IconMapT;
 typedef QMap<QString, QString> StringMapT;
 typedef QMap<qint32, QString> RequestListT;

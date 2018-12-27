@@ -60,7 +60,6 @@ public:
   ~DbSession();
 
   bool isConnected() const {return m_isConnected;}
-  std::string lastError(void) const {return m_lastError;}
 
   void setupDbMapping(void);
   int initDb(void);
@@ -79,23 +78,23 @@ public:
   void setLoggedUser(void);
   QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
 
-  int addUser(const DboUserT& userInfo);
-  int updateUser(const DboUserT& userInfo);
+  std::pair<int, QString> addUser(const DboUserT& userInfo);
+  std::pair<int, QString> updateUser(const DboUserT& userInfo);
   int deleteUser(const std::string& username);
   int deleteAuthSystemUsers(int authSystem);
   bool findUser(const std::string& username, DboUserT& user);
-  int updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
+  std::pair<int, QString> updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
   DbUsersT listUsers(void);
 
-  int addView(const DboView& vinfo);
-  int updateViewWithPath(const DboView& vinfo, const std::string& vpath);
-  int deleteViewWithName(const std::string& vname);
-  int assignView(const std::string& userId, const std::string& vname);
-  int revokeView(const std::string& userId, const std::string& vname);
+  std::pair<int, QString> addView(const DboView& vinfo);
+  std::pair<int, QString> updateViewWithPath(const DboView& vinfo, const std::string& vpath);
+  std::pair<int, QString> deleteViewWithName(const std::string& vname);
+  std::pair<int, QString> assignView(const std::string& userId, const std::string& vname);
+  std::pair<int, QString> revokeView(const std::string& userId, const std::string& vname);
   int listAssignedUsersEmails(QStringList& emails, const std::string& vname);
 
   int addQosData(const QosDataT& qosData);
-  int addQosDataList(const QosDataList& qosDataList);
+  std::pair<int, QString> addQosDataList(const QosDataList& qosDataList);
   int listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
   int getLastQosData(QosDataT& qosData, const std::string& viewId);
 
@@ -111,14 +110,19 @@ public:
   int updateNotificationAckStatusForUser(const std::string& userId, const std::string& viewId, int newAckStatus);
   int updateNotificationAckStatusForView(const std::string& userId, const std::string& viewId, int newAckStatus);
   void getLastNotificationInfo(NotificationT& lastNotifInfo, const std::string& viewId);
-  int listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
+  std::pair<int, QString> listViewRelatedNotifications(NotificationMapT& notifications, const std::string& userId);
+
+  std::pair<int, QString> addSource(const SourceT& sinfo);
+  std::pair<int, QString> updateSource(const SourceT& sinfo);
+  std::pair<int, QString> deleteSource(const QString& sid);
+  SourceListT listSources(int monType);
+  std::pair<bool, SourceT> findSourceById(const QString& sid);
 
 private:
   bool m_isConnected;
   dbo::SqlConnection* m_dboSqlConncetion;
   UserDatabase* m_dboUserDb;
   DboUser m_loggedUser;
-  std::string m_lastError;
   Wt::Auth::Login m_loginObj;
   Wt::Auth::AuthService m_basicAuthService;
   Wt::Auth::PasswordService* m_passAuthService;
