@@ -83,7 +83,7 @@ According to the installation option you selected, open the RealOpInsight web in
 
 For production use, the default password must be changed password as soon as possible for security reasons.
 
-## Getting Started with Kubernetes
+## Integration with Kubernetes
 For an integration with Kubernetes, you will need, off course, a running Kubernetes cluster; a Minikube installation should do the trick.
 
 Then proceed as the follows:
@@ -104,7 +104,7 @@ Then proceed as the follows:
 * On success you shall see a message confirming that.
 
 
-## Getting Started with Zabbix
+## Integration with Zabbix
 You will need, off course, a running Zabbix installation with its JSON-RPC API enabled. Zabbix version 1.8 or higher is required.
 
 Then proceed as follows:
@@ -120,7 +120,7 @@ Then proceed as follows:
 * Click on `Apply` to save the changes.
 * On success you shall see a message confirming that.
 
-## Getting Started with Nagios and related systems
+## Integration with Nagios and related systems
 The below steps apply to all systems based on Nagios concepts, i.e Nagios itself, Centreon, Icinga, Op5 Monitor, etc.
 
 To integrate RealOpInsight with these systems, you have to proceed as follows:
