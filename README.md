@@ -77,7 +77,7 @@ You can then move to the Getting Started section for more instructions.
 
 You can then move to the Getting Started section for more instructions.
 
-# Getting Started using RealOpInsight
+# Getting Started
 
 According to the installation option you selected, open the RealOpInsight web interface and login as administrator (username: `admin`, password: `password`).
 
