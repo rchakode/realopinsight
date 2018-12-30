@@ -412,7 +412,7 @@ void WebMainUI::handleRefresh(void)
   int currentView = 1;
   for (auto& dashboard : m_dashboardMap) {
     dashboard->setDbSession(m_dbSession);
-    dashboard->initSettings(& m_dataSourceSettings);
+    dashboard->initSettings();
     dashboard->updateAllNodesStatus(m_dbSession);
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
@@ -615,7 +615,7 @@ Wt::WAnchor* WebMainUI::createLogoLink(void)
 void WebMainUI::selectItem4Preview(void)
 {
   m_previewSelectorDialog.updateContentWithViewList(m_dbSession->listViews());
-  m_previewSelectorDialog.show();
+  m_previewSelectorDialog.show(); // accept action triggers the method handlePreviewFile
 }
 
 
@@ -651,7 +651,7 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
 
   WebDashboard* dashboard = nullptr;
   try {
-    dashboard = new WebDashboard();
+    dashboard = new WebDashboard(m_dbSession);
     if (! dashboard) {
       showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
       return nullptr;

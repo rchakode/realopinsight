@@ -76,10 +76,9 @@ public:
   int getSmtpUseSsl(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
 
 protected :
-  virtual void fillFromSource(int srcIndex) {}
+  virtual void fillInFormGivenSourceId(int sid) {}
   virtual void updateAllSourceWidgetStates(void) {}
   virtual void updateFields(void) {}
-  virtual void saveAsSource(qint32 index){}
 
 protected Q_SLOTS:
   virtual void applyChanges(void) {}

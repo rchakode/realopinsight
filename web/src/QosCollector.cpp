@@ -26,7 +26,7 @@
 #include "ctime"
 
 QosCollector::QosCollector(void)
-  : DashboardBase()
+  : DashboardBase(nullptr)
 {
 }
 

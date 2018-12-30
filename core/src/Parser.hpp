@@ -70,7 +70,7 @@ class Parser : public QObject
     void fixupVisilityAndDependenciesGraph(void);
     void saveCoordinatesFile(void);
     void insertITServiceNode(NodeT& node);
-    std::pair<int, QString> loadK8sNamespaceView(QDomNodeList& in_xmlNodes, CoreDataT& out_cdata);
+    std::pair<int, QString> loadDynamicViewByGroup(QDomNodeList& inXmlDomNodes, CoreDataT& outCData);
     void bindGraphDependencies(const NodeT& node);
 };
 

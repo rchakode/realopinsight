@@ -308,19 +308,19 @@ QString ngrt4n::basename(const QString& path)
 }
 
 
-std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata)
+std::pair<int, QString> ngrt4n::loadViewByGroup(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata)
 {
   const auto MONITOR_NAME = MonitorT::toString(srcInfo.mon_type);
 
   ChecksT checks;
-  auto importOut = loadDataPoints(srcInfo, filter, checks);
-  if (importOut.first != ngrt4n::RcSuccess) {
-    return std::make_pair(-1, QObject::tr("%1: %2").arg(MONITOR_NAME, importOut.second));
+  auto loadSourceItemsOut = loadDataItems(srcInfo, filter, checks);
+  if (loadSourceItemsOut.first != ngrt4n::RcSuccess) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("%1: %2").arg(MONITOR_NAME, loadSourceItemsOut.second));
   }
 
   // handle results
   if (checks.empty()) {
-    return std::make_pair(-1, QObject::tr("Import from %1 (filter: %2): no item found").arg(MONITOR_NAME, filter));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("no item found (monitor: %1, filter: %2)").arg(MONITOR_NAME, filter));
   }
 
   cdata.clear();
@@ -370,11 +370,11 @@ std::pair<int, QString> ngrt4n::importHostGroupAsBusinessView(const SourceT& src
   // finally insert the root node and update UI widgets
   cdata.bpnodes.insert(ngrt4n::ROOT_ID, rootService);
 
-  return std::make_pair(0, "");
+  return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
 
-std::pair<int, QString> ngrt4n::loadDataPoints(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
+std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
 {
   // Nagios
   if (srcInfo.mon_type == MonitorT::Nagios) {

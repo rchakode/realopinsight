@@ -894,10 +894,10 @@ DbSession::addSource(const SourceT& sinfo)
       dboSource->id = sinfo.id.toStdString();
       dboSource->mon_type = sinfo.mon_type;
       dboSource->mon_url = sinfo.mon_url.toStdString();
+      dboSource->verify_ssl_peer = sinfo.verify_ssl_peer;
       dboSource->ls_addr = sinfo.ls_addr.toStdString();
       dboSource->ls_port = sinfo.ls_port;
       dboSource->auth = sinfo.auth.toStdString();
-      dboSource->verify_ssl_peer = sinfo.verify_ssl_peer;
       dboSource->icon = sinfo.icon.toStdString();
 
       add(dboSource);
@@ -990,7 +990,7 @@ SourceListT DbSession::listSources(int monType)
       sinfo.mon_url  = QString::fromStdString(dboSrc->mon_url);
       sinfo.ls_addr  = QString::fromStdString(dboSrc->ls_addr);
       sinfo.ls_port  = static_cast<qint32>(dboSrc->ls_port);
-      sinfo.auth     = QString::fromStdString(dboSrc->id);
+      sinfo.auth     = QString::fromStdString(dboSrc->auth);
       sinfo.icon     = QString::fromStdString(dboSrc->id);
       sinfo.verify_ssl_peer = static_cast<qint8>(dboSrc->verify_ssl_peer);
 

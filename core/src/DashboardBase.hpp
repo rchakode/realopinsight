@@ -41,12 +41,12 @@ class DashboardBase : public QObject
   Q_OBJECT
 
 public:
-  DashboardBase(void);
+  DashboardBase(DbSession* dbSession);
   virtual ~DashboardBase();
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void initSettings(BaseSettings* p_settings);
+  void initSettings(void);
   qint64 updateCounter(void) const {return m_updateCounter;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString selectedNode(void) const {return m_selectedNode;}
@@ -60,8 +60,8 @@ public:
 public Q_SLOTS:
   void updateAllNodesStatus(DbSession* dbSession);
   void runMonitor(SourceT& src);
-  void runGenericDataSourceUpdate(const SourceT& srcInfo);
-  void runK8sDataSourceUpdate(const SourceT& srcInfo);
+  void runGenericViewUpdate(const SourceT& srcInfo);
+  void runDynamicViewByGroupUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
@@ -75,11 +75,13 @@ Q_SIGNALS:
   void sortEventConsole(void);
   void updateMessageChanged(const std::string& msg);
   void settingsLoaded(void);
-  void timerIntervalChanged(qint32 interval);
   void dashboardLinkSelected(void);
   void updateFinished(void);
 
 protected:
+  CoreDataT m_cdata;
+  bool m_showOnlyTroubles;
+
   void updateNodeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   virtual void updateDashboard(const NodeT& _node);
@@ -92,28 +94,22 @@ protected:
   virtual void updateChart(void) = 0;
   virtual void updateEventFeeds(const NodeT& node) = 0;
 
-protected:
-  CoreDataT m_cdata;
+private:
+  DbSession* m_dbSession;
   qint32 m_timerId;
   qint64 m_updateCounter;
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;
   QSize m_msgConsoleSize;
-  bool m_showOnlyTroubles;
   SourceListT m_sources;
   int m_firstSrcIndex;
 
-protected:
-  void resetInterval(BaseSettings* p_settings);
+  void signalUpdateProcessing(const SourceT& src);
   void updateCNodesWithCheck(const CheckT & check, const SourceT& src);
   void updateCNodesWithChecks(const ChecksT& checks, const SourceT& src);
   void computeFirstSrcIndex(void);
   void updateDashboardOnError(const SourceT& src, const QString& msg);
-
-private:
-  DbSession* m_dbSession;
-  void signalUpdateProcessing(const SourceT& src);
 };
 
 #endif /* SVNAVIGATOR_HPP */

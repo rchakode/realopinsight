@@ -55,17 +55,15 @@ Q_SIGNALS:
   void urlChanged(QString);
   void sourcesChanged (QList<qint8>);
   void errorOccurred(QString msg);
-  void timerIntervalChanged(qint32);
 
 public Q_SLOTS:
   qint32 updateInterval(void) const;
 
 protected :
-  virtual void fillFromSource(int sourceIndex) = 0;
+  virtual void fillInFormGivenSourceId(int sid) = 0;
   virtual void updateAllSourceWidgetStates(void) = 0;
   virtual void loadProperties(void);
   virtual void updateFields(void) = 0;
-  virtual void saveAsSource(qint32 index) = 0;
   void sync(void);
   QString keyValue(const QString& key, const QString& defaultValue);
   void setKeyValue(const QString & _key, const QString & _value);

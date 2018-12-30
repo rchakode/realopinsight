@@ -815,9 +815,9 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
   }
 
   CoreDataT cdata;
-  auto importResult = ngrt4n::importHostGroupAsBusinessView(findSourceOut.second, groupFilter.c_str(), cdata);
-  if (importResult.first != 0) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
+  auto loadViewByGroupOut = ngrt4n::loadViewByGroup(findSourceOut.second, groupFilter.c_str(), cdata);
+  if (loadViewByGroupOut.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, loadViewByGroupOut.second.toStdString());
     return ;
   }
   ngrt4n::fixupDependencies(cdata);
@@ -851,7 +851,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
   }
 
   ChecksT checks;
-  auto importResult = ngrt4n::loadDataPoints(findSourceOut.second, "", checks);
+  auto importResult = ngrt4n::loadDataItems(findSourceOut.second, "", checks);
   if (importResult.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, importResult.second.toStdString());
     return;

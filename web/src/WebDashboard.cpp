@@ -41,11 +41,10 @@
 
 
 
-WebDashboard::WebDashboard(void)
-  : DashboardBase()
+WebDashboard::WebDashboard(DbSession* dbSession)
+  : DashboardBase(dbSession)
 {
-  m_tree.setCdata(&m_cdata);
-  m_map.setCoreData(&m_cdata);
+  setCData(&m_cdata);
   bindFormWidgets();
   addJsEventScript();
   map()->containerSizeChanged().connect(this, & WebDashboard::hanleRenderingAreaSizeChanged);

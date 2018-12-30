@@ -82,7 +82,7 @@ class WebDashboard : public DashboardBase, public Wt::WContainerWidget
   Q_OBJECT
 
 public:
-  WebDashboard(void);
+  WebDashboard(DbSession* dbSession);
   virtual ~WebDashboard();
   void updateMap(void);
   WebMap* map(void) {return &m_map;}
@@ -113,6 +113,7 @@ Q_SIGNALS:
 
 private:
   typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;
+  DbSession* m_dbSession;
   WebTree m_tree;
   WebMap m_map;
   WebMsgConsole m_msgConsole;
@@ -126,6 +127,7 @@ private:
   Wt::WVBoxLayout m_leftVBoxLayout;
   Wt::WVBoxLayout m_rightVBoxLayout;
 
+  void setCData(CoreDataT* cdata) {m_tree.setCdata(cdata);  m_map.setCoreData(cdata);}
   void bindFormWidgets(void);
   void unbindWidgets(void);
   void addJsEventScript(void);

@@ -91,8 +91,8 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
 
   QDomNodeList xmlNodes = xmlRoot.elementsByTagName("Service");
 
-  if (m_cdata->monitor == MonitorT::Kubernetes) {
-    return loadK8sNamespaceView(xmlNodes, *m_cdata);
+  if (m_cdata->monitor != MonitorT::Any) {
+    return loadDynamicViewByGroup(xmlNodes, *m_cdata);
   }
 
   qint32 xmlNodeCount = xmlNodes.size();
@@ -152,31 +152,41 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
 }
 
 
-std::pair<int, QString> Parser::loadK8sNamespaceView(QDomNodeList& in_xmlNodes, CoreDataT& out_cdata)
+std::pair<int, QString> Parser::loadDynamicViewByGroup(QDomNodeList& inXmlDomNodes, CoreDataT& outCData)
 {
-  if (in_xmlNodes.size() != 1) {
-    return std::make_pair(ngrt4n::RcParseError, QObject::tr("unexpected number of nodes in Kubernetes service file: %1").arg(in_xmlNodes.size()));
+  if (inXmlDomNodes.size() != 1) {
+    return std::make_pair(ngrt4n::RcParseError, QObject::tr("unexpected number of nodes for dynamic view file: %1").arg(inXmlDomNodes.size()));
   }
 
-  QDomElement xmlNode = in_xmlNodes.item(0).toElement();
-  auto&& sourceId = xmlNode.attribute("id").trimmed();
-  auto&& ns = xmlNode.firstChildElement("Name").text().trimmed();
+  QDomElement xmlRootNode = inXmlDomNodes.item(0).toElement();
+  QString sourceId = xmlRootNode.attribute("id").trimmed();
+  QString monitoredGroup = xmlRootNode.firstChildElement("Name").text().trimmed();
 
-  out_cdata.sources.insert(sourceId);
+  outCData.sources.insert(sourceId);
 
   auto findSourceOut = m_dbSession->findSourceById(sourceId);
   if (! findSourceOut.first) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed loading source settings on %1").arg(sourceId));
   }
 
-  auto outK8sLoadNsView = K8sHelper(findSourceOut.second.mon_url, findSourceOut.second.verify_ssl_peer).loadNamespaceView(ns, out_cdata);
-  if (outK8sLoadNsView.second != ngrt4n::RcSuccess) {
-    auto m_lastErrorMsg = QObject::tr("%1: %2").arg(findSourceOut.second.id, outK8sLoadNsView.first);
-    return std::make_pair(outK8sLoadNsView.second, m_lastErrorMsg);
+  if (findSourceOut.second.mon_type == MonitorT::Kubernetes) {
+    auto loqdK8sNs = K8sHelper(findSourceOut.second.mon_url, findSourceOut.second.verify_ssl_peer)
+                     .loadNamespaceView(monitoredGroup, outCData);
+    if (loqdK8sNs.second != ngrt4n::RcSuccess) {
+      auto m_lastErrorMsg = QObject::tr("%1: %2").arg(findSourceOut.second.id, loqdK8sNs.first);
+      return std::make_pair(loqdK8sNs.second, m_lastErrorMsg);
+    }
+  } else {
+    auto loadViewByGroupOut = ngrt4n::loadViewByGroup(findSourceOut.second, monitoredGroup, outCData);
+    if (loadViewByGroupOut.first == ngrt4n::RcSuccess) {
+      ngrt4n::fixupDependencies(outCData);
+    }
+    return loadViewByGroupOut;
   }
 
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
+
 
 QString Parser::escapeLabel4Graphviz(const QString& label)
 {

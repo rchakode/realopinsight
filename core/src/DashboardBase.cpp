@@ -75,11 +75,11 @@ StringMapT DashboardBase::calcRules() {
   return map;
 }
 
-DashboardBase::DashboardBase(void)
-  : m_timerId(-1),
-    m_updateCounter(0),
-    m_showOnlyTroubles(false),
-    m_dbSession(nullptr)
+DashboardBase::DashboardBase(DbSession* dbSession)
+  : m_showOnlyTroubles(false),
+    m_dbSession(dbSession),
+    m_timerId(-1),
+    m_updateCounter(0)
 {
   resetStatData();
 }
@@ -91,11 +91,15 @@ DashboardBase::~DashboardBase()
 std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, const QString& viewFile)
 {
   if (! p_settings) {
-    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Not initialized settings"));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("no initialized settings"));
   }
 
   if (viewFile.isEmpty()) {
-    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Empty description file"));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("empty description file"));
+  }
+
+  if (! m_dbSession) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("db session not initialized "));
   }
 
   Parser parser{&m_cdata,
@@ -108,13 +112,12 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
     return std::make_pair(parseOut.first, parseOut.second);
   }
 
-  initSettings(p_settings);
+  initSettings();
 
   int rc = parser.processRenderingData();
   if (rc != ngrt4n::RcSuccess) {
     return std::make_pair(rc, parser.lastErrorMsg());
   }
-
   buildTree();
   buildMap();
 
@@ -135,13 +138,10 @@ void DashboardBase::runMonitor(SourceT& src)
 {
   signalUpdateProcessing(src);
 
-  switch (src.mon_type) {
-    case MonitorT::Kubernetes:
-      runK8sDataSourceUpdate(src);
-      break;
-    default:
-      runGenericDataSourceUpdate(src);
-      break;
+  if (src.mon_type != MonitorT::Any) {
+    runDynamicViewByGroupUpdate(src);
+  } else {
+    runGenericViewUpdate(src);
   }
 
   finalizeUpdate(src);
@@ -157,28 +157,40 @@ void DashboardBase::signalUpdateProcessing(const SourceT& src)
   }
 }
 
-void DashboardBase::runK8sDataSourceUpdate(const SourceT& srcInfo)
+void DashboardBase::runDynamicViewByGroupUpdate(const SourceT& sinfo)
 {
-  CoreDataT newCData;
-  auto&& outLoadNsView = K8sHelper(srcInfo.mon_url, srcInfo.verify_ssl_peer).loadNamespaceView(rootNode().name, newCData);
-  if (outLoadNsView.second != ngrt4n::RcSuccess) {
-    updateDashboardOnError(srcInfo, outLoadNsView.first);
-    return ;
-  }
+  if (sinfo.mon_type == MonitorT::Kubernetes) {
+    CoreDataT newCData;
+    auto loadNsViewOut = K8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer).loadNamespaceView(rootNode().name, newCData);
+    if (loadNsViewOut.second != ngrt4n::RcSuccess) {
+      updateDashboardOnError(sinfo, loadNsViewOut.first);
+      return ;
+    }
 
-  for (const auto& newCNode: newCData.cnodes) {
-    auto cnode = m_cdata.cnodes.find(newCNode.id);
-    if (cnode != m_cdata.cnodes.end()) { // pod may disappear due to restart, but a notification should be displayed in event feed.
-      cnode->check = newCNode.check;
-      updateNodeStatusInfo(*cnode, srcInfo);
-      updateDashboard(*cnode);
-      cnode->monitored = true;
+    for (const auto& newCNode: newCData.cnodes) {
+      auto cnode = m_cdata.cnodes.find(newCNode.id);
+      if (cnode != m_cdata.cnodes.end()) { // pod may disappear due to restart, but a notification should be displayed in event feed.
+        cnode->check = newCNode.check;
+        updateNodeStatusInfo(*cnode, sinfo);
+        updateDashboard(*cnode);
+        cnode->monitored = true;
+      }
+    }
+  } else {
+    ChecksT checks;
+    auto importResult = ngrt4n::loadDataItems(sinfo, rootNode().name, checks);
+    if (importResult.first != ngrt4n::RcSuccess) {
+      updateDashboardOnError(sinfo, importResult.second);
+    } else {
+      updateCNodesWithChecks(checks, sinfo);
     }
   }
+
+
 }
 
 
-void DashboardBase::runGenericDataSourceUpdate(const SourceT& srcInfo)
+void DashboardBase::runGenericViewUpdate(const SourceT& srcInfo)
 {
   for (const auto& hitem: m_cdata.hosts.keys()) { //FIXME: avoid iteration for Pandora FMS => all modules are fetched once
     StringPairT info = ngrt4n::splitSourceDataPointInfo(hitem);
@@ -186,7 +198,7 @@ void DashboardBase::runGenericDataSourceUpdate(const SourceT& srcInfo)
       continue;
     }
     ChecksT checks;
-    auto importResult = ngrt4n::loadDataPoints(srcInfo, info.second, checks);
+    auto importResult = ngrt4n::loadDataItems(srcInfo, info.second, checks);
     if (importResult.first != ngrt4n::RcSuccess) {
       updateDashboardOnError(srcInfo, importResult.second);
     } else {
@@ -381,13 +393,12 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   }
 }
 
-void DashboardBase::initSettings(BaseSettings* p_settings)
+void DashboardBase::initSettings(void)
 {
   if (! m_dbSession) {
     return;
   }
   m_sources = m_dbSession->listSources(MonitorT::Any);
-  resetInterval(p_settings);
   computeFirstSrcIndex();
   Q_EMIT settingsLoaded();
 }
@@ -434,12 +445,6 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
     }
 
   }
-}
-
-void DashboardBase::resetInterval(BaseSettings* p_settings)
-{
-  m_interval = 1000 * p_settings->updateInterval();
-  timerIntervalChanged(m_interval);
 }
 
 NodeT DashboardBase::rootNode(void)

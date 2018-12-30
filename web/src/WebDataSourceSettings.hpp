@@ -49,12 +49,11 @@ public:
 
 protected:
   virtual void applyChanges(void);
-  void applyChangesByIndex(int index);
+  void applyChangesGivenSourceId(int index);
   void handleCancel(void) {return;}
-  virtual void fillFromSource(int srcIndex);
+  virtual void fillInFormGivenSourceId(int sid);
   virtual void updateAllSourceWidgetStates(void);
   virtual void updateFields(void);
-  virtual void saveAsSource(qint32 index);
   virtual void addAsSource(void);
   virtual void deleteSource(void);
 
@@ -64,8 +63,8 @@ private:
   Wt::Signal<int, std::string> m_operationCompleted;
 
   /** other members **/
-  Wt::WComboBox m_sourceSelectionBox;
-  Wt::WStringListModel m_sourceBoxModel;
+  Wt::WComboBox m_sourceSelectionField;
+  Wt::WStringListModel m_sourceDataModel;
   Wt::WLineEdit m_monitorUrlField;
   Wt::WComboBox m_monitorTypeField;
   Wt::WLineEdit m_authStringField;
@@ -87,14 +86,15 @@ private:
   void addEvent(void);
   bool validateSourceSettingsFields(void);
   void renderSourceIndexSelector(void);
-  void handleAddAsSourceOkAction(Wt::WComboBox* inputBox);
-  int getSourceGlobalIndex(int sourceBoxIndex);
-  int findSourceIndexInBox(int sourceGlobalIndex);
-  void addToSourceBox(int sourceGlobalIndex);
+  void handleAddAsSourceOkAction(Wt::WComboBox* sourceIndexSectionField);
+  int getSourceId(int sid);
+  int findFormSourceIndex(int sid);
+  void updateSourceDataModel(int sid);
   void handleSourceBoxChanged(void);
   void updateComponentsVisibiliy(int monitorTypeCurrentIndex);
   void handleShowAuthStringChanged(void);
-  void saveK8sDataSource(int sourceIndex);
+  void saveSourceInDatabase(const SourceT& sinfo);
+  SourceT extractSourceSettingsGivenId(int id);
 };
 
 #endif // WEBDATASOURCESETTINGS_HPP

@@ -100,7 +100,7 @@ void WebDataSourceSettings::bindFormWidgets(void)
   bindWidget("monitor-auth-string", &m_authStringField);
   bindWidget("monitor-url", &m_monitorUrlField);
   bindWidget("monitor-type", &m_monitorTypeField);
-  bindWidget("source-box", &m_sourceSelectionBox);
+  bindWidget("source-box", &m_sourceSelectionField);
   bindWidget("dont-verify-ssl-certificate", &m_dontVerifyCertificateField);
   bindWidget("update-interval", &m_updateIntervalField);
   bindWidget("livestatus-server", &m_livestatusHostField);
@@ -135,7 +135,7 @@ void WebDataSourceSettings::addEvent(void)
   m_addAsSourceBtn.clicked().connect(this, &WebDataSourceSettings::addAsSource);
   m_deleteSourceBtn.clicked().connect(this, &WebDataSourceSettings::deleteSource);
   m_monitorTypeField.activated().connect(this, &WebDataSourceSettings::updateComponentsVisibiliy);
-  m_sourceSelectionBox.changed().connect(this, &WebDataSourceSettings::handleSourceBoxChanged);
+  m_sourceSelectionField.changed().connect(this, &WebDataSourceSettings::handleSourceBoxChanged);
   m_showAuthStringField.changed().connect(this, &WebDataSourceSettings::handleShowAuthStringChanged);
 }
 
@@ -160,10 +160,11 @@ bool WebDataSourceSettings::validateSourceSettingsFields(void)
 
 void WebDataSourceSettings::applyChanges(void)
 {
-  applyChangesByIndex(m_sourceSelectionBox.currentIndex());
+  setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
+  applyChangesGivenSourceId(m_sourceSelectionField.currentIndex());
 }
 
-void WebDataSourceSettings::applyChangesByIndex(int index)
+void WebDataSourceSettings::applyChangesGivenSourceId(int index)
 {
   if (! validateSourceSettingsFields()) {
     return ;
@@ -174,58 +175,66 @@ void WebDataSourceSettings::applyChangesByIndex(int index)
     return;
   }
 
-  auto&& monitorLabel = QString::fromStdString(m_monitorTypeField.currentText().toUTF8());
-  QString validationErrorMsg = "";
-  if (monitorLabel.contains(MonitorT::toString(MonitorT::Kubernetes))) {
-    saveK8sDataSource(index);
+  SourceT sinfo = extractSourceSettingsGivenId(index);
+  QStringList monitoredGroups;
+  if (sinfo.mon_type == MonitorT::Kubernetes) {
+    K8sHelper k8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer);
+    auto outListNamespaces = k8sHelper.listNamespaces();
+    if (outListNamespaces.second != ngrt4n::RcSuccess) {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("failed connecting to source (%1)").arg(outListNamespaces.first.at(0)).toStdString());
+      return ;
+    }
+    monitoredGroups = outListNamespaces.first;
   } else {
-    saveAsSource(index);
-  }
-}
-
-
-
-void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
-{
-  auto&& k8sProxyUrl = QString::fromStdString(m_monitorUrlField.text().toUTF8());
-  auto&& verifySslPeer = m_dontVerifyCertificateField.checkState() == Wt::Checked;
-
-  K8sHelper k8s(k8sProxyUrl, verifySslPeer);
-  auto outListNamespaces = k8s.listNamespaces();
-  if (outListNamespaces.second != ngrt4n::RcSuccess) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("failed connecting to Kubernetes API (%1)").arg(outListNamespaces.first.at(0)).toStdString());
-    return ;
+    ChecksT checks;
+    auto loadDataItemsOut = ngrt4n::loadDataItems(sinfo, "", checks);
+    if (loadDataItemsOut.first != ngrt4n::RcSuccess) {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("failed connecting to source (%1)").arg(loadDataItemsOut.second).toStdString());
+      return ;
+    }
+    for (const auto& check: checks) {
+      auto groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_Q_SEP);
+      for (const auto& group: groups) {
+        monitoredGroups.push_back(group);
+      }
+    }
   }
 
-  saveAsSource(sourceIndex);
+  saveSourceInDatabase(sinfo);
 
   WebBaseSettings settings;
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
+  QHash<QString, bool> mgroupsAlreadyProcessed;
+  for (const QString& mgroup: monitoredGroups) {
+    if (mgroupsAlreadyProcessed.constFind(mgroup) != std::cend(mgroupsAlreadyProcessed)) {
+      continue;
+    }
 
-  for (auto&& ns: outListNamespaces.first) {
-    NodeT nsNode;
-    nsNode.type = NodeType::K8sClusterService;
-    nsNode.id = QString("Source%1").arg(sourceIndex);
-    nsNode.name = ns;
-    nsNode.child_nodes = "";
-    nsNode.sev_prule = PropRules::Unchanged;
-    nsNode.sev_crule = CalcRules::Worst;
-    nsNode.weight = ngrt4n::WEIGHT_UNIT;
-    nsNode.icon = ngrt4n::K8S_NS;
-    nsNode.description = QString("Namespace %1").arg(ns);
+    NodeT gNode;
+    gNode.type = NodeType::K8sClusterService;
+    gNode.id = sinfo.id;
+    gNode.name = mgroup;
+    gNode.child_nodes = "";
+    gNode.sev_prule = PropRules::Unchanged;
+    gNode.sev_crule = CalcRules::Worst;
+    gNode.weight = ngrt4n::WEIGHT_UNIT;
+    gNode.icon = ngrt4n::K8S_NS;
+    gNode.description = QString("Namespace %1").arg(mgroup);
 
     CoreDataT cdata;
-    cdata.monitor = MonitorT::Kubernetes;
-    cdata.bpnodes.insert(nsNode.id, nsNode);
+    cdata.monitor = sinfo.mon_type;
+    cdata.bpnodes.insert(gNode.id, gNode);
 
-    auto destPath = QString("%1/k8s_ns_%2_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"), ns, ngrt4n::generateId());
+    auto destPath = QString("%1/mgroup_%2_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"),
+                                                                 QString(mgroup).replace(" ", "_").replace("/", "_").replace("\\", "_"),
+                                                                 ngrt4n::generateId());
     std::pair<int, QString> outSaveView = ngrt4n::saveViewDataToPath(cdata, destPath);
 
     if (outSaveView.first != ngrt4n::RcSuccess) {
       CORE_LOG("error", outSaveView.second.toStdString());
     } else {
       DboView vinfo;
-      vinfo.name = QString("%1:%2").arg(nsNode.id, nsNode.name).toStdString();
+      vinfo.name = QString("%1:%2").arg(gNode.id, gNode.name).toStdString();
       vinfo.service_count = cdata.bpnodes.size() + cdata.cnodes.size();
       vinfo.path = destPath.toStdString();
       auto addViewOut = dbSession.addView(vinfo);
@@ -233,7 +242,12 @@ void WebDataSourceSettings::saveK8sDataSource(int sourceIndex)
         CORE_LOG("error", addViewOut.second.toStdString());
       }
     }
+    mgroupsAlreadyProcessed[mgroup] = true;
   }
+
+  updateSourceDataModel(index);
+  m_sourceSelectionField.setCurrentIndex(findFormSourceIndex(index));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
 }
 
 
@@ -242,7 +256,8 @@ void WebDataSourceSettings::addAsSource(void)
   if (! validateSourceSettingsFields()) {
     return;
   }
-  m_sourceIndexSelector.show();
+
+  m_sourceIndexSelector.show(); // accept action from this form triggers the method handleAddAsSourceOkAction
 }
 
 
@@ -254,7 +269,7 @@ void WebDataSourceSettings::deleteSource(void)
     return;
   }
 
-  auto currentIndex = m_sourceSelectionBox.currentIndex();
+  auto currentIndex = m_sourceSelectionField.currentIndex();
   if ( ! ngrt4n::DataSourceIndices.contains(QString::number(currentIndex)) ) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("cannot delete source (no valid source id)"));
     return;
@@ -266,7 +281,7 @@ void WebDataSourceSettings::deleteSource(void)
     return ;
   }
 
-  m_sourceBoxModel.removeRow(currentIndex);
+  m_sourceDataModel.removeRow(currentIndex);
   updateFields();
 }
 
@@ -285,62 +300,34 @@ void WebDataSourceSettings::updateAllSourceWidgetStates(void)
     activeSourceIndices.push_back(QString(src.id.at(src.id.size() - 1)).toInt());
   }
 
-  m_sourceBoxModel.setStringList( activeSourceLabels );
+  m_sourceDataModel.setStringList( activeSourceLabels );
   for (size_t i = 0; i < activeSourceLabels.size(); ++i) {
-    m_sourceBoxModel.setData(static_cast<int>(i), 0, activeSourceIndices[i], Wt::UserRole);
+    m_sourceDataModel.setData(static_cast<int>(i), 0, activeSourceIndices[i], Wt::UserRole);
   }
 
-  m_sourceBoxModel.sort(0);
+  m_sourceDataModel.sort(0);
 }
 
 
 void WebDataSourceSettings::updateFields(void)
 {
-  int curIndex = m_sourceSelectionBox.currentIndex();
+  int curIndex = m_sourceSelectionField.currentIndex();
   if ( ngrt4n::DataSourceIndices.contains(QString::number(curIndex)) ) {
-    m_sourceSelectionBox.setCurrentIndex(curIndex);
-    fillFromSource(curIndex);
+    m_sourceSelectionField.setCurrentIndex(curIndex);
+    fillInFormGivenSourceId(curIndex);
   }
 }
 
-
-void WebDataSourceSettings::saveAsSource(qint32 index)
+void WebDataSourceSettings::saveSourceInDatabase(const SourceT& sinfo)
 {
   if (! m_dbSession) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("no valid db session provided"));
     return;
   }
 
-  // set global settings
-  setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
-
-  // extract settings from  UI
-  SourceT srcInfo;
-  srcInfo.id = ngrt4n::sourceId(index);
-  srcInfo.mon_url = m_monitorUrlField.text().toUTF8().c_str();
-  srcInfo.ls_addr = m_livestatusHostField.text().toUTF8().c_str();
-  srcInfo.ls_port = QString( m_livestatusPortField.text().toUTF8().c_str() ).toInt();
-  srcInfo.auth = QString( m_authStringField.text().toUTF8().c_str() );
-  srcInfo.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
-
-  auto sourceName = QString( m_monitorTypeField.currentText().toUTF8().c_str() );
-  if (sourceName.contains("Nagios")) {
-    srcInfo.mon_type = MonitorT::Nagios;
-  } else if (sourceName.contains("Zabbix")) {
-    srcInfo.mon_type = MonitorT::Zabbix;
-  } else if (sourceName.contains("Zenoss")) {
-    srcInfo.mon_type = MonitorT::Zenoss;
-  } else if (sourceName.contains("OpManager")) {
-    srcInfo.mon_type = MonitorT::OpManager;
-  } else if (sourceName.contains("Kubernetes")) {
-    srcInfo.mon_type = MonitorT::Kubernetes;
-  } else {
-    srcInfo.mon_type = MonitorT::Any;
-  }
-
-  auto addSourceOut = m_dbSession->addSource(srcInfo);
+  auto addSourceOut = m_dbSession->addSource(sinfo);
   if (addSourceOut.first == ngrt4n::RcDbDuplicationError) {
-    addSourceOut = m_dbSession->updateSource(srcInfo);
+    addSourceOut = m_dbSession->updateSource(sinfo);
   }
 
   if (addSourceOut.first != ngrt4n::RcSuccess) {
@@ -348,32 +335,26 @@ void WebDataSourceSettings::saveAsSource(qint32 index)
     return;
   }
 
-  // signal the change to other components
-  Q_EMIT timerIntervalChanged(1000 * QString(m_updateIntervalField.text().toUTF8().c_str()).toInt());
-
-  addToSourceBox(index);
-  m_sourceSelectionBox.setCurrentIndex(findSourceIndexInBox(index));
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
 }
 
 
-void WebDataSourceSettings::fillFromSource(int srcIndex)
+void WebDataSourceSettings::fillInFormGivenSourceId(int sid)
 {
   if (! m_dbSession) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("no valid db session"));
     return;
   }
 
-  if (srcIndex < 0 || srcIndex >= MAX_SRCS) {
+  if (sid < 0 || sid >= MAX_SRCS) {
     return;
   }
 
-  auto findSourceOut = m_dbSession->findSourceById(ngrt4n::sourceId(srcIndex));
+  auto findSourceOut = m_dbSession->findSourceById(ngrt4n::sourceId(sid));
   if (! findSourceOut.first) {
     return ;
   }
 
-  m_sourceSelectionBox.setValueText(ngrt4n::sourceId(srcIndex).toStdString());
+  m_sourceSelectionField.setValueText(ngrt4n::sourceId(sid).toStdString());
   m_monitorUrlField.setText(findSourceOut.second.mon_url.toStdString());
   m_livestatusHostField.setText(findSourceOut.second.ls_addr.toStdString());
   m_livestatusPortField.setText(QString::number(findSourceOut.second.ls_port).toStdString());
@@ -384,20 +365,20 @@ void WebDataSourceSettings::fillFromSource(int srcIndex)
 
   updateComponentsVisibiliy(m_monitorTypeField.currentIndex());
 
-  m_sourceSelectionBox.setCurrentIndex(srcIndex);
+  m_sourceSelectionField.setCurrentIndex(sid);
 }
 
 
 void WebDataSourceSettings::renderSourceIndexSelector(void)
 {
-  m_sourceSelectionBox.setModel(&m_sourceBoxModel);
+  m_sourceSelectionField.setModel(&m_sourceDataModel);
   m_sourceIndexSelector.rejectWhenEscapePressed();
 
   m_sourceIndexSelector.setStyleClass("Wt-dialog");
   m_sourceIndexSelector.titleBar()->setStyleClass("titlebar");
   m_sourceIndexSelector.setWindowTitle(Q_TR("Select the source index"));
 
-  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the oject
+  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the object
   Wt::WComboBox* sourceIndexField = new Wt::WComboBox(m_sourceIndexSelector.contents());
   for (const auto& src : ngrt4n::DataSourceIndices) {
     sourceIndexField->addItem(src.toStdString());
@@ -415,41 +396,41 @@ void WebDataSourceSettings::renderSourceIndexSelector(void)
 
 
 
-void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* inputBox)
+void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* sourceIndexSectionField)
 {
   m_sourceIndexSelector.accept();
   bool isValidIndex;
-  int index = QString::fromStdString( inputBox->currentText().toUTF8() ).toInt(&isValidIndex);
+  int index = QString::fromStdString( sourceIndexSectionField->currentText().toUTF8() ).toInt(&isValidIndex);
   if (isValidIndex) {
-    applyChangesByIndex(index);
+    applyChangesGivenSourceId(index);
   }
 }
 
 
 
-int WebDataSourceSettings::getSourceGlobalIndex(int sourceBoxIndex)
+int WebDataSourceSettings::getSourceId(int sid)
 {
-  boost::any value = static_cast<Wt::WAbstractItemModel*>(&m_sourceBoxModel)->data(sourceBoxIndex, 0, Wt::UserRole);
+  boost::any value = static_cast<Wt::WAbstractItemModel*>(&m_sourceDataModel)->data(sid, 0, Wt::UserRole);
   return boost::any_cast<int>(value);
 }
 
 
-int WebDataSourceSettings::findSourceIndexInBox(int sourceGlobalIndex)
+int WebDataSourceSettings::findFormSourceIndex(int sourceGlobalIndex)
 {
-  int index = m_sourceBoxModel.rowCount() - 1;
-  while (index >= 0 && (getSourceGlobalIndex(index) != sourceGlobalIndex)) --index;
+  int index = m_sourceDataModel.rowCount() - 1;
+  while (index >= 0 && (getSourceId(index) != sourceGlobalIndex)) --index;
   return index;
 }
 
 
-void WebDataSourceSettings::addToSourceBox(int sourceGlobalIndex)
+void WebDataSourceSettings::updateSourceDataModel(int sid)
 {
-  int index = findSourceIndexInBox(sourceGlobalIndex);
+  int index = findFormSourceIndex(sid);
   if (index < 0) {
-    m_sourceBoxModel.addString(ngrt4n::sourceId(sourceGlobalIndex).toStdString());
-    m_sourceBoxModel.setData(m_sourceBoxModel.rowCount() - 1, 0, sourceGlobalIndex, Wt::UserRole);
+    m_sourceDataModel.addString(ngrt4n::sourceId(sid).toStdString());
+    m_sourceDataModel.setData(m_sourceDataModel.rowCount() - 1, 0, sid, Wt::UserRole);
   }
-  m_sourceBoxModel.sort(0);
+  m_sourceDataModel.sort(0);
 }
 
 
@@ -472,7 +453,7 @@ void WebDataSourceSettings::setEnabledInputs(bool enable)
 
 void WebDataSourceSettings::handleSourceBoxChanged(void)
 {
-  fillFromSource(getSourceGlobalIndex(m_sourceSelectionBox.currentIndex()));
+  fillInFormGivenSourceId(getSourceId(m_sourceSelectionField.currentIndex()));
 }
 
 
@@ -484,10 +465,14 @@ void WebDataSourceSettings::updateComponentsVisibiliy(int monitorTypeCurrentInde
   if (NagiosSelected) {
     m_livestatusHostField.setHidden(false);
     m_livestatusPortField.setHidden(false);
+    m_monitorUrlField.setHidden(true);
+    m_dontVerifyCertificateField.setHidden(true);
     wApp->doJavaScript("$('#livetstatus-section').show();");
   } else {
     m_livestatusHostField.setHidden(true);
     m_livestatusPortField.setHidden(true);
+    m_monitorUrlField.setHidden(false);
+    m_dontVerifyCertificateField.setHidden(false);
     wApp->doJavaScript("$('#livetstatus-section').hide();");
   }
 
@@ -503,4 +488,38 @@ void WebDataSourceSettings::handleShowAuthStringChanged(void)
   } else {
     m_authStringField.setEchoMode(Wt::WLineEdit::Password);
   }
+}
+
+
+SourceT WebDataSourceSettings::extractSourceSettingsGivenId(int id)
+{
+  SourceT sinfo;
+
+  auto sourceName = QString( m_monitorTypeField.currentText().toUTF8().c_str() );
+  if (sourceName.contains("Nagios")) {
+    sinfo.mon_type = MonitorT::Nagios;
+  } else if (sourceName.contains("Zabbix")) {
+    sinfo.mon_type = MonitorT::Zabbix;
+  } else if (sourceName.contains("Zenoss")) {
+    sinfo.mon_type = MonitorT::Zenoss;
+  } else if (sourceName.contains("OpManager")) {
+    sinfo.mon_type = MonitorT::OpManager;
+  } else if (sourceName.contains("Kubernetes")) {
+    sinfo.mon_type = MonitorT::Kubernetes;
+  } else {
+    sinfo.mon_type = MonitorT::Any;
+  }
+
+  sinfo.id = ngrt4n::sourceId(id);
+  sinfo.auth = QString( m_authStringField.text().toUTF8().c_str() );
+
+  if (sinfo.mon_type == MonitorT::Nagios) {
+    sinfo.ls_addr = m_livestatusHostField.text().toUTF8().c_str();
+    sinfo.ls_port = QString( m_livestatusPortField.text().toUTF8().c_str() ).toInt();
+  } else {
+    sinfo.mon_url = m_monitorUrlField.text().toUTF8().c_str();
+    sinfo.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
+  }
+
+  return sinfo;
 }
