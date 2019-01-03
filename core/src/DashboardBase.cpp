@@ -193,8 +193,6 @@ void DashboardBase::runDynamicViewByGroupUpdate(const SourceT& sinfo)
       updateCNodesWithChecks(checks, sinfo);
     }
   }
-
-
 }
 
 
