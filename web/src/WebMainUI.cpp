@@ -468,6 +468,7 @@ void WebMainUI::handlePreviewFile(const std::string& path, const std::string&)
 {
   WebDashboard* dashboard = loadView(path);
   if (dashboard) {
+    dashboard->setShowOnlyProblemMsgsState(m_showOnlyProblemMsgsField->checkState()==Wt::Checked);
     setDashboardAsFrontStackedWidget(dashboard);
   }
 }
