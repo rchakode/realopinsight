@@ -46,7 +46,6 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void initSettings(void);
   qint64 updateCounter(void) const {return m_updateCounter;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString selectedNode(void) const {return m_selectedNode;}
@@ -57,8 +56,10 @@ public:
   int extractStatsData(CheckStatusCountT& statsData);
   void setDbSession(DbSession* dbSession) {m_dbSession = dbSession;}
 
+  std::pair<int, QString> loadDataSources(void);
+  std::pair<int, QString> updateAllNodesStatus(void);
+
 public Q_SLOTS:
-  void updateAllNodesStatus(DbSession* dbSession);
   void runMonitor(SourceT& src);
   void runGenericViewUpdate(const SourceT& srcInfo);
   void runDynamicViewByGroupUpdate(const SourceT& srcInfo);
@@ -69,14 +70,11 @@ public Q_SLOTS:
   bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
   void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
   SourceListT sources(void) {return m_sources;}
-  int firstSrcIndex(void) {return m_firstSrcIndex;}
 
 Q_SIGNALS:
   void sortEventConsole(void);
   void updateMessageChanged(const std::string& msg);
-  void settingsLoaded(void);
   void dashboardLinkSelected(void);
-  void updateFinished(void);
 
 protected:
   CoreDataT m_cdata;
@@ -103,8 +101,6 @@ private:
   qint32 m_interval;
   QSize m_msgConsoleSize;
   SourceListT m_sources;
-  int m_firstSrcIndex;
-
   void signalUpdateProcessing(const SourceT& src);
   void updateCNodesWithCheck(const CheckT & check, const SourceT& src);
   void updateCNodesWithChecks(const ChecksT& checks, const SourceT& src);

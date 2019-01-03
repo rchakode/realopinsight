@@ -412,8 +412,12 @@ void WebMainUI::handleRefresh(void)
   int currentView = 1;
   for (auto& dashboard : m_dashboardMap) {
     dashboard->setDbSession(m_dbSession);
-    dashboard->initSettings();
-    dashboard->updateAllNodesStatus(m_dbSession);
+    auto loadDsOut = dashboard->loadDataSources();
+    if (loadDsOut.first != ngrt4n::RcSuccess) {
+      CORE_LOG("error", loadDsOut.second.toStdString());
+      continue;
+    }
+    dashboard->updateAllNodesStatus();
     dashboard->updateMap();
     dashboard->updateThumbnailInfo();
     NodeT currentRootNode = dashboard->rootNode();
@@ -747,7 +751,7 @@ void WebMainUI::setupSettingsPage(void)
       m_menuLinks.insert(MenuPreview, link);
 
       // Create view management form
-      menuText = QObject::tr("Manage Views").toStdString();
+      menuText = QObject::tr("Manage Operations Views").toStdString();
       m_viewAccessPermissionForm = new ViewAclManagement(m_dbSession);
       m_adminStackedContents.addWidget(m_viewAccessPermissionForm);
       m_viewAccessPermissionForm->viewDeleted().connect(this, &WebMainUI::handleDeleteView);

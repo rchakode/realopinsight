@@ -213,6 +213,6 @@ void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* 
   m_showOnlyTroubles = showOnlyTrouble;
   setDisabled(true);
   m_msgConsole.clearAll();
-  updateAllNodesStatus(dbSession);
+  updateAllNodesStatus(); //TODO check impact of updateAllNodesStatus(dbSession);
   setDisabled(false);
 }

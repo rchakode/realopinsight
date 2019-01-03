@@ -88,25 +88,25 @@
 <message id="getting-started.tpl">
 
     <!-- Setting thumnail -->
-    <div class="col-sm-3">
+    <div class="col-sm-4">
             <div class="thumbnail">
-              <div class="title">Configure access to monitoring sources</div>
+              <div class="title">Set access to monitoring sources</div>
               <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
-              <p>Allow RealOpInsight to connect to your monitoring servers to retrieve monitoring data needed to keep your service views up-to-date.
+              <p>Define how RealOpInsight should connect to the backed monitoring systems to retrieve data needed to keep your operations views up-to-date.
               </p>
-              <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_settings.html"
+              <p><a href="http://docs.realopinsight.com/"
               class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
             </div>
     </div>
 
   <!-- Describe thumnail -->
-  <div class="col-sm-3">
+  <div class="col-sm-4">
        <div class="thumbnail">
           <div class="title">Edit service views</div>
           <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
-          <p>Use RealOpInsight Editor to easily design service dependencies and rules that govern your business.
+          <p>Use the Service Editor to easily design the views that underlie the operations of your business (dependencies mapping, status calculation and propagation rules).
           </p>
-          <p><a href="http://docs.realopinsight.com/latest/02_ultimate/editor_manual.html"
+          <p><a href="http://docs.realopinsight.com/"
           class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
           </p>
        </div>
@@ -114,13 +114,13 @@
 
 
   <!-- Preview thumnail -->
-  <div class="col-sm-3">
+  <div class="col-sm-4">
           <div class="thumbnail">
-            <div class="title">Preview to validate settings</div>
+            <div class="title">Preview to validate your views</div>
             <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Dashboard Preview" />
-            <p>Use the built-in preview feature to ensure that everything is defined as expected.
+            <p>Use the Preview feature to load your designed views and ensure that they will work as expected (e.g. relationship mapping, status processing).
             </p>
-            <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
+            <p><a href="http://docs.realopinsight.com/"
             class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
           </div>
   </div>
@@ -128,13 +128,13 @@
 
   <div class="clearfix">&nbsp;</div>
   <!-- Assign thumnail -->
-   <div class="col-sm-3">
+   <div class="col-sm-4">
       <div class="thumbnail">
          <div class="title">Assign and let operate</div>
          <img src="/images/built-in/thumbnails/assign-view.png" alt="RealOpInsight View Access Control" />
-         <p>Our friendly view access manager let you set operators that can access and operate the view.
+         <p>Once your views ready, use the Operations Views Manager to set for each operator, the views he can watch from his operations console.
          </p>
-         <p><a href="http://docs.realopinsight.com/latest/02_ultimate/admin_views.html"
+         <p><a href="http://docs.realopinsight.com/"
          class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
       </div>
    </div>
@@ -372,7 +372,7 @@
 
 
 <message id="copyright-footer.tpl">
-    ${software-name} - Copyright &copy; 2010-${release-year} RealOpInsight Labs
+    Copyright &copy; ${release-year} RealOpInsight Labs
     <br />Version ${version}
     - <a href="http://docs.realopinsight.com/">Help</a>
     - <a href="https://github.com/RealOpInsightLabs/realopinsight-ultimate/blob/master/LICENSE" target="_blank">Terms &amp; Conditions</a>
@@ -482,7 +482,9 @@
        <div class="col-sm-12 form-group">
          <label class="control-label">Source Id&nbsp;</label>
          <span>${source-box}</span>
-         <span>Type&nbsp;</span>
+       </div>
+       <div class="col-sm-12 form-group">
+         <label class="control-label">Type&nbsp;</label>
          <span>${monitor-type}</span>
        </div>
        <div class="col-sm-12 form-group">
@@ -492,7 +494,7 @@
      </fieldset>
 
 
-    <fieldset id="livetstatus-section">
+    <fieldset id="livetstatus-settings">
       <div class="col-sm-12 form-group">
         <label class="control-label">Livestatus Host&nbsp;</label>
         <span>${livestatus-server}</span>
@@ -503,7 +505,7 @@
       </div>
     </fieldset>  <!-- id="livetstatus-section" -->
 
-     <fieldset>
+     <fieldset id="source-api-settings">
        <div class="col-sm-12 form-group">
          <label class="control-label">Monitor API Base URL&nbsp;</label>
          <span>${monitor-url}</span>

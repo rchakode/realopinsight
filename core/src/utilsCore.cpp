@@ -333,7 +333,7 @@ std::pair<int, QString> ngrt4n::loadViewByGroup(const SourceT& srcInfo, const QS
   rootService.weight = ngrt4n::WEIGHT_UNIT;
   rootService.name = filter.isEmpty() ? QObject::tr("Application Service (%1)").arg(++importIndex) : filter;
   rootService.type = NodeType::BusinessService;
-  rootService.sev_crule = CalcRules::Worst;
+  rootService.sev_crule = CalcRules::Average;
   rootService.sev_prule = PropRules::Unchanged;
 
   NodeT hostNode;

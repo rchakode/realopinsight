@@ -66,14 +66,21 @@ void runCollector(int period)
 
     for (const auto& view: vlist) {
       QosCollector collector;
-      auto outInitilization = collector.initialize(&settings, view.path.c_str());
-      if (outInitilization.first != ngrt4n::RcSuccess) {
-        REPORTD_LOG("error", QObject::tr("%1: %2").arg(view.name.c_str(), outInitilization.second).toStdString());
-        continue; // skip the view if the initialization failed
+      collector.setDbSession(&dbSession);
+
+      auto initilizeOut = collector.initialize(&settings, view.path.c_str());
+      if (initilizeOut.first != ngrt4n::RcSuccess) {
+        REPORTD_LOG("error", QObject::tr("%1: %2").arg(view.name.c_str(), initilizeOut.second).toStdString());
+        continue;
       }
 
-      collector.initSettings(&settings);
-      collector.updateAllNodesStatus(&dbSession);
+      collector.loadDataSources();
+      auto updateOut = collector.updateAllNodesStatus();
+      if (updateOut.first != ngrt4n::RcSuccess) {
+        REPORTD_LOG("error", updateOut.second.toStdString());
+        continue;
+      }
+
       QosDataT qosData = collector.qosInfo();
       if (qosData.view_name != view.name && std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
         qosData.view_name = view.name;
@@ -84,10 +91,11 @@ void runCollector(int period)
       try {
         dbSession.addQosData(qosData);
       } catch(const std::exception& ex) {
-        REPORTD_LOG("warn", std::string(ex.what()));
+        REPORTD_LOG("error", std::string(ex.what()));
       }
     }
-    // now handle notifications if applicable
+
+    // handle notifications if applicable
     if (settings.getNotificationType() != WebBaseSettings::NoNotification) {
       for (const auto& qosEntry : qosDataList) {
         notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);

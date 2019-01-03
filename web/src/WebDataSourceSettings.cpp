@@ -67,7 +67,7 @@ void WebDataSourceSettings::createFormWidgets(void)
   m_livestatusHostField.setValidator(new HostValidator(this));
 
   // set livestatus port field
-  m_livestatusPortField.setWidth(50);
+  m_livestatusPortField.setWidth(75);
   m_livestatusPortField.setValidator(new PortValidator(this));
   m_livestatusPortField.setEmptyText("port");
   m_livestatusPortField.setMaxLength(5);
@@ -143,13 +143,15 @@ void WebDataSourceSettings::addEvent(void)
 
 bool WebDataSourceSettings::validateSourceSettingsFields(void)
 {
-  bool monitorSourceIsSet = ngrt4n::MonitorSourceTypes.contains( QString::fromStdString(m_monitorTypeField.currentText().toUTF8()));
-  if (! monitorSourceIsSet ) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No monitor source type set"));
+  bool monitorTypeIsSet = ngrt4n::MonitorSourceTypes.contains( QString::fromStdString(m_monitorTypeField.currentText().toUTF8()));
+  if (! monitorTypeIsSet ) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No monitor type selected"));
     return false;
   }
 
-  if (monitorSourceIsSet && m_monitorUrlField.validate() != Wt::WValidator::Valid) {
+  SourceT sinfo = extractSourceSettingsGivenIndex( m_sourceSelectionField.currentIndex() );
+  bool isValidMonitorUrl = (m_monitorUrlField.validate() == Wt::WValidator::Valid || sinfo.mon_type == MonitorT::Nagios);
+  if (! isValidMonitorUrl) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Please fix field(s) in red"));
     return false;
   }
@@ -175,8 +177,8 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
     return;
   }
 
-  SourceT sinfo = extractSourceSettingsGivenId(index);
-  QStringList monitoredGroups;
+  SourceT sinfo = extractSourceSettingsGivenIndex(index);
+  QHash<QString, bool> monitoredGroups;
   if (sinfo.mon_type == MonitorT::Kubernetes) {
     K8sHelper k8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer);
     auto outListNamespaces = k8sHelper.listNamespaces();
@@ -184,7 +186,9 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
       m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("failed connecting to source (%1)").arg(outListNamespaces.first.at(0)).toStdString());
       return ;
     }
-    monitoredGroups = outListNamespaces.first;
+    for (const auto& mgroup: outListNamespaces.first) {
+      monitoredGroups[mgroup] = true;
+    }
   } else {
     ChecksT checks;
     auto loadDataItemsOut = ngrt4n::loadDataItems(sinfo, "", checks);
@@ -195,7 +199,7 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
     for (const auto& check: checks) {
       auto groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_Q_SEP);
       for (const auto& group: groups) {
-        monitoredGroups.push_back(group);
+        monitoredGroups[group] = true;
       }
     }
   }
@@ -204,12 +208,7 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
 
   WebBaseSettings settings;
   DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
-  QHash<QString, bool> mgroupsAlreadyProcessed;
-  for (const QString& mgroup: monitoredGroups) {
-    if (mgroupsAlreadyProcessed.constFind(mgroup) != std::cend(mgroupsAlreadyProcessed)) {
-      continue;
-    }
-
+  for (const QString& mgroup: monitoredGroups.keys()) {
     NodeT gNode;
     gNode.type = NodeType::K8sClusterService;
     gNode.id = sinfo.id;
@@ -242,7 +241,6 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
         CORE_LOG("error", addViewOut.second.toStdString());
       }
     }
-    mgroupsAlreadyProcessed[mgroup] = true;
   }
 
   updateSourceDataModel(index);
@@ -459,25 +457,23 @@ void WebDataSourceSettings::handleSourceBoxChanged(void)
 
 void WebDataSourceSettings::updateComponentsVisibiliy(int monitorTypeCurrentIndex)
 {
-  const auto monitorText = QString::fromStdString(m_monitorTypeField.itemText(monitorTypeCurrentIndex).toUTF8());
+  const auto monitorType = QString::fromStdString(m_monitorTypeField.itemText(monitorTypeCurrentIndex).toUTF8());
 
-  auto NagiosSelected = monitorText.contains("Nagios");
-  if (NagiosSelected) {
-    m_livestatusHostField.setHidden(false);
-    m_livestatusPortField.setHidden(false);
-    m_monitorUrlField.setHidden(true);
-    m_dontVerifyCertificateField.setHidden(true);
-    wApp->doJavaScript("$('#livetstatus-section').show();");
+  const auto NagiosSourceSelected = monitorType.contains("Nagios");
+  if (NagiosSourceSelected) {
+    m_livestatusHostField.setFocus();
+    wApp->doJavaScript("$('#livetstatus-settings').show();");
+    wApp->doJavaScript("$('#source-api-settings').hide();");
   } else {
-    m_livestatusHostField.setHidden(true);
-    m_livestatusPortField.setHidden(true);
-    m_monitorUrlField.setHidden(false);
-    m_dontVerifyCertificateField.setHidden(false);
-    wApp->doJavaScript("$('#livetstatus-section').hide();");
+    m_monitorUrlField.setFocus();
+    m_showAuthStringField.setCheckState(Wt::Unchecked);
+    handleShowAuthStringChanged();
+    wApp->doJavaScript("$('#livetstatus-settings').hide();");
+    wApp->doJavaScript("$('#source-api-settings').show();");
   }
 
-  auto KubernetesNotSelected = ! monitorText.contains("Kubernetes");
-  m_authStringField.setEnabled(KubernetesNotSelected);
+  const auto K8sSourceSelected = ! monitorType.contains("Kubernetes");
+  m_authStringField.setEnabled(K8sSourceSelected);
 }
 
 
@@ -491,7 +487,7 @@ void WebDataSourceSettings::handleShowAuthStringChanged(void)
 }
 
 
-SourceT WebDataSourceSettings::extractSourceSettingsGivenId(int id)
+SourceT WebDataSourceSettings::extractSourceSettingsGivenIndex(int sourceIndex)
 {
   SourceT sinfo;
 
@@ -510,7 +506,7 @@ SourceT WebDataSourceSettings::extractSourceSettingsGivenId(int id)
     sinfo.mon_type = MonitorT::Any;
   }
 
-  sinfo.id = ngrt4n::sourceId(id);
+  sinfo.id = ngrt4n::sourceId(sourceIndex);
   sinfo.auth = QString( m_authStringField.text().toUTF8().c_str() );
 
   if (sinfo.mon_type == MonitorT::Nagios) {

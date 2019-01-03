@@ -99,7 +99,7 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
   }
 
   if (! m_dbSession) {
-    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("db session not initialized "));
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("initialize: db session not initialized"));
   }
 
   Parser parser{&m_cdata,
@@ -112,7 +112,10 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
     return std::make_pair(parseOut.first, parseOut.second);
   }
 
-  initSettings();
+  auto loadDsOut = loadDataSources();
+  if (loadDsOut.first != ngrt4n::RcSuccess) {
+    return loadDsOut;
+  }
 
   int rc = parser.processRenderingData();
   if (rc != ngrt4n::RcSuccess) {
@@ -124,14 +127,19 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
-void DashboardBase::updateAllNodesStatus(DbSession* dbSession)
+std::pair<int, QString> DashboardBase::updateAllNodesStatus(void)
 {
+  if (! m_dbSession) {
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("updateAllNodesStatus: db session not initialized"));
+  }
+
   resetStatData();
-  for (auto&& src: m_sources) { runMonitor(src);}
-  computeBpNodeStatus(ngrt4n::ROOT_ID, dbSession);
+  for (auto&& src: m_sources) { runMonitor(src); }
+  computeBpNodeStatus(ngrt4n::ROOT_ID, m_dbSession);
   updateChart();
   ++m_updateCounter;
-  Q_EMIT updateFinished();
+
+  return std::make_pair(ngrt4n::RcSuccess, QObject::tr(""));
 }
 
 void DashboardBase::runMonitor(SourceT& src)
@@ -393,29 +401,13 @@ void DashboardBase::updateDashboardOnError(const SourceT& src, const QString& ms
   }
 }
 
-void DashboardBase::initSettings(void)
+std::pair<int, QString> DashboardBase::loadDataSources(void)
 {
   if (! m_dbSession) {
-    return;
+    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("loadDataSources: db session not initialized"));
   }
   m_sources = m_dbSession->listSources(MonitorT::Any);
-  computeFirstSrcIndex();
-  Q_EMIT settingsLoaded();
-}
-
-
-
-void DashboardBase::computeFirstSrcIndex(void)
-{
-  m_firstSrcIndex = -1;
-  if (! m_cdata.sources.isEmpty()) {
-    SourceListT::Iterator cur = m_sources.begin();
-    SourceListT::Iterator end = m_sources.end();
-    while (cur != end && ! m_cdata.sources.contains(cur->id)) ++cur;
-    if (cur != end) {
-      m_firstSrcIndex = extractSourceIndex(cur->id);
-    }
-  }
+  return std::make_pair(ngrt4n::RcSuccess, QObject::tr(""));
 }
 
 void DashboardBase::finalizeUpdate(const SourceT& src)
