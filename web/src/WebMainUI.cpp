@@ -239,10 +239,10 @@ Wt::WTemplate* WebMainUI::createBreadCrumbsBarTpl(void)
   tpl->bindWidget("display-view-selection-box", m_selectViewBox);
 
 
-  m_displayOnlyTroubleEventsBox = new Wt::WCheckBox(Q_TR("Show only problems"));
-  m_displayOnlyTroubleEventsBox->changed().connect(this, &WebMainUI::handleDisplayOnlyTroubleStateChanged);
-  m_displayOnlyTroubleEventsBox->setHidden(true);
-  tpl->bindWidget("display-only-trouble-event-box", m_displayOnlyTroubleEventsBox);
+  m_showOnlyProblemMsgsField = new Wt::WCheckBox(Q_TR("Show only problems"));
+  m_showOnlyProblemMsgsField->changed().connect(this, &WebMainUI::handleShowOnlyProblemsMsgs);
+  m_showOnlyProblemMsgsField->setHidden(true);
+  tpl->bindWidget("display-only-trouble-event-box", m_showOnlyProblemMsgsField);
 
   return tpl;
 }
@@ -553,10 +553,10 @@ void WebMainUI::handleNewViewSelected(void)
   auto dashboardIter = m_dashboardMap.find(selectedEntry.c_str());
   if (dashboardIter != m_dashboardMap.end()) {
     setDashboardAsFrontStackedWidget(*dashboardIter);
-    m_displayOnlyTroubleEventsBox->setHidden(false);
+    m_showOnlyProblemMsgsField->setHidden(false);
   } else {
     m_currentDashboard = nullptr;
-    m_displayOnlyTroubleEventsBox->setHidden(true);
+    m_showOnlyProblemMsgsField->setHidden(true);
     if (! m_dbSession->isLoggedAdmin()) {
       swicthFrontStackedWidgetTo(&m_operatorHomeTpl);
     } else {
@@ -566,11 +566,11 @@ void WebMainUI::handleNewViewSelected(void)
 }
 
 
-void WebMainUI::handleDisplayOnlyTroubleStateChanged(void)
+void WebMainUI::handleShowOnlyProblemsMsgs(void)
 {
-  if (m_displayOnlyTroubleEventsBox && m_currentDashboard) {
-    auto showOnlyTrouble = m_displayOnlyTroubleEventsBox->checkState() == Wt::Checked;
-    m_currentDashboard->handleShowOnlyTroubleEvents(showOnlyTrouble, m_dbSession);
+  if (m_showOnlyProblemMsgsField && m_currentDashboard) {
+    m_currentDashboard->setShowOnlyProblemMsgsState(m_showOnlyProblemMsgsField->checkState()==Wt::Checked);
+    m_currentDashboard->refreshMsgConsoleOnProblemStates();
   }
 }
 
@@ -1197,7 +1197,7 @@ void WebMainUI::setDashboardAsFrontStackedWidget(WebDashboard* dashboard)
     swicthFrontStackedWidgetTo(dashboard);
     dashboard->doJavascriptAutoResize();
     m_selectViewBox->setCurrentIndex( m_selectViewBox->findText(dashboard->rootNode().name.toStdString()) );
-    m_displayOnlyTroubleEventsBox->setHidden(false);
+    m_showOnlyProblemMsgsField->setHidden(false);
     m_currentDashboard = dashboard;
   }
 }

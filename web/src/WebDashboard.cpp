@@ -79,15 +79,14 @@ void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
   m_tree.updateItemDecoration(_node, _tip);
 }
 
-void WebDashboard::updateMsgConsole(const NodeT& _node)
+void WebDashboard::updateMsgConsole(const NodeT& node)
 {
-  if (! m_showOnlyTroubles) {
-    m_msgConsole.updateNodeMsg(_node);
-    return ;
-  }
-
-  if (_node.sev != ngrt4n::Normal) {
-    m_msgConsole.updateNodeMsg(_node);
+  if (node.sev != ngrt4n::Normal) {
+    m_msgConsole.updateNodeMsg(node);
+  } else {
+    if (! m_showOnlyProblemMsgsState) {
+      m_msgConsole.updateNodeMsg(node);
+    }
   }
 }
 
@@ -208,11 +207,12 @@ Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
 }
 
 
-void WebDashboard::handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* dbSession)
+void WebDashboard::refreshMsgConsoleOnProblemStates(void)
 {
-  m_showOnlyTroubles = showOnlyTrouble;
   setDisabled(true);
   m_msgConsole.clearAll();
-  updateAllNodesStatus(); //TODO check impact of updateAllNodesStatus(dbSession);
+  for(const auto& node: m_cdata.cnodes) {
+    updateMsgConsole(node);
+  }
   setDisabled(false);
 }

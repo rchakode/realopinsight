@@ -67,9 +67,8 @@ public Q_SLOTS:
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
   qint32 userRole(void) const {return m_userRole;}
-  bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
-  void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
   SourceListT sources(void) {return m_sources;}
+  void setShowOnlyProblemMsgsState(bool state) {m_showOnlyProblemMsgsState = state;}
 
 Q_SIGNALS:
   void sortEventConsole(void);
@@ -78,7 +77,7 @@ Q_SIGNALS:
 
 protected:
   CoreDataT m_cdata;
-  bool m_showOnlyTroubles;
+  bool m_showOnlyProblemMsgsState;
 
   void updateNodeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}

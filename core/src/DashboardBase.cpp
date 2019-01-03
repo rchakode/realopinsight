@@ -76,8 +76,7 @@ StringMapT DashboardBase::calcRules() {
 }
 
 DashboardBase::DashboardBase(DbSession* dbSession)
-  : m_showOnlyTroubles(false),
-    m_dbSession(dbSession),
+  : m_dbSession(dbSession),
     m_timerId(-1),
     m_updateCounter(0)
 {

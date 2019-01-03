@@ -96,7 +96,7 @@ public Q_SLOTS:
   void resetTimer(qint32 interval);
   void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
   void swicthFrontStackedWidgetTo(Wt::WWidget* widget);
-  void resetViewSelectionBox(void) { m_selectViewBox->setCurrentIndex(0); m_displayOnlyTroubleEventsBox->setHidden(true);}
+  void resetViewSelectionBox(void) { m_selectViewBox->setCurrentIndex(0); m_showOnlyProblemMsgsField->setHidden(true);}
   void showMessage(int status, const std::string& msg);
   void showProgressMessage(const std::string& msg) {showMessage(ngrt4n::OperationInProgress, msg); }
   void handleDashboardSelected(std::string viewName);
@@ -141,7 +141,7 @@ private:
   Wt::WDialog* m_aboutDialog;
   WebDashboard* m_currentDashboard;
   Wt::WComboBox* m_selectViewBox;
-  Wt::WCheckBox* m_displayOnlyTroubleEventsBox;
+  Wt::WCheckBox* m_showOnlyProblemMsgsField;
 
   WebDataSourceSettings m_dataSourceSettings;
   WebNotificationSettings m_notificationSettingsForm;
@@ -185,7 +185,7 @@ private:
   void handleDeleteView(const std::string& viewName);
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
-  void handleDisplayOnlyTroubleStateChanged(void);
+  void handleShowOnlyProblemsMsgs(void);
   void handleImportDescriptionFile(void);
   void handleLaunchEditor(void);
   void handlePreviewFile(const std::string& path, const std::string& option);
