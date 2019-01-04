@@ -176,7 +176,6 @@ void WebMainUI::unbindStackedWidgets(void)
 
 void WebMainUI::addEvents(void)
 {
-  QObject::connect(&m_settings, SIGNAL(timerIntervalChanged(qint32)), this, SLOT(resetTimer(qint32)));
   QObject::connect(&m_biDashlet, SIGNAL(reportPeriodChanged(long,long)), this, SLOT(handleReportPeriodChanged(long, long)));
   m_dataSourceSettings.operationCompleted().connect(this, &WebMainUI::showMessage);
   m_authSettingsForm.operationCompleted().connect(this, &WebMainUI::showMessage);
@@ -1148,7 +1147,7 @@ void  WebMainUI::handleViewAclMenu(void)
 {
   m_adminStackedContents.setCurrentWidget(m_viewAccessPermissionForm);
   m_viewAccessPermissionForm->resetModelData();
-  m_adminPanelTitle.setText(Q_TR("Views and Access Control"));
+  m_adminPanelTitle.setText(Q_TR("Manage Operations Views per User"));
 }
 
 
