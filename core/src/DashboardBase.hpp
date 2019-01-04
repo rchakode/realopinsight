@@ -46,7 +46,6 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  qint64 updateCounter(void) const {return m_updateCounter;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString selectedNode(void) const {return m_selectedNode;}
   void setTimerId(qint32 id) {m_timerId = id;}
@@ -60,16 +59,14 @@ public:
   std::pair<int, QString> updateAllNodesStatus(void);
 
 public Q_SLOTS:
-  void runMonitor(SourceT& src);
   void runGenericViewUpdate(const SourceT& srcInfo);
   void runDynamicViewByGroupUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
   qint32 userRole(void) const {return m_userRole;}
-  bool showOnlyTroubles(void) const {return m_showOnlyTroubles;}
-  void setShowOnlyTroubles(bool value) {m_showOnlyTroubles = value;}
   SourceListT sources(void) {return m_sources;}
+  void setShowOnlyProblemMsgsState(bool state) {m_showOnlyProblemMsgsState = state;}
 
 Q_SIGNALS:
   void sortEventConsole(void);
@@ -78,7 +75,7 @@ Q_SIGNALS:
 
 protected:
   CoreDataT m_cdata;
-  bool m_showOnlyTroubles;
+  bool m_showOnlyProblemMsgsState;
 
   void updateNodeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
@@ -95,7 +92,6 @@ protected:
 private:
   DbSession* m_dbSession;
   qint32 m_timerId;
-  qint64 m_updateCounter;
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;

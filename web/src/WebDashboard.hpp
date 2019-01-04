@@ -94,7 +94,7 @@ public:
   virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& descriptionFile);
   std::string tooltip(void) {return m_chart.toStdString();}
   void doJavascriptAutoResize(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("winH=$(window).height();"));}
-  void handleShowOnlyTroubleEvents(bool showOnlyTrouble, DbSession* dbSession);
+  void refreshMsgConsoleOnProblemStates(void);
   Wt::WVBoxLayout* eventFeedLayout(void) {return &m_eventFeedLayout;}
   void handleDashboardSelected(std::string viewName) {Q_EMIT dashboardSelected(viewName);}
 
@@ -104,7 +104,7 @@ protected:
   virtual void updateMap(const NodeT& _node, const QString& _tip);
   virtual void buildTree(void);
   virtual void updateTree(const NodeT& _node, const QString& _tip);
-  virtual void updateMsgConsole(const NodeT& _node);
+  virtual void updateMsgConsole(const NodeT& node);
   virtual void updateChart(void);
   virtual void updateEventFeeds(const NodeT& node);
 

@@ -815,7 +815,7 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
   }
 
   CoreDataT cdata;
-  auto loadViewByGroupOut = ngrt4n::loadViewByGroup(findSourceOut.second, groupFilter.c_str(), cdata);
+  auto loadViewByGroupOut = ngrt4n::loadDynamicViewByGroup(findSourceOut.second, groupFilter.c_str(), cdata);
   if (loadViewByGroupOut.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, loadViewByGroupOut.second.toStdString());
     return ;
@@ -836,7 +836,7 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
 
 void WebEditor::handleDataPointSourceChanged(int index)
 {
-  m_operationCompleted.emit(ngrt4n::OperationInProgress, Q_TR("Import of monitoring data in progress..."));
+  m_operationCompleted.emit(ngrt4n::OperationInProgress, Q_TR("Discovery of monitoring items in progress..."));
 
   auto srcId = QString::fromStdString(m_dataPointSourceField.itemText(index).toUTF8());
   auto findSourceOut = m_dbSession->findSourceById(srcId);
@@ -885,7 +885,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
 
   m_dataPointListModel->setStringList(m_dataPointsListBySource[srcId]);
   m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for %1").arg(srcId).toStdString());
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Import completed"));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Discovery of monitoring items completed"));
 }
 
 

@@ -167,9 +167,9 @@ namespace ngrt4n
 
   QString basename(const QString& path);
 
-  std::pair<int, QString> loadViewByGroup(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata);
+  std::pair<int, QString> loadDynamicViewByGroup(const SourceT& sinfo, const QString& filter, CoreDataT& cdata);
 
-  std::pair<int, QString> loadDataItems(const SourceT& srcInfo, const QString& filter, ChecksT& checks);
+  std::pair<int, QString> loadDataItems(const SourceT& sinfo, const QString& filter, ChecksT& checks);
 
   std::pair<int, QString> saveViewDataToPath(const CoreDataT& cdata, const QString& path);
 

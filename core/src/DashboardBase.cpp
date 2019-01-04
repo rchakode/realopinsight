@@ -76,10 +76,8 @@ StringMapT DashboardBase::calcRules() {
 }
 
 DashboardBase::DashboardBase(DbSession* dbSession)
-  : m_showOnlyTroubles(false),
-    m_dbSession(dbSession),
-    m_timerId(-1),
-    m_updateCounter(0)
+  : m_dbSession(dbSession),
+    m_timerId(-1)
 {
   resetStatData();
 }
@@ -134,26 +132,30 @@ std::pair<int, QString> DashboardBase::updateAllNodesStatus(void)
   }
 
   resetStatData();
-  for (auto&& src: m_sources) { runMonitor(src); }
+  for (const auto& sid: m_cdata.sources) {
+    auto src = m_sources.constFind(sid);
+    if (src != std::cend(m_sources)) {
+      signalUpdateProcessing(*src);
+      if (m_cdata.monitor != MonitorT::Any) {
+        runDynamicViewByGroupUpdate(*src);
+      } else {
+        runGenericViewUpdate(*src);
+      }
+      finalizeUpdate(*src);
+    } else {
+       SourceT unknownSrc;
+       unknownSrc.id = sid;
+       updateDashboardOnError(unknownSrc, QObject::tr("source not set %1").arg(sid));
+    }
+  }
+
   computeBpNodeStatus(ngrt4n::ROOT_ID, m_dbSession);
+
   updateChart();
-  ++m_updateCounter;
 
   return std::make_pair(ngrt4n::RcSuccess, QObject::tr(""));
 }
 
-void DashboardBase::runMonitor(SourceT& src)
-{
-  signalUpdateProcessing(src);
-
-  if (src.mon_type != MonitorT::Any) {
-    runDynamicViewByGroupUpdate(src);
-  } else {
-    runGenericViewUpdate(src);
-  }
-
-  finalizeUpdate(src);
-}
 
 void DashboardBase::signalUpdateProcessing(const SourceT& src)
 {
@@ -193,8 +195,6 @@ void DashboardBase::runDynamicViewByGroupUpdate(const SourceT& sinfo)
       updateCNodesWithChecks(checks, sinfo);
     }
   }
-
-
 }
 
 
@@ -420,6 +420,13 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
     }
 
     switch (src.mon_type) {
+      case MonitorT::Any:
+        if (std::regex_match(cnode.child_nodes.toStdString(), std::regex(QString("%1:.+").arg(src.id).toStdString()))) {
+          ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode.child_nodes), cnode.check);
+          updateNodeStatusInfo(cnode, src);
+          updateDashboard(cnode);
+        }
+        break;
       case MonitorT::Kubernetes:
         cnode.sev = ngrt4n::Critical;
         cnode.check.status = ngrt4n::K8sFailed;
@@ -428,11 +435,11 @@ void DashboardBase::finalizeUpdate(const SourceT& src)
         updateDashboard(cnode);
         break;
       default:
-        if (std::regex_match(cnode.child_nodes.toStdString(), std::regex(QString("%1:.+").arg(src.id).toStdString()))) {
-          ngrt4n::setCheckOnError(ngrt4n::Unset, tr("Undefined service (%1)").arg(cnode.child_nodes), cnode.check);
-          updateNodeStatusInfo(cnode, src);
-          updateDashboard(cnode);
-        }
+        cnode.sev = ngrt4n::Critical;
+        cnode.check.status = ngrt4n::Unset;
+        cnode.check.alarm_msg = QObject::tr("Item %1 seems to no longer exist").arg(cnode.child_nodes).toStdString();
+        updateNodeStatusInfo(cnode, src);
+        updateDashboard(cnode);
         break;
     }
 
