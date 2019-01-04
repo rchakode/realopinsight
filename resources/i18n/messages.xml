@@ -90,8 +90,8 @@
     <!-- Setting thumnail -->
     <div class="col-sm-4">
             <div class="thumbnail">
-              <div class="title">Set access to monitoring sources</div>
-              <img src="/images/built-in/thumbnails/setting.png" alt="RealOpInsight Settings User Interface" />
+              <h3>Set Monitoring Sources</h3>
+              <img src="/images/built-in/thumbnails/source-settings.png" alt="RealOpInsight Settings User Interface" />
               <p>Define how RealOpInsight should connect to the backed monitoring systems to retrieve data needed to keep your operations views up-to-date.
               </p>
               <p><a href="http://docs.realopinsight.com/"
@@ -102,8 +102,8 @@
   <!-- Describe thumnail -->
   <div class="col-sm-4">
        <div class="thumbnail">
-          <div class="title">Edit service views</div>
-          <img src="/images/built-in/thumbnails/editor.png" alt="RealOpInsight Editor" />
+          <h3>Edit View Service Trees</h3>
+          <img src="/images/built-in/thumbnails/service-editor.png" alt="RealOpInsight Editor" />
           <p>Use the Service Editor to easily design the views that underlie the operations of your business (dependencies mapping, status calculation and propagation rules).
           </p>
           <p><a href="http://docs.realopinsight.com/"
@@ -116,8 +116,8 @@
   <!-- Preview thumnail -->
   <div class="col-sm-4">
           <div class="thumbnail">
-            <div class="title">Preview to validate your views</div>
-            <img src="/images/built-in/thumbnails/dashboard.png" alt="RealOpInsight Dashboard Preview" />
+            <h3>Preview to Validate Your Views</h3>
+            <img src="/images/built-in/thumbnails/application-dashboard.png" alt="RealOpInsight Dashboard Preview" />
             <p>Use the Preview feature to load your designed views and ensure that they will work as expected (e.g. relationship mapping, status processing).
             </p>
             <p><a href="http://docs.realopinsight.com/"
@@ -130,8 +130,8 @@
   <!-- Assign thumnail -->
    <div class="col-sm-4">
       <div class="thumbnail">
-         <div class="title">Assign and let operate</div>
-         <img src="/images/built-in/thumbnails/assign-view.png" alt="RealOpInsight View Access Control" />
+         <h3>Assign and Let Operate</h3>
+         <img src="/images/built-in/thumbnails/manage-operations-views.png" alt="RealOpInsight View Access Control" />
          <p>Once your views ready, use the Operations Views Manager to set for each operator, the views he can watch from his operations console.
          </p>
          <p><a href="http://docs.realopinsight.com/"
