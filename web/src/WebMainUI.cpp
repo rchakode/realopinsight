@@ -977,7 +977,7 @@ void WebMainUI::initOperatorDashboard(void)
     auto loadViewOut = loadView(view.path);
     if (! loadViewOut.first) {
       CORE_LOG("error", tr("%1: %2").arg(QString(view.name.c_str()), loadViewOut.second).toStdString());
-      failedViews.append(" ").append(view.name);
+      failedViews.append(failedViews.empty()? "": ", ").append(view.name);
       continue;
     }
 
