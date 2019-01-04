@@ -176,8 +176,9 @@ std::pair<int, QString> Parser::loadDynamicViewByGroup(QDomNodeList& inXmlDomNod
       auto m_lastErrorMsg = QObject::tr("%1: %2").arg(findSourceOut.second.id, loqdK8sNs.first);
       return std::make_pair(loqdK8sNs.second, m_lastErrorMsg);
     }
+
   } else {
-    auto loadViewByGroupOut = ngrt4n::loadViewByGroup(findSourceOut.second, monitoredGroup, outCData);
+    auto loadViewByGroupOut = ngrt4n::loadDynamicViewByGroup(findSourceOut.second, monitoredGroup, outCData);
     if (loadViewByGroupOut.first == ngrt4n::RcSuccess) {
       ngrt4n::fixupDependencies(outCData);
     }

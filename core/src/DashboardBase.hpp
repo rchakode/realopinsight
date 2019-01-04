@@ -46,7 +46,6 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  qint64 updateCounter(void) const {return m_updateCounter;}
   void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
   QString selectedNode(void) const {return m_selectedNode;}
   void setTimerId(qint32 id) {m_timerId = id;}
@@ -60,7 +59,6 @@ public:
   std::pair<int, QString> updateAllNodesStatus(void);
 
 public Q_SLOTS:
-  void runMonitor(SourceT& src);
   void runGenericViewUpdate(const SourceT& srcInfo);
   void runDynamicViewByGroupUpdate(const SourceT& srcInfo);
   void resetStatData(void);
@@ -94,7 +92,6 @@ protected:
 private:
   DbSession* m_dbSession;
   qint32 m_timerId;
-  qint64 m_updateCounter;
   QString m_selectedNode;
   qint32 m_userRole;
   qint32 m_interval;

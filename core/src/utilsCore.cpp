@@ -308,12 +308,12 @@ QString ngrt4n::basename(const QString& path)
 }
 
 
-std::pair<int, QString> ngrt4n::loadViewByGroup(const SourceT& srcInfo, const QString& filter, CoreDataT& cdata)
+std::pair<int, QString> ngrt4n::loadDynamicViewByGroup(const SourceT& sinfo, const QString& filter, CoreDataT& cdata)
 {
-  const auto MONITOR_NAME = MonitorT::toString(srcInfo.mon_type);
+  const auto MONITOR_NAME = MonitorT::toString(sinfo.mon_type);
 
   ChecksT checks;
-  auto loadSourceItemsOut = loadDataItems(srcInfo, filter, checks);
+  auto loadSourceItemsOut = loadDataItems(sinfo, filter, checks);
   if (loadSourceItemsOut.first != ngrt4n::RcSuccess) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("%1: %2").arg(MONITOR_NAME, loadSourceItemsOut.second));
   }
@@ -324,7 +324,7 @@ std::pair<int, QString> ngrt4n::loadViewByGroup(const SourceT& srcInfo, const QS
   }
 
   cdata.clear();
-  cdata.monitor = MonitorT::Any;
+  cdata.monitor = sinfo.mon_type;
   static uint64_t importIndex = 0;
 
   NodeT rootService;
@@ -362,7 +362,7 @@ std::pair<int, QString> ngrt4n::loadViewByGroup(const SourceT& srcInfo, const QS
     itemNode.id = ngrt4n::generateId();
     itemNode.parents.insert(hostNode.id);
     itemNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
-    itemNode.child_nodes = QString::fromStdString("%1:%2").arg(srcInfo.id, checkId);
+    itemNode.child_nodes = QString::fromStdString("%1:%2").arg(sinfo.id, checkId);
     cdata.bpnodes.insert(hostNode.id, hostNode);
     cdata.cnodes.insert(itemNode.id, itemNode);
   }
@@ -374,12 +374,12 @@ std::pair<int, QString> ngrt4n::loadViewByGroup(const SourceT& srcInfo, const QS
 }
 
 
-std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& srcInfo, const QString& filter, ChecksT& checks)
+std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& sinfo, const QString& filter, ChecksT& checks)
 {
   // Nagios
-  if (srcInfo.mon_type == MonitorT::Nagios) {
+  if (sinfo.mon_type == MonitorT::Nagios) {
     int retcode = ngrt4n::RcGenericFailure;
-    LsHelper handler(srcInfo.ls_addr, static_cast<uint16_t>(srcInfo.ls_port));
+    LsHelper handler(sinfo.ls_addr, static_cast<uint16_t>(sinfo.ls_port));
     if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
       retcode = ngrt4n::RcSuccess;
     }
@@ -387,47 +387,47 @@ std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& srcInfo, const QStr
   }
 
   // Zabbix
-  if (srcInfo.mon_type == MonitorT::Zabbix) {
+  if (sinfo.mon_type == MonitorT::Zabbix) {
     ZbxHelper handler;
-    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+    int retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::GroupFilter);
     if (checks.empty()) {
-      retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+      retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::HostFilter);
     }
     return std::make_pair(retcode, handler.lastError());
   }
 
 
   // Zenoss
-  if (srcInfo.mon_type == MonitorT::Zenoss) {
-    ZnsHelper handler(srcInfo.mon_url);
-    int retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::HostFilter);
+  if (sinfo.mon_type == MonitorT::Zenoss) {
+    ZnsHelper handler(sinfo.mon_url);
+    int retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::HostFilter);
     if (checks.empty()) {
-      retcode = handler.loadChecks(srcInfo, checks, filter, ngrt4n::GroupFilter);
+      retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::GroupFilter);
     }
     return std::make_pair(retcode, handler.lastError());
   }
 
 
   // Pandora
-  if (srcInfo.mon_type == MonitorT::Pandora) {
-    PandoraHelper handler(srcInfo.mon_url);
-    int retcode = handler.loadChecks(srcInfo, checks, filter);
+  if (sinfo.mon_type == MonitorT::Pandora) {
+    PandoraHelper handler(sinfo.mon_url);
+    int retcode = handler.loadChecks(sinfo, checks, filter);
     return std::make_pair(retcode, handler.lastError());
   }
 
 
   // OpManager
-  if (srcInfo.mon_type == MonitorT::OpManager) {
+  if (sinfo.mon_type == MonitorT::OpManager) {
     int retcode = ngrt4n::RcGenericFailure;
-    OpManagerHelper handler(srcInfo.mon_url);
+    OpManagerHelper handler(sinfo.mon_url);
     if (filter.isEmpty()) {
-      retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListAllDevices, filter, checks);
+      retcode = handler.loadChecks(sinfo, OpManagerHelper::ListAllDevices, filter, checks);
     } else {
-      retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByName, filter, checks);
+      retcode = handler.loadChecks(sinfo, OpManagerHelper::ListDeviceByName, filter, checks);
       if (checks.empty()) {
-        retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByCategory, filter, checks);
+        retcode = handler.loadChecks(sinfo, OpManagerHelper::ListDeviceByCategory, filter, checks);
         if (checks.empty()) {
-          retcode = handler.loadChecks(srcInfo, OpManagerHelper::ListDeviceByType, filter, checks);
+          retcode = handler.loadChecks(sinfo, OpManagerHelper::ListDeviceByType, filter, checks);
         }
       }
     }
@@ -435,12 +435,12 @@ std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& srcInfo, const QStr
   }
 
   // Kubernetes
-  if (srcInfo.mon_type == MonitorT::Kubernetes) {
-    K8sHelper k8s(srcInfo.mon_url, srcInfo.verify_ssl_peer);
+  if (sinfo.mon_type == MonitorT::Kubernetes) {
+    K8sHelper k8s(sinfo.mon_url, sinfo.verify_ssl_peer);
     return std::make_pair(ngrt4n::RcGenericFailure, "TODO import k8s data points");
   }
 
-  return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot load data points for unknown data source: %1").arg(srcInfo.mon_type));
+  return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot load data points for unknown data source: %1").arg(sinfo.mon_type));
 }
 
 

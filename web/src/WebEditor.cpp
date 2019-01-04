@@ -815,7 +815,7 @@ void WebEditor::importMonitoringConfig(const std::string& srcId, const std::stri
   }
 
   CoreDataT cdata;
-  auto loadViewByGroupOut = ngrt4n::loadViewByGroup(findSourceOut.second, groupFilter.c_str(), cdata);
+  auto loadViewByGroupOut = ngrt4n::loadDynamicViewByGroup(findSourceOut.second, groupFilter.c_str(), cdata);
   if (loadViewByGroupOut.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, loadViewByGroupOut.second.toStdString());
     return ;
