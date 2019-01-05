@@ -465,10 +465,12 @@ void WebMainUI::handleLaunchEditor(void)
 
 void WebMainUI::handlePreviewFile(const std::string& path, const std::string&)
 {
-  WebDashboard* dashboard = loadView(path);
-  if (dashboard) {
-    dashboard->setShowOnlyProblemMsgsState(m_showOnlyProblemMsgsField->checkState()==Wt::Checked);
-    setDashboardAsFrontStackedWidget(dashboard);
+  auto loadViewOut = loadView(path);
+  if (loadViewOut.first) {
+    loadViewOut.first->setShowOnlyProblemMsgsState(m_showOnlyProblemMsgsField->checkState()==Wt::Checked);
+    setDashboardAsFrontStackedWidget(loadViewOut.first);
+  } else {
+    showMessage(ngrt4n::OperationSucceeded, loadViewOut.second.toStdString());
   }
 }
 
@@ -646,38 +648,33 @@ void WebMainUI::setupUploadForm(void)
 }
 
 
-WebDashboard* WebMainUI::loadView(const std::string& path)
+std::pair<WebDashboard*, QString>
+WebMainUI::loadView(const std::string& path)
 {
   if (path.empty()) {
-    showMessage(ngrt4n::OperationFailed, Q_TR("Cannot open empty path"));
-    return nullptr;
+    return {nullptr, QObject::tr("Cannot open empty path")};
   }
 
   WebDashboard* dashboard = nullptr;
   try {
     dashboard = new WebDashboard(m_dbSession);
     if (! dashboard) {
-      showMessage(ngrt4n::OperationFailed, Q_TR("Cannot allocate the dashboard widget"));
-      return nullptr;
+      return {nullptr, QObject::tr("Cannot allocate the dashboard widget")};
     }
 
     auto outInitDashboard = dashboard->initialize(&m_dataSourceSettings, path.c_str());
     if (outInitDashboard.first != ngrt4n::RcSuccess) {
-      showMessage(ngrt4n::OperationFailed, outInitDashboard.second.toStdString());
       delete dashboard;
-      return nullptr;
+      return {nullptr, outInitDashboard.second};
     }
 
     QString viewName = dashboard->rootNode().name;
     auto loadedDashboardItem = m_dashboardMap.find(viewName);
     if (loadedDashboardItem != m_dashboardMap.end()) {
-      // cleanup the existing dashboard before to reload it
+      // cleanup the existing dashboard before to reload it later
       m_dashboardStackedContents.removeWidget(*loadedDashboardItem);
       m_dashboardMap.remove(viewName);
       delete *loadedDashboardItem;
-      //      showMessage(ngrt4n::OperationFailed, tr("A console with the same name is already loaded (%1)").arg(viewName).toStdString());
-      //      delete dashboard;
-      //      return nullptr;
     }
 
     m_dashboardMap.insert(viewName, dashboard);
@@ -693,9 +690,9 @@ WebDashboard* WebMainUI::loadView(const std::string& path)
     std::string errorMsg = tr("Dashboard initialization failed with bad_alloc").toStdString();
     CORE_LOG("error", errorMsg);
     showMessage(ngrt4n::OperationFailed, errorMsg);
-    return nullptr;
+    return {nullptr, QObject::tr("Dashboard initialization failed with bad_alloc")};
   }
-  return dashboard;
+  return {dashboard, ""};
 }
 
 void WebMainUI::scaleMap(double factor)
@@ -977,18 +974,22 @@ void WebMainUI::initOperatorDashboard(void)
   int thumbPerRow = m_dbSession->dashboardTilesPerRow();
   std::string failedViews = "";
   for (const auto& view : userViews) {
-    WebDashboard* dashboardItem = loadView(view.path);
-    if (! dashboardItem) {
-      failedViews.append(" ").append(view.name);
+    auto loadViewOut = loadView(view.path);
+    if (! loadViewOut.first) {
+      CORE_LOG("error", tr("%1: %2").arg(QString(view.name.c_str()), loadViewOut.second).toStdString());
+      failedViews.append(failedViews.empty()? "": ", ").append(view.name);
       continue;
     }
-    QObject::connect(dashboardItem, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
-    auto&& dashboardName =  dashboardItem->rootNode().name.toStdString();
 
-    Wt::WTemplate* thumbWidget = createThumbnailWidget(dashboardItem->thumbnailTitleBar(), dashboardItem->thumbnailProblemDetailBar(), dashboardItem->thumbnail());
-    thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, dashboardName));
+    QObject::connect(loadViewOut.first, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
+
+    const auto DashboardName = loadViewOut.first->rootNode().name.toStdString();
+    Wt::WTemplate* thumbWidget = createThumbnailWidget(loadViewOut.first->thumbnailTitleBar(),
+                                                       loadViewOut.first->thumbnailProblemDetailBar(),
+                                                       loadViewOut.first->thumbnail());
+    thumbWidget->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, DashboardName));
     m_thumbsLayout->addWidget(thumbWidget, thumbIndex / thumbPerRow, thumbIndex % thumbPerRow); // take the ownership of the widget
-    m_thumbsWidgets.insert(dashboardName, thumbWidget);
+    m_thumbsWidgets.insert(DashboardName, thumbWidget);
 
     ++thumbIndex;
   }
@@ -1000,7 +1001,7 @@ void WebMainUI::initOperatorDashboard(void)
   }
 
   if (thumbIndex != static_cast<int>(userViews.size())) {
-    showMessage(ngrt4n::OperationFailed, QObject::tr("Failed while loading views: %1").arg(failedViews.c_str()).toStdString());
+    showMessage(ngrt4n::OperationFailed, QObject::tr("Loading failures (details in log): %1").arg(failedViews.c_str()).toStdString());
   }
 }
 

@@ -232,7 +232,7 @@ private:
   void clearThumbnailTemplate(Wt::WTemplate* tpl);
   bool createDirectory(const std::string& path, bool cleanContent);
   void resetFileUploader(void);
-  WebDashboard* loadView(const std::string& path);
+  std::pair<WebDashboard*, QString> loadView(const std::string& path);
   Wt::WTemplate* createBreadCrumbsBarTpl(void);
   WebMsgDialog* createNotificationManager(void);
   UserFormView* createAccountPanel(void);
