@@ -17,7 +17,7 @@ Among others, RealOpinsight features include:
 RealOpInsight can be easily installed using one of the following methods:
 
 * Binaries for Ubuntu Server 16.04 LTS.
-* Docker image based on Ubuntu Server 16.04 LTS.
+* Docker -image based on Ubuntu Server 16.04 LTS.
 * Virtual machine images (Open Virtualization Format, OVF 2.0), a.k.a virtual machine image, based on Ubuntu Server 16.04 LTS. The appliance can be installed on VirtualBox, VMware, or any other OVA-compatible hypervisors.
 
 ## Installation via Docker
@@ -167,6 +167,6 @@ The software is licensed under the terms of GPLv3 License, mainly due to contami
 # Contributions
 Contributions are welcome!
 
-* Contribute by submitting a bug when you find something that does not work as expected.
-* To contribute bug patches or new features, you can use the Github Pull Request model. It is assumed that code and documentation are contributed under the same terms of use.
-* Contribute by funding features. The project team will then work with you to understand your requirements so to build features to fillful them. When those features are published we will add specific advertizing regarding your funding.
+* Give a feedback,submit a bug when you find something that does not work as expected, or give a star are good starting points to start contributing. 
+* You can also contribute bug patches or new features. In this case please use the Github Pull Request model. It is assumed that code and documentation are contributed under the same terms of use.
+* You can even contribute by funding features. The project team will then work with you to understand your requirements so to build features to fillful them. When those features are published we will add specific advertizing regarding your funding.
