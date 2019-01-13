@@ -164,7 +164,6 @@ This project bas been initiated by Rodrigue Chakode.
 
 The software is licensed under the terms of GPLv3 License, mainly due to contamination by third-party systems that the software is bound to. All those third-party systems offer dual licenses (e.g. for proprierary uses), subject to pay some license fees. You can contact us you're insterested in such a use.
 
-
 # Contributions
 Contributions are welcome!
 
