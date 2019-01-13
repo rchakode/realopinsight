@@ -158,3 +158,15 @@ To integrate RealOpInsight with these systems, you have to proceed as follows:
 * When prompted, select `Source0` as `Source Id`.
 * Click on `Apply` to save the changes.
 * On success you shall see a message confirming that.
+
+# Copyrights & License
+This project bas been initiated by Rodrigue Chakode.
+
+The software is licensed under the terms of GPLv3 License, mainly due to contamination by third-party systems that the software is bound to. All those third-party systems offer dual licenses (e.g. for proprierary uses), subject to pay some license fees. You can contact us you're insterested in such a use.
+
+
+# Contributions
+Contributions are welcome!
+
+* To contribute bug patches or new features, you can use the Github Pull Request model. It is assumed that code and documentation are contributed under the same terms of use.
+* You can also contribute to fund feature. So the project team will work with you to understand your requirements and then build features to fillful them. When those features are published we will add specific advertizing regarding your funding.
