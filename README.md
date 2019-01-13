@@ -168,5 +168,5 @@ The software is licensed under the terms of GPLv3 License, mainly due to contami
 Contributions are welcome!
 
 * Give a feedback,submit a bug when you find something that does not work as expected, or give a star are good starting points to start contributing. 
-* You can also contribute bug patches or new features. In this case please use the Github Pull Request model. It is assumed that code and documentation are contributed under the same terms of use.
+* You can also contribute bug patches or new features. In this case please use the Github Pull Request model. It is assumed that code and documentation are contributed under the same terms of use as the base code.
 * You can even contribute by funding features. The project team will then work with you to understand your requirements so to build features to fillful them. When those features are published we will add specific advertizing regarding your funding.
