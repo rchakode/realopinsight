@@ -108,7 +108,7 @@ void  WebEditor::handleOpenFile(const std::string& path, const std::string&)
                 &settings,
                 m_dbSession};
 
-  auto&& outParser = parser.parse(path.c_str());
+  auto outParser = parser.parse(path.c_str());
   if (outParser.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, outParser.second.toStdString());
     return ;
@@ -228,8 +228,6 @@ void WebEditor::bindFormWidgets(void)
   m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
   m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
-  // bind signal
-  //m_typeField.changed().connect(this, &WebEditor::handleNodeTypeChanged);
   m_typeField.activated().connect(this, &WebEditor::handleNodeTypeChanged);
 
   // set icon type values
@@ -293,10 +291,8 @@ void WebEditor::bindFormWidgets(void)
 }
 
 
-
 void WebEditor::handleNewViewButton(void)
 {
-  m_cdata.clear();
   NodeT node;
   node.id = ngrt4n::ROOT_ID;
   node.name = QObject::tr("New service view");
@@ -308,6 +304,8 @@ void WebEditor::handleNewViewButton(void)
   node.weight = ngrt4n::WEIGHT_UNIT;
   node.icon = ngrt4n::DEFAULT_ICON;
 
+  m_cdata.clear();
+  m_cdata.monitor = MonitorT::Any;
   m_cdata.bpnodes.insert(node.id, node);
 
   rebuiltTree();
@@ -665,12 +663,12 @@ void WebEditor::handleNodeTypeChanged(int index)
   QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
   NodeListT::ConstIterator ninfoIt;
   if ( ! ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, ninfoIt) ) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No service selected"));
+    CORE_LOG("debug", Q_TR("No service selected"));
     return ;
   }
 
   if ( QSet<int>{NodeType::ITService, NodeType::ExternalService}.contains(index) ) {
-    if (! findDescendantNodes(nodeId).empty()) {
+    if ( ! findDescendantNodes(nodeId).empty() ) {
       m_typeField.setCurrentIndex(ninfoIt->type);
       m_typeField.activated().emit(ninfoIt->type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
@@ -679,10 +677,11 @@ void WebEditor::handleNodeTypeChanged(int index)
   }
 
   if (index == ninfoIt->type) {
-    return ; // nothing to do
+    return ;
   }
 
-  // Before anything, backup the node info before processing that implies to remove it and thus, invalidate its iterator
+  // Before anything, backup the node info before any processing that implies to
+  // remove it and thus, invalidate its iterator
   NodeT ninfoCopy = *ninfoIt;
   const int oldNodeType = ninfoCopy.type;
   ninfoCopy.child_nodes.clear();
