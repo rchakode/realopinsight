@@ -155,7 +155,7 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
 std::pair<int, QString> Parser::loadDynamicViewByGroup(QDomNodeList& inXmlDomNodes, CoreDataT& outCData)
 {
   if (inXmlDomNodes.size() != 1) {
-    return std::make_pair(ngrt4n::RcParseError, QObject::tr("unexpected number of nodes for dynamic view file: %1").arg(inXmlDomNodes.size()));
+    return std::make_pair(ngrt4n::RcParseError, QObject::tr("unexpected number of items for dynamic view: %1").arg(inXmlDomNodes.size()));
   }
 
   QDomElement xmlRootNode = inXmlDomNodes.item(0).toElement();

@@ -367,6 +367,7 @@ struct CoreDataT {
     cnodes.clear();
     bpnodes.clear();
     edges.clear();
+    monitor = MonitorT::Any;
   }
 };
 
