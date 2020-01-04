@@ -500,6 +500,8 @@ SourceT WebDataSourceSettings::extractSourceSettingsGivenIndex(int sourceIndex)
     sinfo.mon_type = MonitorT::Zenoss;
   } else if (sourceName.contains("OpManager")) {
     sinfo.mon_type = MonitorT::OpManager;
+  } else if (sourceName.contains("Pandora FMS")) {
+    sinfo.mon_type = MonitorT::Pandora;
   } else if (sourceName.contains("Kubernetes")) {
     sinfo.mon_type = MonitorT::Kubernetes;
   } else {
