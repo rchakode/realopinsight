@@ -26,24 +26,22 @@
 #define USERFORM_HPP
 
 #include "DbObjects.hpp"
-#include <Wt/WBoostAny>
-#include <Wt/WDateEdit>
-#include <Wt/WDateValidator>
-#include <Wt/WFormModel>
-#include <Wt/WIntValidator>
-#include <Wt/WLengthValidator>
-#include <Wt/WModelIndex>
-#include <Wt/WPushButton>
-#include <Wt/WString>
-#include <Wt/WTemplateFormView>
-#include <Wt/WValidator>
-#include <Wt/WStackedWidget>
-#include <Wt/WRegExpValidator>
-#include <Wt/WSignal>
-#include <Wt/WScrollArea>
-#include <Wt/WStandardItemModel>
-#include <Wt/WTableView>
 #include "LdapHelper.hpp"
+#include <Wt/WDateEdit.h>
+#include <Wt/WDateValidator.h>
+#include <Wt/WFormModel.h>
+#include <Wt/WIntValidator.h>
+#include <Wt/WLengthValidator.h>
+#include <Wt/WModelIndex.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WString.h>
+#include <Wt/WTemplateFormView.h>
+#include <Wt/WValidator.h>
+#include <Wt/WStackedWidget.h>
+#include <Wt/WRegExpValidator.h>
+#include <Wt/WSignal.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WTableView.h>
 
 class DbSession;
 class UserFormModel;
@@ -83,7 +81,7 @@ public:
   static constexpr Wt::WFormModel::Field DashboardDisplayMode = "dashboard-mode";
   static constexpr Wt::WFormModel::Field DashboardTilesPerRow = "dashboard-tilesperrow";
 
-  UserFormModel(const DboUserT* user, bool changePassword, bool userForm, Wt::WObject *parent = 0);
+  UserFormModel(const DboUserT* user, bool changePassword, bool userForm);
   void setWritable(bool writtable);
   void setData(const DboUserT & user);
 
@@ -92,10 +90,10 @@ private:
   static const int MAX_CHILDREN = 15;
   bool m_userForm;
 
-  Wt::WValidator* createNameValidator(void);
-  Wt::WValidator* createEmailValidator(void);
-  Wt::WValidator* createPasswordValidator(void);
-  Wt::WValidator* createConfirmPasswordValidator(void);
+  std::unique_ptr<Wt::WValidator> createNameValidator(void);
+  std::unique_ptr<Wt::WValidator> createEmailValidator(void);
+  std::unique_ptr<Wt::WValidator> createPasswordValidator(void);
+  std::unique_ptr<Wt::WValidator> createConfirmPasswordValidator(void);
 
 };
 
@@ -111,7 +109,7 @@ public:
   Wt::Signal<DboUserT>& validated(void) {return m_validated;}
   Wt::Signal<std::string>& deleteTriggered(void) {return m_deleteTriggered;}
   Wt::Signal<std::string, std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
-  Wt::Signal<void>& closeTriggered(void) {return m_close;}
+  Wt::Signal<Wt::WMouseEvent>& closeTriggered(void) {return m_close;}
   void reset(void);
   void setWritable(bool writtable);
   void resetValidationState(bool writtable);
@@ -119,29 +117,32 @@ public:
 private:
   DboUserT m_user;
   bool m_changePassword;
-  UserFormModel* m_model;
+  UserFormModel* m_modelRef;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
-  Wt::WComboBox* m_dashboardDispalyModeField;
-  Wt::WSpinBox* m_dashboardTilesPerRowField;
+  Wt::WComboBox* m_dashboardDispalyModeFieldRef;
+  Wt::WSpinBox* m_dashboardTilesPerRowFieldRef;
 
   Wt::Signal<DboUserT> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
   Wt::Signal<std::string, std::string, std::string> m_changePasswordTriggered;
-  Wt::Signal<void> m_close;
+  Wt::Signal<Wt::WMouseEvent> m_close;
 
 
   void process(void);
-  void handleDeleteRequest(void);
-  Wt::WComboBox* createUserLevelField(void);
-  Wt::WLineEdit* createPaswordField(void);
+  void handleDeleteClick(void);
+  void handleCloseClick(Wt::WMouseEvent ev);
+  void handleCancelClick(Wt::WMouseEvent ev);
+  void handleChangePasswordClick(const std::string& login, const std::string& currentPass,const std::string& newPass);
+  std::unique_ptr<Wt::WComboBox> createUserLevelField(void);
+  std::unique_ptr<Wt::WLineEdit> createPaswordField(void);
   void createChangePasswordDialog(void);
-  Wt::WComboBox* createDashboardDisplayModeField(void);
-  Wt::WSpinBox* createDashboardTilesPerRowField(void);
+  std::unique_ptr<Wt::WComboBox> createDashboardDisplayModeField(void);
+  std::unique_ptr<Wt::WSpinBox> createDashboardTilesPerRowField(void);
 };
 
 
-class DbUserManager : public Wt::WScrollArea
+class DbUserManager : public Wt::WContainerWidget
 {
 public:
   enum {
@@ -152,12 +153,13 @@ public:
   ~DbUserManager(void);
 
   void updateDbUsers(void);
-  Wt::WWidget* dbUserListWidget(void) {return m_dbUserListWidget;}
-  Wt::WPanel* createUserPanel(const DboUserT& user);
-  UserFormView* userForm() {return m_userForm;}
-  Wt::WContainerWidget* userListContainer(void) {return m_usersListContainer;}
+  std::unique_ptr<Wt::WTemplate> dbUserListWidget(void) {return std::move(m_dbUserListWidget);}
+  Wt::WTemplate* dbUserListWidgetRef(void) {return m_dbUserListWidgetRef;}
+  std::unique_ptr<Wt::WPanel> createUserPanel(const DboUserT& user);
+  std::unique_ptr<UserFormView> userForm() {return std::move(m_userForm);}
+  UserFormView* userFormRef() {return m_userFormRef;}
   Wt::Signal<int>& updateCompleted(void) {return m_updateCompleted;}
-  void resetUserForm(void) {m_userForm->reset();}
+  void resetUserForm(void) {m_userFormRef->reset();}
   std::string lastError(void) const {return m_lastError.toStdString();}
 
 private:
@@ -167,10 +169,16 @@ private:
   /** Private member **/
   QString m_lastError;
   DbSession* m_dbSession;
-  UserFormView* m_userForm;
-  Wt::WContainerWidget* m_usersListContainer;
   Wt::WStackedWidget* m_contents;
-  Wt::WTemplate* m_dbUserListWidget;
+  UserFormView* m_userFormRef;
+  std::unique_ptr<UserFormView> m_userForm;
+  std::unique_ptr<Wt::WTemplate> m_dbUserListWidget;
+  Wt::WTemplate* m_dbUserListWidgetRef;
+
+  void handleFormAddUser(DboUserT dboUser);
+  void handleFormUpdateUser(DboUserT dboUser);
+  void handleDeleteUser(std::string username);
+  void handleFormChangePassword(std::string username, std::string oldPass, std::string newPass);
 };
 
 

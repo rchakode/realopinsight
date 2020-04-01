@@ -23,31 +23,28 @@
  */
 
 #include "WebTree.hpp"
-#include "utilsCore.hpp"
-#include "WebUtils.hpp"
-#include <Wt/WLength>
+#include <any>
+#include <utility>
+#include <Wt/WLength.h>
 
-WebTree::WebTree(void)
-  : Wt::WTreeView(0),
-    m_model(new Wt::WStandardItemModel(0,1))
+WebTree::WebTree(CoreDataT* cdata)
+  : Wt::WTreeView(),
+    m_cdata(cdata)
 {
+  m_model = std::make_shared<Wt::WStandardItemModel>(0, 1);
+  m_model->setHeaderData(0, Wt::Orientation::Horizontal, newEditionTip());
   setModel(m_model);
   activateDashboardFeatures();
 }
 
-
-WebTree::~WebTree()
-{
-  delete m_model;
-}
-
+WebTree::~WebTree(){}
 
 void WebTree::activateDashboardFeatures(void)
 {
   setHeaderHeight(0);
-  setSelectionMode(Wt::SingleSelection);
+  setSelectionMode(Wt::SelectionMode::Single);
   setSelectable(false);
-  setSelectionBehavior(Wt::SelectItems);
+  setSelectionBehavior(Wt::SelectionBehavior::Items);
   setColumnWidth(0, 500);
 }
 
@@ -62,127 +59,107 @@ void WebTree::activateEditionFeatures(void)
 
 void WebTree::build(void)
 {
-  // just clear m_treeItems, because the containing pointer shall be deleted with the tree model
-  m_treeItems.clear();
+  m_items.clear();
+  m_model->clear();
 
-
-  // now reconstruct the tree
-  bool bindToParent = false;
-  bool selectItemAfterProcessing = false;
-
-  for(NodeListT::ConstIterator node = m_cdata->bpnodes.begin(), end = m_cdata->bpnodes.end();  node != end; ++node) {
-    WebTree::addTreeItem(*node, bindToParent, selectItemAfterProcessing);
+  // create bpnodes
+  for(const auto & node : m_cdata->bpnodes) {
+    WebTree::newNodeItem(node, "", true);
   }
-
-  for(NodeListT::ConstIterator node=m_cdata->cnodes.begin(), end=m_cdata->cnodes.end();  node != end; ++node) {
-    WebTree::addTreeItem(*node, bindToParent, selectItemAfterProcessing);
+  // create cnodes
+  for(const auto & node : m_cdata->cnodes) {
+    WebTree::newNodeItem(node, "", true);
   }
-
+  // bind dependencies
   for (QMultiMap<QString, QString>::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
     bindChildToParent(edge.value(), edge.key());
   }
-
-  renewModel();
+  // update model
+  auto treeRoot = m_items.find(ngrt4n::ROOT_ID);
+  if (treeRoot != m_items.end() && treeRoot->second) {
+    m_model->appendRow(std::move(std::unique_ptr<Wt::WStandardItem>(treeRoot->second)));
+    m_model->setHeaderData(0, Wt::Orientation::Horizontal, childMgntTip());
+  }
 }
-
-
-void WebTree::renewModel(void)
-{
-  Wt::WStandardItemModel* oldModel = m_model;
-
-  m_model = new Wt::WStandardItemModel();
-
-  m_model->appendRow(m_treeItems[ngrt4n::ROOT_ID]);
-
-  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Tree Explorer"));
-
-  setModel(m_model);
-  delete oldModel;
-}
-
 
 
 void WebTree::expandNodeById(const QString& nodeId)
 {
-  auto item = m_treeItems[nodeId];
-  if (item) {
-    expand(item->index());
+  auto item = m_items.find(nodeId);
+  if (item != m_items.end() && item->second) {
+    expand((item->second)->index());
   }
 }
 
 void WebTree::selectNodeById(const QString& nodeId)
 {
-  auto item = m_treeItems[nodeId];
-  if (item) {
-    select(item->index());
+  auto item = m_items.find(nodeId);
+  if (item != m_items.end() && item->second) {
+    select((item->second)->index());
   }
 }
 
-void WebTree::addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing)
+void WebTree::newNodeItem(const NodeT& nodeInfo, const QString& parentId, bool selectNewNode)
 {
   auto item = new Wt::WStandardItem();
-
-  item->setText(Wt::WString(_node.name.toStdString()));
+  item->setText(Wt::WString(nodeInfo.name.toStdString()));
   item->setIcon("images/built-in/unknown.png");
-  item->setData(_node.id, Wt::UserRole);
-  //FIXME item->setFlags(item->flags() | Wt::ItemFlag::ItemIsDragEnabled | Wt::ItemFlag::ItemIsDropEnabled) ;
+  item->setData(nodeInfo.id, Wt::ItemDataRole::User);
+  m_items[nodeInfo.id] = item;
 
-  m_treeItems.insert(_node.id, item);
-
-  if (_bindToParent && ! _node.parents.isEmpty()) {
-    bindChildToParent(_node.id, *_node.parents.begin());
+  if (! parentId.isEmpty()) {
+    bindChildToParent(nodeInfo.id, parentId);
   }
-
-  if (_selectItemAfterProcessing) {
+  if (selectNewNode) {
     select(item->index());
   }
 }
 
 
-Wt::WStandardItem* WebTree::findItemByNodeId(const QString& _nodeId)
+Wt::WStandardItem* WebTree::findItemByNodeId(const QString& nodeId)
 {
-  auto item = m_treeItems.find(_nodeId);
-  return (item != m_treeItems.end())? *item : nullptr;
+  auto itemIt = m_items.find(nodeId);
+  return (itemIt != m_items.end())? itemIt->second : nullptr;
 }
 
 
 void WebTree::bindChildToParent(const QString& childId, const QString& parentId)
 {
-  auto parentItem = findItemByNodeId(parentId);
-  auto childItem = findItemByNodeId(childId);
-  if (parentItem != NULL && childItem != NULL) {
-    parentItem->appendRow(childItem);
+  auto citem = findItemByNodeId(childId);
+  auto pitem = findItemByNodeId(parentId);
+  if (citem != nullptr && pitem != nullptr) {
+    pitem->appendRow(std::move(std::unique_ptr<Wt::WStandardItem>(citem)));
+  } else {
+    CORE_LOG("debug", QObject::tr("ignoring dependency with child or parent not found").arg(parentId, childId).toStdString());
   }
 }
 
 
-void WebTree::updateItemDecoration(const NodeT& _node, const QString& _tip)
+void WebTree::updateItemDecoration(const NodeT& nodeInfo, const QString& tooltip)
 {
-  auto item = findItemByNodeId(_node.id);
+  auto item = findItemByNodeId(nodeInfo.id);
   if (item) {
-    item->setIcon(ngrt4n::getIconPath(_node.sev).toStdString());
-    item->setToolTip(Wt::WString::fromUTF8(_tip.toStdString()));
+    item->setIcon(ngrt4n::getIconPath(nodeInfo.sev).toStdString());
+    item->setToolTip(Wt::WString::fromUTF8(tooltip.toStdString()));
   }
 }
 
-QString WebTree::findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const {
-
-  if (! _index.isValid()) {
+QString WebTree::findNodeIdFromTreeItem(const Wt::WModelIndex& index) const
+{
+  if (! index.isValid()) {
     return "";
   }
 
-  auto item = m_model->itemFromIndex(_index);
+  auto item = m_model->itemFromIndex(index);
   if (! item) {
     return "";
   }
-
-  QString id = "";
+  QString id("");
   try {
-    id = boost::any_cast<QString>(item->data(Wt::UserRole));
-  } catch(...) {
+    id = Wt::cpp17::any_cast<QString>(item->data(Wt::ItemDataRole::User));
+  } catch (...) {
     id = "";
   }
-
   return id;
 }
 

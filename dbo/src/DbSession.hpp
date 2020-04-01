@@ -25,20 +25,21 @@
 #ifndef DBSESSION_HPP
 #define DBSESSION_HPP
 
-#include "DbObjects.hpp"
-#include <Wt/Auth/AuthService>
-#include <Wt/Auth/PasswordVerifier>
-#include <Wt/Dbo/Dbo>
-#include <Wt/Dbo/backend/Sqlite3>
-#include <Wt/Dbo/backend/Postgres>
-#include <Wt/Auth/PasswordService>
-#include <Wt/Auth/User>
-#include <Wt/WGlobal>
-#include <Wt/Auth/Dbo/AuthInfo>
-#include <Wt/Auth/Dbo/UserDatabase>
-#include <Wt/Auth/Login>
 #include <climits>
 #include <semaphore.h>
+#include "dbo/src/DbObjects.hpp"
+#include <Wt/Auth/AuthService.h>
+#include <Wt/Auth/PasswordVerifier.h>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/backend/Sqlite3.h>
+#include <Wt/Dbo/backend/Postgres.h>
+#include <Wt/Auth/PasswordService.h>
+#include <Wt/Auth/User.h>
+#include <Wt/WGlobal.h>
+#include <Wt/Auth/Dbo/AuthInfo.h>
+#include <Wt/Auth/Dbo/UserDatabase.h>
+#include <Wt/Auth/Login.h>
+#include <Wt/Auth/HashFunction.h>
 
 typedef Wt::Auth::Dbo::AuthInfo<DboUser> AuthInfo;
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
@@ -56,33 +57,59 @@ enum {
 class DbSession : public dbo::Session
 {
 public:
-  DbSession(int dbType, const std::string& db);
+  DbSession();
   ~DbSession();
 
-  bool isConnected() const {return m_isConnected;}
+  bool isReady() const {return m_dbIsReady;}
 
   void setupDbMapping(void);
   int initDb(void);
-  Wt::Auth::AbstractUserDatabase& users() const {return *m_dboUserDb;}
-  Wt::Auth::AuthService& auth();
-  Wt::Auth::PasswordService* passwordAuthentificator(void);
-  Wt::Auth::Login& loginObject(void);
-  bool isLogged(void) {return loginObject().loggedIn();}
-  bool isLoggedAdmin(void) {return loggedUser().role == DboUser::AdmRole;}
   void configureAuth(void);
-  const DboUser& loggedUser(void) const {return m_loggedUser;}
-  bool isCompleteUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::CompleteDashboard;}
-  bool displayOnlyTiles(void) const {return loggedUser().dashboardDisplayMode == DboUser::TileDashboard;}
-  bool isReportUserDashboard(void) const {return loggedUser().dashboardDisplayMode == DboUser::NoReportDashboard;}
-  int dashboardTilesPerRow(void) const {return (loggedUser().dashboardTilesPerRow <= 0 ? 5 : loggedUser().dashboardTilesPerRow);}
-  void setLoggedUser(void);
-  QString loggedUserName(void)const {return QString::fromStdString(loggedUser().username);}
+  void decodeLoggedUser(void);
+  Wt::Auth::AbstractUserDatabase& users() const {
+    return *m_usersDb;
+  }
+  Wt::Auth::AuthService& auth() {
+    return m_basicAuthService;
+  }
+  Wt::Auth::PasswordService* passwordAuthentificator(void) {
+    return m_passAuthService;
+  }
+  Wt::Auth::Login& wtAuthLogin(void) {
+    rereadAll();
+    return m_wtAuthLogin;
+  }
+  bool isLogged(void) {
+    return wtAuthLogin().loggedIn();
+  }
+  bool isLoggedAdmin(void) {
+    return loggedUser().role == DboUser::AdmRole;
+  }
+  const DboUser& loggedUser(void) const {
+    return m_loggedUser;
+  }
+  bool isCompleteUserDashboard(void) const {
+    return loggedUser().dashboardDisplayMode == DboUser::CompleteDashboard;
+  }
+  bool displayOnlyTiles(void) const {
+    return loggedUser().dashboardDisplayMode == DboUser::TileDashboard;
+  }
+  bool isReportUserDashboard(void) const {
+    return loggedUser().dashboardDisplayMode == DboUser::NoReportDashboard;
+  }
+  int boardCardsPerRow(void) const {
+    return (loggedUser().dashboardTilesPerRow <= 0 ? 5 : loggedUser().dashboardTilesPerRow);
+  }
+  QString loggedUserName(void)const {
+    return QString::fromStdString(loggedUser().username);
+  }
 
   std::pair<int, QString> addUser(const DboUserT& userInfo);
   std::pair<int, QString> updateUser(const DboUserT& userInfo);
   int deleteUser(const std::string& username);
   int deleteAuthSystemUsers(int authSystem);
   bool findUser(const std::string& username, DboUserT& user);
+  Wt::Auth::User findAuthUser(const std::string& username, const std::string& password);
   std::pair<int, QString> updatePassword(const std::string& uname, const std::string& currentPass, const std::string& newPass);
   DbUsersT listUsers(void);
 
@@ -95,8 +122,8 @@ public:
 
   int addQosData(const QosDataT& qosData);
   std::pair<int, QString> addQosDataList(const QosDataList& qosDataList);
-  int listQosData(QosDataListMapT& qosDataMap, const std::string& viewId, long fromDate = 0, long toDate = LONG_MAX);
-  int getLastQosData(QosDataT& qosData, const std::string& viewId);
+  int listQosData(QosDataListMapT& qosDataMap, const std::string& view, long fromDate = 0, long toDate = LONG_MAX);
+  int getLastQosData(QosDataT& qosData, const std::string& view);
 
   DbViewsT listViews(void);
   DbViewsT listViewListByAssignedUser(const std::string& uname);
@@ -119,15 +146,17 @@ public:
   std::pair<bool, SourceT> findSourceById(const QString& sid);
 
 private:
-  bool m_isConnected;
-  dbo::SqlConnection* m_dboSqlConncetion;
-  UserDatabase* m_dboUserDb;
+  bool m_dbIsReady;
+  UserDatabase* m_usersDb;
   DboUser m_loggedUser;
-  Wt::Auth::Login m_loginObj;
+  Wt::Auth::Login m_wtAuthLogin;
   Wt::Auth::AuthService m_basicAuthService;
   Wt::Auth::PasswordService* m_passAuthService;
 
-  std::string hashPassword(const std::string& pass);
+  std::string hashPassword(const std::string& pass) {
+    Wt::Auth::BCryptHashFunction h;
+    return h.compute(pass, "$ngrt4n$salt");
+  }
 };
 
 #endif // DBSESSION_HPP

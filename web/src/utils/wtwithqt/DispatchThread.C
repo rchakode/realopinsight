@@ -9,10 +9,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -22,124 +22,123 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-#include "WQApplication"
+#include "WQApplication.h"
 #include "DispatchThread.h"
 
 namespace Wt {
 
-DispatchObject::DispatchObject(DispatchThread *thread)
-  : thread_(thread)
-{
-  connect(this, SIGNAL(doEvent()), this, SLOT(onEvent()));
-}
-
-void DispatchObject::propagateEvent()
-{
-  Q_EMIT doEvent();
-}
-
-void DispatchObject::onEvent()
-{
-  thread_->doEvent();
-}
-
-DispatchThread::DispatchThread(WQApplication *app,
-			       bool withEventLoop)
-  : QThread(),
-    app_(app),
-    qtEventLoop_(withEventLoop),
-    dispatchObject_(0),
-    event_(0),
-    done_(false),
-    newEvent_(false)
-{ }
-
-void DispatchThread::run()
-{
-  if (qtEventLoop_)
-    dispatchObject_ = new DispatchObject(this);
-
-  signalDone();
-
-  if (qtEventLoop_)
-    exec();
-  else
-    myExec();
-
-  delete dispatchObject_;
-
-  signalDone();
-}
-
-void DispatchThread::myExec()
-{
-  boost::mutex::scoped_lock lock(newEventMutex_);
-
-  for (;;) {
-    if (!newEvent_)
-      newEventCondition_.wait(lock);
-
-    doEvent();
-
-    if (app_->finalized_)
-      return;
-
-    newEvent_ = false;
+  DispatchObject::DispatchObject(DispatchThread *thread)
+    : thread_(thread)
+  {
+    connect(this, SIGNAL(doEvent()), this, SLOT(onEvent()));
   }
-}
 
-void DispatchThread::myPropagateEvent()
-{
-  boost::mutex::scoped_lock lock(newEventMutex_);
-  newEvent_ = true;
-  newEventCondition_.notify_one();
-}
+  void DispatchObject::propagateEvent()
+  {
+    Q_EMIT doEvent();
+  }
 
-void DispatchThread::signalDone()
-{
-  boost::mutex::scoped_lock lock(doneMutex_);
-  done_ = true;
-  doneCondition_.notify_one();
-}
+  void DispatchObject::onEvent()
+  {
+    thread_->doEvent();
+  }
 
-void DispatchThread::waitDone()
-{
-  boost::mutex::scoped_lock lock(doneMutex_);
+  DispatchThread::DispatchThread(WQApplication *app,
+                                 bool withEventLoop)
+    : QThread(),
+      app_(app),
+      qtEventLoop_(withEventLoop),
+      dispatchObject_(0),
+      event_(0),
+      done_(false),
+      newEvent_(false)
+  { }
 
-  if (done_)
-    return;
-  else
-    doneCondition_.wait(lock);
- }
+  void DispatchThread::run()
+  {
+    if (qtEventLoop_) {
+      dispatchObject_ = new DispatchObject(this);
+    }
 
-void DispatchThread::notify(const WEvent& event)
-{
-  event_ = &event;
+    signalDone();
 
-  done_ = false;
+    if (qtEventLoop_) {
+      exec();
+    } else {
+      myExec();
+    }
+    delete dispatchObject_;
+    signalDone();
+  }
 
-  if (dispatchObject_)
-    dispatchObject_->propagateEvent();
-  else
-    myPropagateEvent();
+  void DispatchThread::myExec()
+  {
+    boost::mutex::scoped_lock lock(newEventMutex_);
 
-  waitDone();
-}
+    for (;;) {
+      if (!newEvent_) {
+        newEventCondition_.wait(lock);
+      }
+      doEvent();
+      if (app_->finalized_) {
+        return;
+      }
+      newEvent_ = false;
+    }
+  }
 
-void DispatchThread::destroy()
-{
-  if (qtEventLoop_)
-    QThread::exit();
-}
+  void DispatchThread::myPropagateEvent()
+  {
+    boost::mutex::scoped_lock lock(newEventMutex_);
+    newEvent_ = true;
+    newEventCondition_.notify_one();
+  }
 
-void DispatchThread::doEvent()
-{
-  app_->attachThread(true);
+  void DispatchThread::signalDone()
+  {
+    boost::mutex::scoped_lock lock(doneMutex_);
+    done_ = true;
+    doneCondition_.notify_one();
+  }
 
-  app_->realNotify(*event_);
-  signalDone();
+  void DispatchThread::waitDone()
+  {
+    boost::mutex::scoped_lock lock(doneMutex_);
 
-  app_->attachThread(false);
-}
+    if (done_)
+      return;
+    else
+      doneCondition_.wait(lock);
+  }
+
+  void DispatchThread::notify(const WEvent& event)
+  {
+    event_ = &event;
+
+    done_ = false;
+
+    if (dispatchObject_)
+      dispatchObject_->propagateEvent();
+    else
+      myPropagateEvent();
+
+    waitDone();
+  }
+
+  void DispatchThread::destroy()
+  {
+    if (qtEventLoop_)
+      QThread::exit();
+  }
+
+  void DispatchThread::doEvent()
+  {
+    app_->attachThread(true);
+    if (event_) {
+      app_->realNotify(*event_);
+    }
+    signalDone();
+    app_->attachThread(false);
+  }
 
 }

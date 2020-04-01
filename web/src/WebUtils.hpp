@@ -28,59 +28,58 @@
 #include "semaphore.h"
 #include "SettingFactory.hpp"
 #include <QString>
-#include <Wt/WText>
-
+#include <Wt/WText.h>
 
 #define Q_TR(s) QObject::tr(s).toStdString()
 #define CORE_LOG(level, msg) ngrt4n::logCore(level, msg)
 #define REPORTD_LOG(level, msg) ngrt4n::logReportd(level, msg)
 
+namespace ngrt4n
+{
 
-namespace ngrt4n {
+enum OperationStatusT
+{
+  OperationSucceeded,
+  OperationFailed,
+  OperationInProgress,
+  OperationFinished
+};
 
-  enum OperationStatusT {
-    OperationSucceeded,
-    OperationFailed,
-    OperationInProgress,
-    OperationFinished
-  };
+void showMessage(int exitCode, const std::string &errorMsg, const std::string &successMsg, Wt::WText *infoBox);
+std::string tr(const std::string &msg);
+std::string severityCssClass(int severity);
+std::string severityHtmlColor(int severity);
+std::string thumbCss(int severity);
+Wt::WColor severityWColor(int severity);
+std::unique_ptr<Wt::WWidget>  footer(void);
+std::string sqliteDbPath(void);
+std::string timeTextFromQtTimeText(const std::string &qtimeText);
+Wt::WString timet2String(long mytime_t, const std::string &format = "dd/MM hh:mm:ss");
+Wt::WString wHumanTimeText(long mytime_t);
+Wt::WString wHumanTimeText(const std::string &mytime_t);
+Wt::WString wTimeToNow(const std::string &myStrTime_t);
+Wt::WString wTimeToNow(long mytime_t);
+std::unique_ptr<Wt::WText> createFontAwesomeTextButton(const std::string &iconClasses, const std::string &tip);
+void initCoreLogger(void);
+void initReportdLogger(void);
+void freeCoreLogger(void);
+void freeReportdLogger(void);
+void logCore(const std::string &level, const std::string &msg);
+void logReportd(const std::string &level, const std::string &msg);
+void logReportd(const std::string &level, const QString &msg);
+bool isValidUri(const QString &addr, const QString &schemePrefix, bool nopath);
+bool isValidHostAddr(const QString &addr);
+std::string md5Hash(const std::string &input);
+void googleAnalyticsLogger(void);
 
-  void showMessage(int exitCode, const std::string& errorMsg, const std::string& successMsg, Wt::WText* infoBox);
-  std::string tr(const std::string& msg);
-  std::string severityCssClass(int severity);
-  std::string severityHtmlColor(int severity);
-  std::string thumbnailCssClass(int severity);
-  Wt::WColor severityWColor(int severity);
-  Wt::WWidget* footer(void);
-  std::string sqliteDbPath(void);
-  std::string timeTextFromQtTimeText(const std::string& qtimeText);
-  Wt::WString timet2String(long mytime_t, const std::string& format = "dd/MM hh:mm:ss");
-  Wt::WString wHumanTimeText(long mytime_t);
-  Wt::WString wHumanTimeText(const std::string& mytime_t);
-  Wt::WString wTimeToNow(const std::string& myStrTime_t);
-  Wt::WString wTimeToNow(long mytime_t);
-  Wt::WText* createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip);
-  void initCoreLogger(void);
-  void initReportdLogger(void);
-  void freeCoreLogger(void);
-  void freeReportdLogger(void);
-  void logCore(const std::string& level, const std::string& msg);
-  void logReportd(const std::string& level, const std::string& msg);
-  void logReportd(const std::string& level, const QString& msg);
-  bool isValidUri(const QString& addr, const QString& schemePrefix, bool nopath);
-  bool isValidHostAddr(const QString& addr);
-  std::string md5Hash(const std::string& input);
-  void googleAnalyticsLogger(void);
-
-  Wt::WStandardItem* createStandardItem(const std::string& text, const std::string& data);
-  Wt::WStandardItem* createCheckableStandardItem(const std::string& data, bool checked);
-  Wt::WStandardItem* createSeverityStandardItem(const NodeT& _node);
-  void updateSeverityItem(Wt::WStandardItem* item, int severity);
-  std::string getItemData(Wt::WStandardItem* item);
-  sem_t* createSemaphoreOrDie(const std::string& sem_name);
-  void releaseSemaphore(sem_t* my_sem);
-  Wt::WFont chartTitleFont(void);
-} //Namespace
-
+std::unique_ptr<Wt::WStandardItem> createStandardItem(const std::string &text, const std::string &data);
+std::unique_ptr<Wt::WStandardItem> createCheckableStandardItem(const std::string &data, bool checked);
+std::unique_ptr<Wt::WStandardItem> createSeverityStandardItem(const NodeT &_node);
+void updateSeverityItem(Wt::WStandardItem* itemRef, int severity);
+std::string getItemData(Wt::WStandardItem *itemRef);
+sem_t *createSemaphoreOrDie(const std::string &sem_name);
+void releaseSemaphore(sem_t *my_sem);
+Wt::WFont chartTitleFont(void);
+} // namespace ngrt4n
 
 #endif // WEBUTILS_HPP

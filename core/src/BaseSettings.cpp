@@ -30,20 +30,13 @@
 #include <QRegExpValidator>
 
 
-BaseSettings::BaseSettings(void)
-  : m_settingFactory(new SettingFactory())
-{
-}
-
-BaseSettings::BaseSettings(const QString& settingFile)
-  : m_settingFactory(new SettingFactory(settingFile))
+BaseSettings::BaseSettings()
 {
 }
 
 
 BaseSettings::~BaseSettings(void)
 {
-  delete m_settingFactory;
 }
 
 void BaseSettings::loadProperties(void)
@@ -54,27 +47,11 @@ void BaseSettings::loadProperties(void)
 
 int BaseSettings::getGraphLayout(void) const
 {
-  return m_settingFactory->getGraphLayout();
+  return SettingFactory().getGraphLayout();
 }
 
 qint32 BaseSettings::updateInterval(void) const
 {
-  return m_settingFactory->updateInterval();
+  return SettingFactory().updateInterval();
 }
-
-void BaseSettings::sync(void)
-{
-  m_settingFactory->sync();
-}
-
-QString BaseSettings::keyValue(const QString& key, const QString& defaultValue)
-{
-  return m_settingFactory->value(key, defaultValue).toString();
-}
-
-void BaseSettings::setKeyValue(const QString & _key, const QString & _value)
-{
-  m_settingFactory->setKeyValue(_key, _value); m_settingFactory->sync();
-}
-
 

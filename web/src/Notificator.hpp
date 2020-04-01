@@ -25,11 +25,11 @@
 #ifndef NOTIFICATOR_H
 #define NOTIFICATOR_H
 #include "Base.hpp"
+#include <QObject>
+#include <QString>
 #include "dbo/src/DbSession.hpp"
 #include "WebNotificationSettings.hpp"
 #include "utils/smtpclient/MailSender.hpp"
-#include <QObject>
-#include <QString>
 
 class Notificator : public QObject
 {

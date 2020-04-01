@@ -1,0 +1,189 @@
+#main {
+  margin: auto;
+  max-width: 100%;
+}
+    
+#top {
+  background-image: -webkit-linear-gradient(top, #f7f6f4, rgba(255,255,255,.1));
+  background: #fff;
+  margin-bottom: auto;
+  border-bottom: none;
+}
+
+#footer {
+  background-image: -webkit-linear-gradient(top, #ddd ,#fff);
+  background: #fff;
+}
+
+#hero {
+  background-color: #E3F2FD;
+  background-image: -webkit-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 50%, #FFBB69 75%, #F1F1F1 55%, #9DC6DD);
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+}
+
+#hero.primary {
+  padding-top: 120px;
+}
+
+#hero #home-buttons {
+  margin-top: 24px;
+  margin-bottom: auto;
+}
+
+#kube-features {
+  margin-top: 32px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1128px; 
+}
+
+#kube-features .row:first-child {
+    padding-bottom: 32px;
+    margin-bottom: 64px;
+    border-bottom: none; 
+}
+
+#product-overview, #product-mediahighlight {
+  margin-top: 32px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1128px; 
+}
+
+#components{
+  max-width: 1128px;
+  margin: auto;
+}
+
+#components .item {
+  background: #E3F2FD;
+}
+#contents {
+  background: #E3F2FD;
+}
+
+#action-buttons {
+  margin-top: 32px;
+  margin-bottom: auto;
+}
+
+#home-buttons .button {
+  min-width: 24ch;
+  margin: 5px;
+}
+
+#hero p::before {
+  background: #FF8D00;
+}
+
+.row .col {
+  padding: 15px;
+}
+
+#hero h1 {
+  font-size: 3.75em;
+  line-height: 112%;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+#hero.primary p {
+  font-size: 18pt;
+  line-height: 30px;
+  font-style: normal;
+  font-weight: 400;
+  margin-top: 23px;
+}
+
+.button.primary {
+  background-color: #868686;
+}
+
+h1,
+address,
+blockquote,
+dl,
+fieldset,
+figure,
+form,
+hr,
+ol,
+p,
+pre,
+table,
+ul {
+ margin-bottom:24px
+}
+
+@media screen and (min-width: 601px) {
+  #hero h1 {
+    font-size:60px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #hero h1 {
+    font-size:40px;
+  }
+ 
+}
+
+h2 {
+  font-size:28px;
+  line-height:60px;
+  font-weight: 300; 
+}
+
+h3 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 250;
+}
+
+h4 {
+    font-size:20px;
+    line-height:40px;
+    font-weight: 250;
+}
+
+h5 {
+  font-size:16px;
+  line-height:36px;
+  font-weight: 250;
+}
+
+#top img {
+  width: 170px;
+}
+
+#top ul {
+  justify-content: space-evenly;
+}
+
+#top-nav-main {
+  width: 100%;
+}
+
+#product-overview h3 {
+  font-weight: 600;
+}
+
+#screencast {
+  max-width: 100%;
+  background: #333;
+  padding: 32px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+  background-image: -webkit-linear-gradient(top, #9DC6DD ,#fff);
+}
+
+#screencast h1 {
+  font-size: 3.75em;
+  line-height: 112%;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.5);
+}

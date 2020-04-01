@@ -21,11 +21,12 @@
 # along with RealOpInsight.  If not, see <http://www.gnu.org/licenses/>.   #
 #--------------------------------------------------------------------------#
  */
-#include "WebAuthSettings.hpp"
 #include "WebUtils.hpp"
+#include "WebAuthSettings.hpp"
 #include "LdapUserManager.hpp"
-#include <Wt/WStandardItemModel>
-#include <Wt/WStandardItem>
+#include <Wt/WGlobal.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WStandardItem.h>
 
 /**
  * @brief LdapUserTable::LdapUserTable
@@ -35,27 +36,27 @@ namespace {
   const int TABLE_COLUMN_COUNT = 5;
 }
 LdapUserManager::LdapUserManager(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WTableView(parent),
-    m_userEnableStatusChanged(this),
-    m_model(new Wt::WStandardItemModel(0, TABLE_COLUMN_COUNT, this)),
+  : Wt::WTableView(),
+    m_userEnableStatusChanged(),
+    m_model(std::make_shared<Wt::WStandardItemModel>(0, TABLE_COLUMN_COUNT)),
     m_dbSession(dbSession)
 {
+  setModel(m_model);
   setSortingEnabled(true);
   setLayoutSizeAware(true);
   setColumnResizeEnabled(true);
   setSelectable(true);
-  setSelectionMode(Wt::SingleSelection);
-  setSelectionBehavior(Wt::SelectRows);
+  setSelectionMode(Wt::SelectionMode::Single);
+  setSelectionBehavior(Wt::SelectionBehavior::Rows);
   setHeaderHeight(26);
   setAlternatingRowColors(true);
 
   setModelHeader();
-  setModel(m_model);
   addEvent();
 }
 
 /**
- * @brief Add signa/slot event handling
+ * @brief Add signal/slot event handling
  */
 void LdapUserManager::addEvent()
 {
@@ -117,11 +118,11 @@ void LdapUserManager::addUserRow(const LdapUserAttrsT& userInfo, bool imported)
 {
   int row = m_model->rowCount();
   std::string dn = userInfo["dn"];
-  m_model->setItem(row, 0, ngrt4n::createStandardItem(dn, dn));
-  m_model->setItem(row, 1, ngrt4n::createStandardItem(userInfo["cn"], dn));
-  m_model->setItem(row, 2, ngrt4n::createStandardItem(userInfo[m_ldapUidField], dn));
-  m_model->setItem(row, 3, ngrt4n::createStandardItem(userInfo["mail"], dn));
-  m_model->setItem(row, 4, ngrt4n::createCheckableStandardItem(dn, imported));
+  m_model.get()->setItem(row, 0, ngrt4n::createStandardItem(dn, dn));
+  m_model.get()->setItem(row, 1, ngrt4n::createStandardItem(userInfo["cn"], dn));
+  m_model.get()->setItem(row, 2, ngrt4n::createStandardItem(userInfo[m_ldapUidField], dn));
+  m_model.get()->setItem(row, 3, ngrt4n::createStandardItem(userInfo["mail"], dn));
+  m_model.get()->setItem(row, 4, ngrt4n::createCheckableStandardItem(dn, imported));
 }
 
 
@@ -132,7 +133,7 @@ void LdapUserManager::handleImportationAction(Wt::WStandardItem* item)
     LdapUserMapT::ConstIterator userInfo =  m_users.find(ldapDn);
     if (userInfo != m_users.end()) {
       std::string username = (*userInfo)[m_ldapUidField];
-      if (item->checkState() == Wt::Checked) { // enable LDAP authentication
+      if (item->checkState() == Wt::CheckState::Checked) { // enable LDAP authentication
         if (insertIntoDatabase(*userInfo) != 0) {
           updateUserList();
         }

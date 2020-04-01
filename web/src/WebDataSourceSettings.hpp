@@ -28,13 +28,13 @@
 
 #include "WebBaseSettings.hpp"
 #include "Validators.hpp"
-#include <Wt/WLineEdit>
-#include <Wt/WComboBox>
-#include <Wt/WStringListModel>
-#include <Wt/WPushButton>
-#include <Wt/WDialog>
-#include <Wt/WTemplate>
-#include <Wt/WSpinBox>
+#include <Wt/WLineEdit.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WStringListModel.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WDialog.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WSpinBox.h>
 
 class WebDataSourceSettings : public WebBaseSettings, public Wt::WTemplate
 {
@@ -49,7 +49,7 @@ public:
 
 protected:
   virtual void applyChanges(void);
-  void applyChangesGivenSourceId(int index);
+  void applySourceChanges(int index);
   void handleCancel(void) {return;}
   virtual void fillInFormGivenSourceId(int sid);
   virtual void updateAllSourceWidgetStates(void);
@@ -59,34 +59,27 @@ protected:
 
 
 private:
-  /** signals **/
   Wt::Signal<int, std::string> m_operationCompleted;
-
-  /** other members **/
-  Wt::WComboBox m_sourceSelectionField;
-  Wt::WStringListModel m_sourceDataModel;
-  Wt::WLineEdit m_monitorUrlField;
-  Wt::WComboBox m_monitorTypeField;
-  Wt::WLineEdit m_authStringField;
-  Wt::WLineEdit m_livestatusHostField;
-  Wt::WLineEdit m_livestatusPortField;
-  Wt::WCheckBox m_showAuthStringField;
-  Wt::WCheckBox m_dontVerifyCertificateField;
-  Wt::WSpinBox m_updateIntervalField;
-  Wt::WPushButton m_applyChangeBtn;
-  Wt::WPushButton m_addAsSourceBtn;
-  Wt::WPushButton m_deleteSourceBtn;
+  Wt::WComboBox* m_sourceSelectionFieldRef;
+  std::shared_ptr<Wt::WStringListModel> m_sourceDataModel;
+  Wt::WLineEdit* m_monitorUrlFieldRef;
+  Wt::WComboBox* m_monitorTypeFieldRef;
+  Wt::WLineEdit* m_authStringFieldRef;
+  Wt::WLineEdit* m_livestatusHostFieldRef;
+  Wt::WLineEdit* m_livestatusPortFieldRef;
+  Wt::WCheckBox* m_showAuthStringFieldRef;
+  Wt::WCheckBox* m_dontVerifyCertificateFieldRef;
+  Wt::WSpinBox* m_updateIntervalFieldRef;
+  Wt::WPushButton* m_applyBtnRef;
+  Wt::WPushButton* m_addAsNewBtnRef;
+  Wt::WPushButton* m_deleteBtnRef;
+  Wt::WComboBox* m_sourceIndexFieldRef;
   Wt::WDialog m_sourceIndexSelector;
   DbSession* m_dbSession;
 
 
-  void createFormWidgets(void);
-  void bindFormWidgets(void);
-  void unbindFormWidgets(void);
-  void addEvent(void);
   bool validateSourceSettingsFields(void);
-  void renderSourceIndexSelector(void);
-  void handleAddAsSourceOkAction(Wt::WComboBox* sourceIndexSectionField);
+  void handleAddAsSource(Wt::WMouseEvent);
   int getSourceId(int sid);
   int findFormSourceIndex(int sid);
   void updateSourceDataModel(int sid);

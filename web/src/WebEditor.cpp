@@ -28,274 +28,227 @@
 #include "utilsCore.hpp"
 #include "Parser.hpp"
 #include "WebBaseSettings.hpp"
-#include "WebInputSelector.hpp"
+#include "WebInputField.hpp"
 #include "ZbxHelper.hpp"
 #include "K8sHelper.hpp"
+#include <fstream>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <fstream>
-#include <QDebug>
-#include <Wt/WApplication>
-#include <Wt/WPanel>
-#include <Wt/WPointF>
-#include <Wt/WText>
-#include <Wt/WLink>
-#include <Wt/WImage>
-#include <Wt/WTemplate>
-#include <Wt/WPoint>
-#include <regex>
+#include <Wt/WApplication.h>
+#include <Wt/WPanel.h>
+#include <Wt/WPointF.h>
+#include <Wt/WText.h>
+#include <Wt/WLink.h>
+#include <Wt/WImage.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WPoint.h>
 
 
 const QMap<int, std::string> WebEditor::MENU_LABELS = {
-  {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add sub service (Shift + C)")},
-  {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete sub service (Shift + X)")}
+  {WebEditor::MENU_ADD_SUBSERVICE, Q_TR("Add child (Shift+C)")},
+  {WebEditor::MENU_DELETE_SUBSERVICE, Q_TR("Delete node and descendants (Shift+X)")}
 };
 
-WebEditor::WebEditor(void) :
-  m_operationCompleted(this)
+WebEditor::WebEditor(void)
 {
-  configureTreeComponent();
-  enableContextMenus();
-  bindMainPanes();
-  bindFormWidgets();
+  auto mainLayout = std::make_unique<Wt::WHBoxLayout>();
+
+  m_viewSelector.dataTriggered().connect(this, &WebEditor::handleOpenFile);
+  m_nagiosBPISelector.fileUploaded().connect(this, &WebEditor::importNagiosBpi);
+  m_zabbixITViewSelector.itemTriggered().connect(this, &WebEditor::importZabbixITServices);
+  m_configImporter.dataTriggered().connect(this, &WebEditor::importMonitoringConfig);
+
+  auto tree = std::make_unique<WebTree>(&m_cdata);
+  m_treeRef = tree.get();
+  m_treeRef->activateEditionFeatures();
+  m_treeRef->selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
+  m_treeRef->doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
+  m_treeRef->keyPressed().connect(this, &WebEditor::handleKeyPressed);
+  mainLayout->addWidget(std::move(tree));
+
+  m_contextMenus.addItem("images/plus.png", MENU_LABELS[MENU_ADD_SUBSERVICE])->triggered().connect(this, &WebEditor::handleTreeContextMenu);
+  m_contextMenus.addItem("images/minus.png", MENU_LABELS[MENU_DELETE_SUBSERVICE])->triggered().connect(this, &WebEditor::handleTreeContextMenu);
+
+  auto editionPane = std::make_unique<Wt::WTemplate>(Wt::WString::tr("editor-fields-form.tpl"));
+  m_editionPaneRef = editionPane.get();
+  mainLayout->addWidget(std::move(editionPane));
+
+  auto serviceBtn = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/new.png"));
+  serviceBtn->setToolTip(Q_TR("Start a new edition"));
+  serviceBtn->clicked().connect(this, &WebEditor::handleNewViewButton);
+  m_editionPaneRef->bindWidget("new-service-view", std::move(serviceBtn));
+
+  auto openServiceBtn = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/open.png"));
+  openServiceBtn->setToolTip(Q_TR("Open an existing service view for edition"));
+  openServiceBtn->clicked().connect(this, &WebEditor::handleOpenViewButton);
+  m_editionPaneRef->bindWidget("open-service-view", std::move(openServiceBtn));
+
+  auto saveCurrentServiceBtn = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/save.png"));
+  saveCurrentServiceBtn->setToolTip(Q_TR("Save changes"));
+  saveCurrentServiceBtn->clicked().connect(this, &WebEditor::handleSaveViewButton);
+  m_editionPaneRef->bindWidget("save-current-view", std::move(saveCurrentServiceBtn));
+
+  auto importConfigBtn = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/import-monitoring-data.png"));
+  importConfigBtn->setToolTip(Q_TR("Import monitoring data as group-based tree"));
+  importConfigBtn->clicked().connect(this, &WebEditor::handleImportMonitoringConfigButton);
+  m_editionPaneRef->bindWidget("import-native-config", std::move(importConfigBtn));
+
+  auto importZabbixItServices = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/import-zabbix_32x32.png"));
+  importZabbixItServices->setToolTip(Q_TR("Import Zabbix IT services"));
+  importZabbixItServices->clicked().connect(this, &WebEditor::handleImportZabbixItServiceButton);
+  m_editionPaneRef->bindWidget("import-zabbix-it-service", std::move(importZabbixItServices));
+
+  auto importNagiosBpiBtn = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/import-nagios_32x32.png"));
+  importNagiosBpiBtn->setToolTip(Q_TR("Import Nagios BPI"));
+  importNagiosBpiBtn->clicked().connect(this, &WebEditor::handleImportNagiosBpiButton);
+  m_editionPaneRef->bindWidget("import-nabios-bpi", std::move(importNagiosBpiBtn));
+
+  // name field
+  m_nameFieldRef = m_editionPaneRef->bindNew<Wt::WLineEdit>("name-field");
+  m_nameFieldRef->setPlaceholderText(Q_TR("Set service name"));
+  m_nameFieldRef->blurred().connect(this, &WebEditor::handleNodeLabelChanged);
+
+  auto typeItemsLayout = std::make_unique<Wt::WHBoxLayout>();
+
+  auto externalTypeSelectorField = std::make_unique<Wt::WComboBox>();
+  m_externalTypeSelectorFieldRef = externalTypeSelectorField.get();
+  externalTypeSelectorField->setHidden(true);
+  typeItemsLayout->addWidget(std::move(externalTypeSelectorField));
+
+  auto typeField = std::make_unique<Wt::WComboBox>();
+  m_typeFieldRef = typeField.get();
+  typeField->addItem(NodeType::toString(NodeType::BusinessService).toStdString());
+  typeField->addItem(NodeType::toString(NodeType::ITService).toStdString());
+  typeField->addItem(NodeType::toString(NodeType::ExternalService).toStdString());
+  typeField->activated().connect(this, &WebEditor::handleNodeTypeChanged);
+  typeItemsLayout->addWidget(std::move(typeField));
+
+  auto typeItemsContainer = std::make_unique<Wt::WContainerWidget>();
+  typeItemsContainer->setLayout(std::move(typeItemsLayout));
+  m_editionPaneRef->bindWidget("type-field", std::move(typeItemsContainer));
+
+  auto propRuleField = std::make_unique<Wt::WComboBox>();
+  m_propRuleFieldRef = propRuleField.get();
+  propRuleField->addItem(PropRules(PropRules::Unchanged).toString().toStdString());
+  propRuleField->addItem(PropRules(PropRules::Decreased).toString().toStdString());
+  propRuleField->addItem(PropRules(PropRules::Increased).toString().toStdString());
+  m_editionPaneRef->bindWidget("prop-rule-field", std::move(propRuleField));
+
+  // calculation rules field
+  auto calcRuleField = std::make_unique<Wt::WComboBox>();
+  m_calcRuleFieldRef = calcRuleField.get();
+  calcRuleField->addItem(CalcRules(CalcRules::Worst).toString().toStdString());
+  calcRuleField->addItem(CalcRules(CalcRules::Average).toString().toStdString());
+  calcRuleField->addItem(CalcRules(CalcRules::WeightedAverageWithThresholds).toString().toStdString());
+  m_editionPaneRef->bindWidget("calc-rule-field", std::move(calcRuleField));
+
+  // set icon type values
+  auto iconField = std::make_unique<Wt::WComboBox>();
+  m_iconFieldRef = iconField.get();
+  for (const auto& icon: ngrt4n::NodeIcons.keys()) {
+    int index = m_iconFieldRef->count();
+    m_iconFieldRef->addItem(icon.toStdString());
+    m_iconIndexMap[icon] =index;
+    if (icon == ngrt4n::DEFAULT_ICON) {
+      m_iconFieldRef->setCurrentIndex(index);
+    }
+  }
+  m_editionPaneRef->bindWidget("icon-field", std::move(iconField));
+
+  auto descField = std::make_unique<Wt::WLineEdit>();
+  m_descFieldRef = descField.get();
+  m_editionPaneRef->bindWidget("description-field", std::move(descField));
+
+  auto checkSelectorPanel = std::make_unique<Wt::WContainerWidget>();
+  auto checkSelectorLayout = std::make_unique<Wt::WHBoxLayout>();
+
+  m_checkSelectorPanelRef = checkSelectorPanel.get();
+  checkSelectorPanel->setDisabled(true);
+
+  auto checkSourceField = std::make_unique<Wt::WComboBox>();
+  m_checkSourceFieldRef = checkSourceField.get();
+  checkSourceField->activated().connect(this, &WebEditor::handleDataPointSourceChanged);
+  checkSelectorLayout->addWidget(std::move(checkSourceField), 1);
+
+  auto checkGroupField = std::make_unique<Wt::WComboBox>();
+  m_checkGroupFieldRef = checkGroupField.get();
+  checkGroupField->addItem(Q_TR("Set a group for filtering"));
+  checkGroupField->activated().connect(this, &WebEditor::handleDataPointGroupChanged);
+  checkSelectorLayout->addWidget(std::move(checkGroupField), 1);
+
+  auto checkField = std::make_unique<Wt::WLineEdit>();
+  m_checkFieldRef = checkField.get();
+  checkField->setPlaceholderText(Q_TR("Type a monitoring data point"));
+  checkField->blurred().connect(this, &WebEditor::handleDataPointChanged);
+  checkSelectorLayout->addWidget(std::move(checkField), 3);
+
+  Wt::WSuggestionPopup::Options checkSuggestionConfig;
+  checkSuggestionConfig.highlightBeginTag = "<span class=\"highlight\">";
+  checkSuggestionConfig.highlightEndTag = "</span>";
+  checkSuggestionConfig.listSeparator = ',';
+  checkSuggestionConfig.whitespace = " \\n";
+  checkSuggestionConfig.wordSeparators = "-., \":\\n;";
+  checkSuggestionConfig.appendReplacedText = "";
+  auto checkListModel = std::make_unique<Wt::WStringListModel>();
+  m_checkSuggestionModelRef = checkListModel.get();
+  m_checkSuggestionPanel = std::make_unique<Wt::WSuggestionPopup>(Wt::WSuggestionPopup::generateMatcherJS(checkSuggestionConfig), Wt::WSuggestionPopup::generateReplacerJS(checkSuggestionConfig));
+  m_checkSuggestionPanel->forEdit(m_checkFieldRef);
+  m_checkSuggestionPanel.get()->setModel(std::move(checkListModel));
+
+  checkSelectorPanel->setLayout(std::move(checkSelectorLayout));
+  m_editionPaneRef->bindWidget("monitoring-item-field", std::move(checkSelectorPanel));
+
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setSpacing(2);
+  mainLayout->setResizable(0);
+  mainLayout->setResizable(1);
+  setLayout(std::move(mainLayout));
 }
 
-WebEditor::~WebEditor()
-{
-  unbindWidgets();
-}
 
-
-void WebEditor::enableContextMenus() {
-  m_editionContextMenu.addItem("images/plus.png", MENU_LABELS[MENU_ADD_SUBSERVICE])
-      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
-
-  m_editionContextMenu.addItem("images/minus.png", MENU_LABELS[MENU_DELETE_SUBSERVICE])
-      ->triggered().connect(this, &WebEditor::handleTreeContextMenu);
-}
-
-void WebEditor::configureTreeComponent()
-{
-  m_tree.setCdata(&m_cdata);
-  m_tree.activateEditionFeatures();
-
-  m_tree.selectionChanged().connect(this, &WebEditor::handleTreeItemSelectionChanged);
-  m_tree.doubleClicked().connect(this, &WebEditor::showTreeContextMenu);
-  m_tree.keyPressed().connect(this, &WebEditor::handleKeyPressed);
-}
+WebEditor::~WebEditor(){}
 
 
 void  WebEditor::handleOpenViewButton(void)
 {
-  // view name starting with "Source?:" must not be edited. E.g. Kubernetes view
+  // dynamic view starting with "Source?:" must not be edited. E.g. Kubernetes view
   DbViewsT viewList;
   for (auto && view: m_dbSession->listViews()) {
     if (! std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
       viewList.push_back(view);
     }
   }
-  m_openViewDialog.updateContentWithViewList(viewList);
-  m_openViewDialog.show();
+  m_viewSelector.updateContentWithViewList(viewList);
+  m_viewSelector.show();
 }
 
 
 void  WebEditor::handleOpenFile(const std::string& path, const std::string&)
 {
-  WebBaseSettings settings;
-  Parser parser{&m_cdata,
-                Parser::ParsingModeEditor,
-                &settings,
-                m_dbSession};
-
+  Parser parser{&m_cdata, Parser::ParsingModeEditor, m_dbSession};
   auto outParser = parser.parse(path.c_str());
   if (outParser.first != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, outParser.second.toStdString());
     return ;
   }
-
   int rc = parser.processRenderingData();
   if (rc != ngrt4n::RcSuccess) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, parser.lastErrorMsg().toStdString());
     return ;
   }
-
-  rebuiltTree();
+  rebuildTree();
   m_currentFilePath = path;
-}
-
-
-void WebEditor::bindMainPanes(void)
-{
-  setLayout(m_mainLayout = new Wt::WHBoxLayout());
-
-  m_mainLayout->setContentsMargins(0, 0, 0, 0);
-
-  m_mainLayout->addWidget(&m_tree);
-  m_mainLayout->addWidget(&m_fieldEditionPane);
-
-  m_mainLayout->setSpacing(2);
-  m_mainLayout->setResizable(0);
-  m_mainLayout->setResizable(1);
-}
-
-
-void WebEditor::unbindWidgets(void)
-{
-  m_mainLayout->removeWidget(&m_tree);
-  m_mainLayout->removeWidget(&m_fieldEditionPane);
-  m_dataPointItemsLayout->removeWidget(&m_dataPointField);
-  m_dataPointItemsLayout->removeWidget(&m_dataPointSourceField);
-  m_dataPointItemsLayout->removeWidget(&m_dataPointGroupField);
-  m_typeItemsLayout->removeWidget(&m_typeField);
-  m_typeItemsLayout->removeWidget(&m_typeExternalServiceSelectorField);
-  clear();
-}
-
-
-void WebEditor::bindFormWidgets(void)
-{
-  m_fieldEditionPane.setTemplateText(Wt::WString::tr("editor-fields-form.tpl"));
-
-  // new service button
-  m_newServiceViewBtn.setToolTip(Q_TR("Create a new service view"));
-  m_newServiceViewBtn.setImageLink(Wt::WLink("images/built-in/new.png"));
-  m_newServiceViewBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("new-service-view", &m_newServiceViewBtn);
-  // bind signal
-  m_newServiceViewBtn.clicked().connect(this, &WebEditor::handleNewViewButton);
-
-  // open service button
-  m_openServiceViewBtn.setToolTip(Q_TR("Open and edit an existing service view"));
-  m_openServiceViewBtn.setImageLink(Wt::WLink("images/built-in/open.png"));
-  m_openServiceViewBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("open-service-view", &m_openServiceViewBtn);
-  // connect signals
-  m_openServiceViewBtn.clicked().connect(this, &WebEditor::handleOpenViewButton);
-  m_openViewDialog.dataTriggered().connect(this, &WebEditor::handleOpenFile);
-
-  // save service button
-  m_saveCurrentViewBtn.setToolTip(Q_TR("Save changes"));
-  m_saveCurrentViewBtn.setImageLink(Wt::WLink("images/built-in/save.png"));
-  m_saveCurrentViewBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("save-current-view", &m_saveCurrentViewBtn);
-  // connect signals
-  m_saveCurrentViewBtn.clicked().connect(this, &WebEditor::handleSaveViewButton);
-
-  // import native monitoring data button
-  m_importMonitoringConfigBtn.setToolTip(Q_TR("Import of monitoring data as group-based tree"));
-  m_importMonitoringConfigBtn.setImageLink(Wt::WLink("images/built-in/import-monitoring-data.png"));
-  m_importMonitoringConfigBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("import-native-config", &m_importMonitoringConfigBtn);
-  // connect signal
-  m_importMonitoringConfigBtn.clicked().connect(this, &WebEditor::handleImportMonitoringConfigButton);
-  m_importMonitoringConfigDialog.dataTriggered().connect(this, &WebEditor::importMonitoringConfig);
-
-  // import Zabbix IT Services
-  m_importZabbixItServicesBtn.setToolTip(Q_TR("Import Zabbix IT services"));
-  m_importZabbixItServicesBtn.setImageLink(Wt::WLink("images/built-in/import-zabbix_32x32.png"));
-  m_importZabbixItServicesBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("import-zabbix-it-service", &m_importZabbixItServicesBtn);
-  // connect signal
-  m_importZabbixItServicesBtn.clicked().connect(this, &WebEditor::handleImportZabbixItServiceButton);
-  m_importZabbixItServicesDialog.itemTriggered().connect(this, &WebEditor::importZabbixITServices);
-
-
-  // import Nagios BPI button
-  m_importNagiosBpiBtn.setToolTip(Q_TR("Import Nagios BPI"));
-  m_importNagiosBpiBtn.setImageLink(Wt::WLink("images/built-in/import-nagios_32x32.png"));
-  m_importNagiosBpiBtn.setStyleClass("btn");
-  m_fieldEditionPane.bindWidget("import-nabios-bpi", &m_importNagiosBpiBtn);
-  // connect signal
-  m_importNagiosBpiBtn.clicked().connect(this, &WebEditor::handleImportNagiosBpiButton);
-  m_importNagiosBpiDialog.fileUploaded().connect(this, &WebEditor::importNagiosBpi);
-
-  // name field
-  m_fieldEditionPane.bindWidget("name-field", &m_nameField);
-  m_nameField.setPlaceholderText(Q_TR("Set service name"));
-  // bind signal
-  m_nameField.blurred().connect(this, &WebEditor::handleNodeLabelChanged);
-
-
-  // set node type values
-  m_fieldEditionPane.bindWidget("type-field", &m_typeItemsContainer);
-
-  m_typeItemsContainer.setLayout(m_typeItemsLayout = new Wt::WHBoxLayout());
-  m_typeItemsLayout->addWidget(&m_typeField);
-  m_typeItemsLayout->addWidget(&m_typeExternalServiceSelectorField);
-  m_typeExternalServiceSelectorField.setHidden(true);
-
-  m_typeField.addItem(NodeType::toString(NodeType::BusinessService).toStdString());
-  m_typeField.addItem(NodeType::toString(NodeType::ITService).toStdString());
-  m_typeField.addItem(NodeType::toString(NodeType::ExternalService).toStdString());
-  m_typeField.activated().connect(this, &WebEditor::handleNodeTypeChanged);
-
-  // set icon type values
-  for (const auto& icon: ngrt4n::NodeIcons.keys()) {
-    int index = m_iconBox.count();
-    m_iconBox.addItem(icon.toStdString());
-    m_iconIndexMap[icon] =index;
-
-    if (icon == ngrt4n::DEFAULT_ICON) {
-      m_iconBox.setCurrentIndex(index);
-    }
-  }
-
-  // propagation rule field
-  m_fieldEditionPane.bindWidget("prop-rule-field", &m_propRuleBox);
-  m_propRuleBox.addItem(PropRules(PropRules::Unchanged).toString().toStdString());
-  m_propRuleBox.addItem(PropRules(PropRules::Decreased).toString().toStdString());
-  m_propRuleBox.addItem(PropRules(PropRules::Increased).toString().toStdString());
-
-  // calculation rules field
-  m_fieldEditionPane.bindWidget("calc-rule-field", &m_calcRuleBox);
-  m_calcRuleBox.addItem(CalcRules(CalcRules::Worst).toString().toStdString());
-  m_calcRuleBox.addItem(CalcRules(CalcRules::Average).toString().toStdString());
-  m_calcRuleBox.addItem(CalcRules(CalcRules::WeightedAverageWithThresholds).toString().toStdString());
-
-  m_fieldEditionPane.bindWidget("icon-field", &m_iconBox);
-  m_fieldEditionPane.bindWidget("description-field", &m_descField);
-
-  // data point-related field and widgets
-  m_fieldEditionPane.bindWidget("monitoring-item-field", &m_dataPointItemsContainer);
-  m_dataPointItemsContainer.setLayout(m_dataPointItemsLayout = new Wt::WHBoxLayout());
-  m_dataPointItemsLayout->addWidget(&m_dataPointSourceField, 1);
-  m_dataPointItemsLayout->addWidget(&m_dataPointGroupField, 1);
-  m_dataPointItemsLayout->addWidget(&m_dataPointField, 3);
-  m_dataPointItemsContainer.setDisabled(true);
-
-  m_dataPointField.blurred().connect(this, &WebEditor::handleDataPointChanged);
-  m_dataPointSourceField.activated().connect(this, &WebEditor::handleDataPointSourceChanged);
-  m_dataPointGroupField.activated().connect(this, &WebEditor::handleDataPointGroupChanged);
-
-  // options auto completion
-  Wt::WSuggestionPopup::Options dataPointSuggestionOptions;
-  dataPointSuggestionOptions.highlightBeginTag = "<span class=\"highlight\">";
-  dataPointSuggestionOptions.highlightEndTag = "</span>";
-  dataPointSuggestionOptions.listSeparator = ',';
-  dataPointSuggestionOptions.whitespace = " \\n";
-  dataPointSuggestionOptions.wordSeparators = "-., \":\\n;";
-  dataPointSuggestionOptions.appendReplacedText = "";
-
-  m_dataPointListPopup.reset(new Wt::WSuggestionPopup(
-                               Wt::WSuggestionPopup::generateMatcherJS(dataPointSuggestionOptions),
-                               Wt::WSuggestionPopup::generateReplacerJS(dataPointSuggestionOptions)
-                               ));
-  m_dataPointListPopup->forEdit(&m_dataPointField);
-  m_dataPointField.setPlaceholderText(Q_TR("Type a monitoring data point"));
-
-  m_dataPointListModel.reset(new Wt::WStringListModel());
-  m_dataPointListPopup.get()->setModel(static_cast<Wt::WStringListModel*>(m_dataPointListModel.get()));
-
-  m_dataPointGroupField.addItem(Q_TR("Set a group for filtering"));
 }
 
 
 void WebEditor::handleNewViewButton(void)
 {
+  static int unnamedViewIndex = 0;
   NodeT node;
   node.id = ngrt4n::ROOT_ID;
-  node.name = QObject::tr("New service view");
+  node.name = QObject::tr("Unnamed service view - %1").arg(QString::number(unnamedViewIndex++));
   node.type = NodeType::BusinessService;
   node.parents.clear();
   node.sev = ngrt4n::Unknown;
@@ -308,18 +261,18 @@ void WebEditor::handleNewViewButton(void)
   m_cdata.monitor = MonitorT::Any;
   m_cdata.bpnodes.insert(node.id, node);
 
-  rebuiltTree();
+  rebuildTree();
 }
 
 
-void WebEditor::rebuiltTree(void)
+void WebEditor::rebuildTree(void)
 {
-  m_tree.build();
+  m_treeRef->build();
   auto rnode = m_cdata.bpnodes.find(ngrt4n::ROOT_ID);
   if (rnode != m_cdata.bpnodes.end()) {
     fillInEditorFromNodeInfo(*rnode);
-    m_tree.expandNodeById(ngrt4n::ROOT_ID);
-    m_tree.selectNodeById(ngrt4n::ROOT_ID);
+    m_treeRef->expandNodeById(ngrt4n::ROOT_ID);
+    m_treeRef->selectNodeById(ngrt4n::ROOT_ID);
   }
 }
 
@@ -328,20 +281,19 @@ void WebEditor::rebuiltTree(void)
 void WebEditor::handleTreeItemSelectionChanged(void)
 {
   updateNodeDataFromEditor(m_formerSelectedNodeId);
-
-  Wt::WModelIndexSet selectedTreeItems = m_tree.selectedIndexes();
+  Wt::WModelIndexSet selectedTreeItems = m_treeRef->selectedIndexes();
   if (! selectedTreeItems.empty()) {
-    m_selectedTreeItemIndex = *(selectedTreeItems.begin());
+    m_selectedTreeIndex = *(selectedTreeItems.begin());
     fillInEditorFromCurrentSelection();
   } else {
-    m_selectedTreeItemIndex = Wt::WModelIndex();
+    m_selectedTreeIndex = Wt::WModelIndex();
   }
 }
 
 
 void WebEditor::showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent event) {
-  if (m_selectedTreeItemIndex.isValid()) {
-    m_editionContextMenu.popup(event);
+  if (m_selectedTreeIndex.isValid()) {
+    m_contextMenus.popup(event);
   }
 }
 
@@ -349,134 +301,117 @@ void WebEditor::showTreeContextMenu(Wt::WModelIndex, Wt::WMouseEvent event) {
 void WebEditor::handleTreeContextMenu(Wt::WMenuItem* menu)
 {
   std::string triggeredMenu = menu->text().toUTF8();
-
   if (triggeredMenu == MENU_LABELS[ MENU_ADD_SUBSERVICE ]) {
-    addSubServiceFromTreeNodeIndex(m_selectedTreeItemIndex);
+    addChildUnderTreeIndex(m_selectedTreeIndex);
   } else if (triggeredMenu == MENU_LABELS[ MENU_DELETE_SUBSERVICE ] ) {
-    removeServiceByTreeNodeIndex(m_selectedTreeItemIndex);
+    removeNodeByTreeIndex(m_selectedTreeIndex);
   }
 }
 
 
 void WebEditor::handleKeyPressed(const Wt::WKeyEvent& event)
 {
-  if (event.modifiers() != Wt::ShiftModifier) {
+  if (event.modifiers() != Wt::KeyboardModifier::Shift) {
     return;
   }
 
   switch (event.key()) {
-    case Wt::Key_C:
-      addSubServiceFromTreeNodeIndex(m_selectedTreeItemIndex);
-      break;
-    case Wt::Key_X:
-      removeServiceByTreeNodeIndex(m_selectedTreeItemIndex);
-      break;
-    case Wt::Key_S:
-      handleSaveViewButton();
-      break;
-    case Wt::Key_N:
-      handleNewViewButton();
-      break;
-    case Wt::Key_O:
-      handleOpenViewButton();
-      break;
-    case Wt::Key_I:
-      handleImportMonitoringConfigButton();
-      break;
-    case Wt::Key_Z:
-      handleImportZabbixItServiceButton();
-      break;
-    case Wt::Key_G:
-      handleImportNagiosBpiButton();
-      break;
-    default:
-      break;
+  case Wt::Key::C:
+    addChildUnderTreeIndex(m_selectedTreeIndex);
+    break;
+  case Wt::Key::X:
+    removeNodeByTreeIndex(m_selectedTreeIndex);
+    break;
+  case Wt::Key::S:
+    handleSaveViewButton();
+    break;
+  case Wt::Key::N:
+    handleNewViewButton();
+    break;
+  case Wt::Key::O:
+    handleOpenViewButton();
+    break;
+  case Wt::Key::I:
+    handleImportMonitoringConfigButton();
+    break;
+  case Wt::Key::Z:
+    handleImportZabbixItServiceButton();
+    break;
+  case Wt::Key::G:
+    handleImportNagiosBpiButton();
+    break;
+  default:
+    break;
   }
 }
 
 
-void WebEditor::addSubServiceFromTreeNodeIndex(const Wt::WModelIndex& index)
+void WebEditor::addChildUnderTreeIndex(const Wt::WModelIndex& index)
 {
-  static int newNodeIndex = 0;
-
   if (! index.isValid()) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Unsupported action (invalid selection)"));
     return ;
   }
+  m_treeRef->expand(index);
+  QString nodeId = m_treeRef->findNodeIdFromTreeItem(index);
 
-  m_tree.expand(index);
-  QString nodeId = m_tree.findNodeIdFromTreeItem(index);
+  static int newNodeIndex = 0;
+  NodeT child;
+  child.name = QObject::tr("Unnamed service - %1").arg(++newNodeIndex);
+  child.id = ngrt4n::generateId();
+  child.type = NodeType::BusinessService;
+  child.sev_prule = PropRules::Unchanged;
+  child.sev_crule = CalcRules::Worst;
+  child.weight = ngrt4n::WEIGHT_UNIT;
+  child.icon = ngrt4n::DEFAULT_ICON;
+  child.parents = QSet<QString>{ nodeId };
 
-  NodeT childSrv;
-  childSrv.id = ngrt4n::generateId();
-  childSrv.name = QObject::tr("New service %1").arg(++newNodeIndex);
-  childSrv.type = NodeType::BusinessService;
-  childSrv.sev_prule = PropRules::Unchanged;
-  childSrv.sev_crule = CalcRules::Worst;
-  childSrv.weight = ngrt4n::WEIGHT_UNIT;
-  childSrv.icon = ngrt4n::DEFAULT_ICON;
-  childSrv.parents = QSet<QString>{ nodeId };
+  m_cdata.bpnodes.insert(child.id, child);
 
-  m_cdata.bpnodes.insert(childSrv.id, childSrv);
-
-  auto selectedSrvIt = m_cdata.bpnodes.find(nodeId);
-  if (selectedSrvIt == m_cdata.bpnodes.end()) {
+  auto selectedNodeIt = m_cdata.bpnodes.find(nodeId);
+  if (selectedNodeIt == m_cdata.bpnodes.end()) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("No parent node found with id: %1").arg(nodeId).toStdString());
     return;
   }
 
-  if (selectedSrvIt->type != NodeType::BusinessService) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on node type: %1").arg(NodeType::toString(selectedSrvIt->type)).toStdString());
+  if (selectedNodeIt->type != NodeType::BusinessService) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("Action not allowed on node type: %1").arg(NodeType::toString(selectedNodeIt->type)).toStdString());
     return;
   }
 
-  bool bindToParent = true;
-  bool selectItemAfterProcessing = true;
-  m_tree.addTreeItem(childSrv, bindToParent, selectItemAfterProcessing);
+  m_treeRef->newNodeItem(child, nodeId, true);
+  // FIXME: check the construction of parent->child dependency
 }
 
 
-void WebEditor::removeServiceByTreeNodeIndex(const Wt::WModelIndex& index)
+void WebEditor::removeNodeByTreeIndex(const Wt::WModelIndex& index)
 {
   if (! index.isValid()) {
     return ;
   }
 
-  QString nodeId = m_tree.findNodeIdFromTreeItem(index);
+  QString nodeId = m_treeRef->findNodeIdFromTreeItem(index);
   NodeListT::iterator ninfoIt;
   if ( ! ngrt4n::findNode(&m_cdata, nodeId, ninfoIt) ) {
     return ;
   }
 
-  int depth = findNodeDepth(*ninfoIt);
-  auto parentId = *ninfoIt->parents.begin();
-
-  m_formerSelectedNodeId.clear();
-
-  // check it's the root node, and forbid the deletion
-  if (depth == 1 || parentId.isEmpty()) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Operation not allowed on root node"));
+  if (ninfoIt->id == ngrt4n::ROOT_ID) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Operation not allowed on root item"));
     return ;
   }
 
-  // find all the descendant nodes
   auto descendants = findDescendantNodes(nodeId);
-
-  // find descendants from m_cdata
   for (const auto& node: descendants) {
     removeNodeFromCdata(node);
   }
-
-  // remove the node itself from m_cdata
   removeNodeFromCdata(*ninfoIt);
-
-  // reconstruct m_cdata.edges
   bindParentChildEdges();
+  m_formerSelectedNodeId.clear();
 
-  // rebuild the tree
-  m_tree.build();
-  m_tree.expandToDepth(depth > 1 ? depth -1 : 1);
-  //m_tree.selectNodeById(parentId);
-
+  m_treeRef->build();
+  int depth = findNodeDepth(*ninfoIt);
+  m_treeRef->expandToDepth(depth > 1 ? depth - 1 : 1);
 }
 
 
@@ -549,43 +484,40 @@ void WebEditor::bindParentChildEdges(void)
 
 void WebEditor::fillInEditorFromCurrentSelection(void)
 {
-  QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
-  NodeListT::const_iterator node_cit;
-
-  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, node_cit);
+  QString nodeId = m_treeRef->findNodeIdFromTreeItem(m_selectedTreeIndex);
+  NodeListT::const_iterator nodeInfo;
+  bool success = ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, nodeInfo);
   if (! success) {
     return;
   }
-
-  fillInEditorFromNodeInfo(*node_cit);
-
+  fillInEditorFromNodeInfo(*nodeInfo);
   m_formerSelectedNodeId = nodeId;
 }
 
 
 void WebEditor::fillInEditorFromNodeInfo(const NodeT& ninfo)
 {
-  m_nameField.setText(ninfo.name.toStdString());
-  m_descField.setText(ninfo.description.toStdString());
-  m_iconBox.setCurrentIndex(m_iconIndexMap[ninfo.icon]);
-  m_calcRuleBox.setCurrentIndex(ninfo.sev_crule);
-  m_propRuleBox.setCurrentIndex(ninfo.sev_prule);
-  m_typeField.setCurrentIndex(ninfo.type);
-  m_typeField.activated().emit(ninfo.type);
+  m_nameFieldRef->setText(ninfo.name.toStdString());
+  m_descFieldRef->setText(ninfo.description.toStdString());
+  m_iconFieldRef->setCurrentIndex(m_iconIndexMap[ninfo.icon]);
+  m_calcRuleFieldRef->setCurrentIndex(ninfo.sev_crule);
+  m_propRuleFieldRef->setCurrentIndex(ninfo.sev_prule);
+  m_typeFieldRef->setCurrentIndex(ninfo.type);
+  m_typeFieldRef->activated().emit(ninfo.type);
 
   switch (ninfo.type) {
-    case NodeType::ITService:
-      m_dataPointField.setText(ninfo.child_nodes.toStdString());
-      break;
-    case NodeType::ExternalService:
-      m_typeExternalServiceSelectorField.setValueText(ninfo.child_nodes.toStdString());
-      break;
-    default:
-      break;
+  case NodeType::ITService:
+    m_checkFieldRef->setText(ninfo.child_nodes.toStdString());
+    break;
+  case NodeType::ExternalService:
+    m_externalTypeSelectorFieldRef->setValueText(ninfo.child_nodes.toStdString());
+    break;
+  default:
+    break;
   }
 
-  m_typeExternalServiceSelectorField.setHidden(NodeType::ExternalService != ninfo.type);
-  m_dataPointItemsContainer.setDisabled(ninfo.type != NodeType::ITService);
+  m_externalTypeSelectorFieldRef->setHidden(NodeType::ExternalService != ninfo.type);
+  m_checkSelectorPanelRef->setDisabled(ninfo.type != NodeType::ITService);
 }
 
 
@@ -597,119 +529,112 @@ void WebEditor::updateNodeDataFromEditor(const QString& nodeId)
     return ;
   }
 
-  nodeIt->name =  QString::fromStdString(m_nameField.text().toUTF8());
-  nodeIt->description =  QString::fromStdString(m_descField.text().toUTF8());
-  nodeIt->type =  m_typeField.currentIndex();
-  nodeIt->icon = QString::fromStdString(m_iconBox.currentText().toUTF8());
-  nodeIt->sev_crule  = m_calcRuleBox.currentIndex();
-  nodeIt->sev_prule  = m_propRuleBox.currentIndex();
+  nodeIt->name =  QString::fromStdString(m_nameFieldRef->text().toUTF8());
+  nodeIt->description =  QString::fromStdString(m_descFieldRef->text().toUTF8());
+  nodeIt->type =  m_typeFieldRef->currentIndex();
+  nodeIt->icon = QString::fromStdString(m_iconFieldRef->currentText().toUTF8());
+  nodeIt->sev_crule  = m_calcRuleFieldRef->currentIndex();
+  nodeIt->sev_prule  = m_propRuleFieldRef->currentIndex();
 
   switch (nodeIt->type) {
-    case NodeType::ITService:
-      nodeIt->child_nodes = QString::fromStdString( m_dataPointField.text().toUTF8() );
-      break;
-    case NodeType::ExternalService:
-      if (m_typeExternalServiceSelectorField.currentIndex() != 0) {
-        nodeIt->child_nodes = QString::fromStdString( m_typeExternalServiceSelectorField.currentText().toUTF8() );
-      }
-      break;
-    default:
-      break;
+  case NodeType::ITService:
+    nodeIt->child_nodes = QString::fromStdString(m_checkFieldRef->text().toUTF8() );
+    break;
+  case NodeType::ExternalService:
+    if (m_externalTypeSelectorFieldRef->currentIndex() != 0) {
+      nodeIt->child_nodes = QString::fromStdString( m_externalTypeSelectorFieldRef->currentText().toUTF8() );
+    }
+    break;
+  default:
+    break;
   }
 
-
-  m_tree.updateItemLabel(nodeId, nodeIt->name.toStdString());
+  m_treeRef->updateItemLabel(nodeId, nodeIt->name.toStdString());
 }
 
 void WebEditor::refreshDynamicContents(void)
 {
-  m_dataPointSourceField.clear();
-
-  m_dataPointSourceField.addItem(Q_TR("Set a source for autocompletion"));
+  m_checkSourceFieldRef->clear();
+  m_checkSourceFieldRef->addItem(Q_TR("Set a source for autocompletion"));
   auto sources = m_dbSession->listSources(MonitorT::Any);
   for (const auto& sinfo: sources) {
-    m_dataPointSourceField.addItem(sinfo.id.toStdString());
+    m_checkSourceFieldRef->addItem(sinfo.id.toStdString());
   }
-
-  m_typeExternalServiceSelectorField.clear();
-  m_typeExternalServiceSelectorField.addItem(Q_TR("Select an external service"));
+  m_externalTypeSelectorFieldRef->clear();
+  m_externalTypeSelectorFieldRef->addItem(Q_TR("Select an external service"));
   for (auto&& v: m_dbSession->listViews()) {
-    m_typeExternalServiceSelectorField.addItem(v.name);
+    m_externalTypeSelectorFieldRef->addItem(v.name);
   }
 }
 
 
 void WebEditor::handleNodeLabelChanged(void)
 {
-  m_tree.updateItemLabel(m_formerSelectedNodeId, m_nameField.text().toUTF8());
+  m_treeRef->updateItemLabel(m_formerSelectedNodeId, m_nameFieldRef->text().toUTF8());
   updateNodeDataFromEditor(m_formerSelectedNodeId);
 }
 
 void WebEditor::handleDataPointChanged(void)
 {
-  if (m_dataPointField.isEnabled()) {
-    auto dataPoint = m_dataPointField.text().toUTF8();
+  if (m_checkFieldRef->isEnabled()) {
+    auto dataPoint =m_checkFieldRef->text().toUTF8();
     size_t slashIndex = dataPoint.find("/");
-    m_nameField.setText(dataPoint.substr(slashIndex + 1) + "("  + dataPoint.substr(0, slashIndex) + ")");
+    m_nameFieldRef->setText(dataPoint.substr(slashIndex + 1) + "("  + dataPoint.substr(0, slashIndex) + ")");
   }
 }
 
 
 void WebEditor::handleNodeTypeChanged(int index)
 {
-  m_dataPointItemsContainer.setDisabled(index != NodeType::ITService);
-  m_typeExternalServiceSelectorField.setHidden(index != NodeType::ExternalService);
+  m_checkSelectorPanelRef->setDisabled(index != NodeType::ITService);
+  m_externalTypeSelectorFieldRef->setHidden(index != NodeType::ExternalService);
 
-  QString nodeId = m_tree.findNodeIdFromTreeItem(m_selectedTreeItemIndex);
+  QString nodeId = m_treeRef->findNodeIdFromTreeItem(m_selectedTreeIndex);
   NodeListT::ConstIterator ninfoIt;
   if ( ! ngrt4n::findNode(m_cdata.bpnodes, m_cdata.cnodes, nodeId, ninfoIt) ) {
-    CORE_LOG("debug", Q_TR("No service selected"));
+    m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Please select a node first"));
+    return;
+  }
+
+  // get the node info before the iterator to expire
+  NodeT nodeInfo = *ninfoIt;
+  nodeInfo.child_nodes.clear();
+
+  if (index == nodeInfo.type) {
     return ;
   }
 
   if ( QSet<int>{NodeType::ITService, NodeType::ExternalService}.contains(index) ) {
     if ( ! findDescendantNodes(nodeId).empty() ) {
-      m_typeField.setCurrentIndex(ninfoIt->type);
-      m_typeField.activated().emit(ninfoIt->type);
+      m_typeFieldRef->setCurrentIndex(nodeInfo.type);
+      m_typeFieldRef->activated().emit(nodeInfo.type);
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Type not allowed for item with descendants"));
       return ;
     }
   }
 
-  if (index == ninfoIt->type) {
-    return ;
-  }
-
-  // Before anything, backup the node info before any processing that implies to
-  // remove it and thus, invalidate its iterator
-  NodeT ninfoCopy = *ninfoIt;
-  const int oldNodeType = ninfoCopy.type;
-  ninfoCopy.child_nodes.clear();
-
   switch (index) {
-    case NodeType::ITService:
-      if (m_cdata.bpnodes.remove(ninfoCopy.id) > 0) {
-        m_cdata.cnodes.insert(ninfoCopy.id, ninfoCopy);
-      } else {
-        m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in parent list"));
-      }
+  case NodeType::ITService:
+    if (m_cdata.bpnodes.remove(nodeInfo.id) > 0) {
+      m_cdata.cnodes.insert(nodeInfo.id, nodeInfo);
+    } else {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in parent list"));
+    }
+    break;
+  default: // => NodeType::ExternalService or NodeType::BusinessService:
+    if ( QSet<int>{NodeType::ExternalService, NodeType::BusinessService}.contains(nodeInfo.type) ) {
+      m_cdata.bpnodes[nodeId].child_nodes.clear(); // typically for external service child_nodes is not empty
       break;
-    default:
-      //case NodeType::ExternalService:
-      //case NodeType::BusinessService:
-      if ( QSet<int>{NodeType::ExternalService, NodeType::BusinessService}.contains(oldNodeType) ) {
-        m_cdata.bpnodes[nodeId].child_nodes.clear(); // typically for external service child_nodes is not empty
-        break;
-      }
-      if (m_cdata.cnodes.remove(ninfoCopy.id) > 0) {
-        m_cdata.bpnodes.insert(ninfoCopy.id, ninfoCopy);
-      } else {
-        m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in child list"));
-      }
-      break;
+    }
+    if (m_cdata.cnodes.remove(nodeInfo.id) > 0) {
+      m_cdata.bpnodes.insert(nodeInfo.id, nodeInfo);
+    } else {
+      m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Node not found in child list"));
+    }
+    break;
 
   }
-  updateNodeDataFromEditor(ninfoIt->id);
+  updateNodeDataFromEditor(nodeInfo.id);
 }
 
 
@@ -723,7 +648,6 @@ void WebEditor::handleSaveViewButton(void)
   }
 
   updateNodeDataFromEditor(m_formerSelectedNodeId);
-
   ngrt4n::fixupDependencies(m_cdata);
 
   auto outRegisterView = registerViewWithPath(m_cdata, destPath.c_str());
@@ -733,7 +657,6 @@ void WebEditor::handleSaveViewButton(void)
     m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Saved"));
     m_currentFilePath = destPath;
   }
-
 }
 
 
@@ -778,23 +701,23 @@ std::pair<int, QString> WebEditor::registerViewWithPath(const CoreDataT& cdata, 
 void WebEditor::handleImportMonitoringConfigButton(void)
 {
   auto sources = m_dbSession->listSources(MonitorT::Any);
-  m_importMonitoringConfigDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithTextFilter);
-  m_importMonitoringConfigDialog.show();
+  m_configImporter.updateContentWithSourceList(sources.keys(), WebInputField::SourceWithTextFilter);
+  m_configImporter.show();
 }
 
 
 void WebEditor::handleImportZabbixItServiceButton(void)
 {
   auto sources = m_dbSession->listSources(MonitorT::Zabbix);
-  m_importZabbixItServicesDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceOnly);
-  m_importZabbixItServicesDialog.show();
+  m_zabbixITViewSelector.updateContentWithSourceList(sources.keys(), WebInputField::SourceOnly);
+  m_zabbixITViewSelector.show();
 }
 
 void WebEditor::handleImportNagiosBpiButton(void)
 {
   auto sources = m_dbSession->listSources(MonitorT::Nagios);
-  m_importNagiosBpiDialog.updateContentWithSourceList(sources.keys(), InputSelector::SourceWithFileFilter);
-  m_importNagiosBpiDialog.show();
+  m_nagiosBPISelector.updateContentWithSourceList(sources.keys(), WebInputField::SourceWithFileFilter);
+  m_nagiosBPISelector.show();
 }
 
 
@@ -837,7 +760,7 @@ void WebEditor::handleDataPointSourceChanged(int index)
 {
   m_operationCompleted.emit(ngrt4n::OperationInProgress, Q_TR("Discovery of monitoring items in progress..."));
 
-  auto srcId = QString::fromStdString(m_dataPointSourceField.itemText(index).toUTF8());
+  auto srcId = QString::fromStdString(m_checkSourceFieldRef->itemText(index).toUTF8());
   auto findSourceOut = m_dbSession->findSourceById(srcId);
   if (! findSourceOut.first) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Cannot load source info"));
@@ -859,41 +782,40 @@ void WebEditor::handleDataPointSourceChanged(int index)
   const std::string ALL_GROUPS = Q_TR("All groups");
   const std::string NO_GROUP = Q_TR("Unclassified");
 
-  m_dataPointListModel->removeRows(0, m_dataPointListModel->rowCount());
-  m_dataPointGroupField.clear();
+  m_checkSuggestionModelRef->removeRows(0, m_checkSuggestionModelRef->rowCount());
+  m_checkGroupFieldRef->clear();
 
-  m_dataPointGroupField.addItem(ALL_GROUPS);
+  m_checkGroupFieldRef->addItem(ALL_GROUPS);
   for (const auto& check: checks) {
     std::string dataPoint = QString("%1:%2").arg(srcId, check.id.c_str()).toStdString();
     QStringList groups = QString::fromStdString(check.host_groups).split(ngrt4n::CHILD_Q_SEP);
 
     if (groups.isEmpty()) {
       m_dataPointsListByGroup[NO_GROUP.c_str()].push_back(dataPoint);
-      m_dataPointGroupField.addItem(NO_GROUP);
+      m_checkGroupFieldRef->addItem(NO_GROUP);
     } else {
       for (const auto& group: groups) {
         auto gpKey = group.toStdString();
         m_dataPointsListByGroup[gpKey].push_back(dataPoint);
-        if (m_dataPointGroupField.findText(gpKey) < 0) {
-          m_dataPointGroupField.addItem(gpKey);
+        if (m_checkGroupFieldRef->findText(gpKey) < 0) {
+          m_checkGroupFieldRef->addItem(gpKey);
         }
       }
       m_dataPointsListBySource[srcId].push_back(dataPoint);
     }
   }
 
-  m_dataPointListModel->setStringList(m_dataPointsListBySource[srcId]);
-  m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for %1").arg(srcId).toStdString());
+  m_checkSuggestionModelRef->setStringList(m_dataPointsListBySource[srcId]);
+  m_checkFieldRef->setPlaceholderText(QObject::tr("Autocompletion enabled for %1").arg(srcId).toStdString());
   m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Discovery of monitoring items completed"));
 }
 
 
 void WebEditor::handleDataPointGroupChanged(int)
 {
-  std::string group = m_dataPointGroupField.currentText().toUTF8();
-  m_dataPointListModel->setStringList(m_dataPointsListByGroup[group]);
-
-  m_dataPointField.setPlaceholderText(QObject::tr("Autocompletion enabled for '%1' group").arg(group.c_str()).toStdString());
+  std::string group = m_checkGroupFieldRef->currentText().toUTF8();
+  m_checkSuggestionModelRef->setStringList(m_dataPointsListByGroup[group]);
+  m_checkFieldRef->setPlaceholderText(QObject::tr("Autocompletion enabled for '%1' group").arg(group.c_str()).toStdString());
 }
 
 
@@ -925,7 +847,7 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
   QTextStream streamReader(&file);
   NodeT rootSrv;
   rootSrv.id = ngrt4n::ROOT_ID;
-  rootSrv.name = QObject::tr("Nagios BPI Services"); //FIXME added a prefix ?
+  rootSrv.name = QObject::tr("Nagios BPI Services"); //TODO added a prefix ?
   rootSrv.type = NodeType::BusinessService;
   rootSrv.sev = ngrt4n::Unknown;
 
@@ -1187,7 +1109,6 @@ void WebEditor::importZabbixITServices(const std::string& srcId)
   }
 
   CoreDataT cdata;
-
   auto allZbxSources = m_dbSession->listSources(MonitorT::Zabbix);
   auto outLoadItServices = ZbxHelper().loadITServices(allZbxSources[srcId.c_str()], cdata);
   if (outLoadItServices.first != ngrt4n::RcSuccess) {
@@ -1196,7 +1117,6 @@ void WebEditor::importZabbixITServices(const std::string& srcId)
   }
 
   m_currentFilePath.clear();
-
   auto destPath = QString("%1/%2_autoimport.ms.ngrt4n.xml").arg(m_configDir, ngrt4n::generateId());
   auto saveStatus = registerViewWithPath(cdata, destPath);
   if (saveStatus.first != 0) {

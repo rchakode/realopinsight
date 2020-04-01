@@ -63,10 +63,10 @@ std::string ChartBase::defaultTooltipText(void)
     totalText    = "/"+QString::number(m_dataCount);
   }
   QString tooltip =
-      QString("Normal: %1% - %2%9\n"
-              "Minor: %3%  - %4%9\n"
-              "Major: %5%  - %6%9\n"
-              "Critical: %7%  - %8%9\n").arg
+      QString("Normal: %1% (%2%9)\n"
+              "Minor: %3% (%4%9)\n"
+              "Major: %5% (%6%9)\n"
+              "Critical: %7% (%8%9)\n").arg
       (QString::number(m_severityRatio[ngrt4n::Normal],'f',0),
       normalText,
       QString::number(m_severityRatio[ngrt4n::Minor],'f',0),

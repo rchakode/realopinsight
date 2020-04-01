@@ -21,136 +21,112 @@
 # ------------------------------------------------------------------------ #
 */
 
+#include <any>
 #include "dbo/src/DbSession.hpp"
 #include "utilsCore.hpp"
 #include "WebUtils.hpp"
 #include "K8sHelper.hpp"
 #include "WebDataSourceSettings.hpp"
-#include <Wt/WSpinBox>
-#include <Wt/WApplication>
+#include <Wt/WSpinBox.h>
+#include <Wt/WApplication.h>
 
 
 WebDataSourceSettings::WebDataSourceSettings()
   : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("data-source-settings-form.tpl")),
-    m_operationCompleted(this),
     m_dbSession(nullptr)
 {
-  createFormWidgets();
-  bindFormWidgets();
+
+  m_sourceSelectionFieldRef = bindNew<Wt::WComboBox>("source-box");
+  m_sourceSelectionFieldRef->changed().connect(this, &WebDataSourceSettings::handleSourceBoxChanged);
+
+  m_sourceDataModel = std::make_shared<Wt::WStringListModel>();
+  m_sourceSelectionFieldRef->setModel(m_sourceDataModel);
+
+  m_sourceIndexSelector.rejectWhenEscapePressed();
+  m_sourceIndexSelector.setStyleClass("Wt-dialog");
+  m_sourceIndexSelector.titleBar()->setStyleClass("titlebar");
+  m_sourceIndexSelector.setWindowTitle(Q_TR("Select the source index"));
+  m_sourceIndexFieldRef = m_sourceIndexSelector.contents()->addNew<Wt::WComboBox>();
+  for (const auto& src : ngrt4n::DataSourceIndices) { m_sourceIndexFieldRef->addItem(src.toStdString()); }
+
+  auto sourceIndexValidationBtn = std::make_unique<Wt::WPushButton>("OK");
+  sourceIndexValidationBtn->setDefault(true);
+  sourceIndexValidationBtn->clicked().connect(this, &WebDataSourceSettings::handleAddAsSource);
+  m_sourceIndexSelector.footer()->addWidget(std::move(sourceIndexValidationBtn));
+
+  auto sourceIndexCancellationBtn = std::make_unique<Wt::WPushButton>("Cancel");
+  sourceIndexCancellationBtn->clicked().connect(&m_sourceIndexSelector, &Wt::WDialog::reject);
+  m_sourceIndexSelector.footer()->addWidget(std::move(sourceIndexCancellationBtn));
+
+  m_monitorTypeFieldRef = bindNew<Wt::WComboBox>("monitor-type");
+  m_monitorTypeFieldRef->addItem(Q_TR("-- Select a type --"));
+  for (const auto& srcid: ngrt4n::MonitorSourceTypes) { m_monitorTypeFieldRef->addItem(srcid.toStdString()); }
+  m_monitorTypeFieldRef->activated().connect(this, &WebDataSourceSettings::updateComponentsVisibiliy);
+
+  m_monitorUrlFieldRef = bindNew<Wt::WLineEdit>("monitor-url");
+  m_monitorUrlFieldRef->setValidator(std::make_unique<UriValidator>("http", false, this));
+  m_monitorUrlFieldRef->setPlaceholderText("Set the url to the monitor web interface");
+
+  m_livestatusHostFieldRef = bindNew<Wt::WLineEdit>("livestatus-server");
+  m_livestatusHostFieldRef->setPlaceholderText("hostname/IP");
+  m_livestatusHostFieldRef->setValidator(std::make_unique<HostValidator>(this));
+
+  m_livestatusPortFieldRef = bindNew<Wt::WLineEdit>("livestatus-port");
+  m_livestatusPortFieldRef->setWidth(75);
+  m_livestatusPortFieldRef->setValidator(std::make_unique<PortValidator>());
+  m_livestatusPortFieldRef->setPlaceholderText("port");
+  m_livestatusPortFieldRef->setMaxLength(5);
+
+  m_dontVerifyCertificateFieldRef = bindNew<Wt::WCheckBox>("dont-verify-ssl-certificate");
+  m_dontVerifyCertificateFieldRef->setText(Q_TR("Don't verify SSL certificate") );
+
+  m_updateIntervalFieldRef = bindNew<Wt::WSpinBox>("update-interval");
+  m_updateIntervalFieldRef->setMinimum(5);
+  m_updateIntervalFieldRef->setMaximum(1200);
+  m_updateIntervalFieldRef->setValue(BaseSettings::updateInterval());
+
+  m_authStringFieldRef = bindNew<Wt::WLineEdit>("monitor-auth-string");
+  m_authStringFieldRef->setEchoMode(Wt::EchoMode::Password);
+  m_authStringFieldRef->setPlaceholderText( Q_TR("Set the authentication string") );
+
+  m_showAuthStringFieldRef = bindNew<Wt::WCheckBox>("show-in-clear");
+  m_showAuthStringFieldRef->setText( Q_TR("Show in clear") );
+  m_showAuthStringFieldRef->changed().connect(this, &WebDataSourceSettings::handleShowAuthStringChanged);
+
+  m_applyBtnRef = bindNew<Wt::WPushButton>("apply-change-button");
+  m_applyBtnRef->setText(Q_TR("Apply changes"));
+  m_applyBtnRef->setStyleClass("btn btn-success");
+  m_applyBtnRef->clicked().connect(this, &WebDataSourceSettings::applyChanges);
+
+  m_addAsNewBtnRef = bindNew<Wt::WPushButton>("add-as-source-button");
+  m_addAsNewBtnRef->setText(Q_TR("Add as new source"));
+  m_addAsNewBtnRef->setStyleClass("btn btn-info");
+  m_addAsNewBtnRef->clicked().connect(this, &WebDataSourceSettings::addAsSource);
+
+  m_deleteBtnRef = bindNew<Wt::WPushButton>("delete-button");
+  m_deleteBtnRef->setText(Q_TR("Delete source"));
+  m_deleteBtnRef->setStyleClass("btn btn-danger");
+  m_deleteBtnRef->clicked().connect(this, &WebDataSourceSettings::deleteSource);
+
   setEnabledInputs(false);
-  addEvent();
   updateContents();
 }
 
 
-WebDataSourceSettings::~WebDataSourceSettings()
-{
-  unbindFormWidgets();
-}
-
-
-void WebDataSourceSettings::createFormWidgets(void)
-{
-  renderSourceIndexSelector();
-
-  m_monitorTypeField.addItem(Q_TR("-- Select a type --"));
-  for (const auto& srcid: ngrt4n::MonitorSourceTypes) {
-    m_monitorTypeField.addItem(srcid.toStdString());
-  }
-
-  m_monitorUrlField.setValidator(new UriValidator("http", false, this));
-  m_monitorUrlField.setEmptyText("Set the url to the monitor web interface");
-
-  // set livestatus server
-  m_livestatusHostField.setEmptyText("hostname/IP");
-  m_livestatusHostField.setValidator(new HostValidator(this));
-
-  // set livestatus port field
-  m_livestatusPortField.setWidth(75);
-  m_livestatusPortField.setValidator(new PortValidator(this));
-  m_livestatusPortField.setEmptyText("port");
-  m_livestatusPortField.setMaxLength(5);
-
-  // other fields
-  m_dontVerifyCertificateField.setText( Q_TR("Don't verify SSL certificate") );
-
-  // update interval field
-  m_updateIntervalField.setMinimum(5);
-  m_updateIntervalField.setMaximum(1200);
-  m_updateIntervalField.setValue(BaseSettings::updateInterval());
-
-  m_authStringField.setEchoMode(Wt::WLineEdit::Password);
-  m_authStringField.setEmptyText( Q_TR("Set the authentication string") );
-  m_showAuthStringField.setText( Q_TR("Show in clear") );
-
-  // buttons
-  m_applyChangeBtn.setText( Q_TR("Apply changes") );
-  m_addAsSourceBtn.setText( Q_TR("Add as new source") );
-  m_deleteSourceBtn.setText( Q_TR("Delete source") );
-  m_applyChangeBtn.setStyleClass("btn btn-success");
-  m_addAsSourceBtn.setStyleClass("btn btn-info");
-  m_deleteSourceBtn.setStyleClass("btn btn-danger");
-}
-
-
-void WebDataSourceSettings::bindFormWidgets(void)
-{
-  bindWidget("show-in-clear", &m_showAuthStringField);
-  bindWidget("monitor-auth-string", &m_authStringField);
-  bindWidget("monitor-url", &m_monitorUrlField);
-  bindWidget("monitor-type", &m_monitorTypeField);
-  bindWidget("source-box", &m_sourceSelectionField);
-  bindWidget("dont-verify-ssl-certificate", &m_dontVerifyCertificateField);
-  bindWidget("update-interval", &m_updateIntervalField);
-  bindWidget("livestatus-server", &m_livestatusHostField);
-  bindWidget("livestatus-port", &m_livestatusPortField);
-  bindWidget("apply-change-button", &m_applyChangeBtn);
-  bindWidget("add-as-source-button", &m_addAsSourceBtn);
-  bindWidget("delete-button", &m_deleteSourceBtn);
-}
-
-
-void WebDataSourceSettings::unbindFormWidgets(void)
-{
-  takeWidget("show-in-clear");
-  takeWidget("monitor-auth-string");
-  takeWidget("monitor-url");
-  takeWidget("monitor-type");
-  takeWidget("source-box");
-  takeWidget("dont-verify-ssl-certificate");
-  takeWidget("update-interval");
-  takeWidget("livestatus-server");
-  takeWidget("livestatus-port");
-  takeWidget("use-ngrt4nd");
-  takeWidget("apply-change-button");
-  takeWidget("add-as-source-button");
-  takeWidget("delete-button");
-}
-
-
-void WebDataSourceSettings::addEvent(void)
-{
-  m_applyChangeBtn.clicked().connect(this, &WebDataSourceSettings::applyChanges);
-  m_addAsSourceBtn.clicked().connect(this, &WebDataSourceSettings::addAsSource);
-  m_deleteSourceBtn.clicked().connect(this, &WebDataSourceSettings::deleteSource);
-  m_monitorTypeField.activated().connect(this, &WebDataSourceSettings::updateComponentsVisibiliy);
-  m_sourceSelectionField.changed().connect(this, &WebDataSourceSettings::handleSourceBoxChanged);
-  m_showAuthStringField.changed().connect(this, &WebDataSourceSettings::handleShowAuthStringChanged);
-}
-
+WebDataSourceSettings::~WebDataSourceSettings(){}
 
 
 bool WebDataSourceSettings::validateSourceSettingsFields(void)
 {
-  bool monitorTypeIsSet = ngrt4n::MonitorSourceTypes.contains( QString::fromStdString(m_monitorTypeField.currentText().toUTF8()));
+  bool monitorTypeIsSet = ngrt4n::MonitorSourceTypes.contains( QString::fromStdString(m_monitorTypeFieldRef->currentText().toUTF8()));
   if (! monitorTypeIsSet ) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("No monitor type selected"));
     return false;
   }
 
-  SourceT sinfo = extractSourceSettingsGivenIndex( m_sourceSelectionField.currentIndex() );
-  bool isValidMonitorUrl = (m_monitorUrlField.validate() == Wt::WValidator::Valid || sinfo.mon_type == MonitorT::Nagios);
+  SourceT sinfo = extractSourceSettingsGivenIndex( m_sourceSelectionFieldRef->currentIndex() );
+  bool isValidMonitorUrl = (m_monitorUrlFieldRef->validate() == Wt::ValidationState::Valid || sinfo.mon_type == MonitorT::Nagios);
   if (! isValidMonitorUrl) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Please fix field(s) in red"));
     return false;
@@ -162,11 +138,11 @@ bool WebDataSourceSettings::validateSourceSettingsFields(void)
 
 void WebDataSourceSettings::applyChanges(void)
 {
-  setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalField.text().toUTF8().c_str());
-  applyChangesGivenSourceId(m_sourceSelectionField.currentIndex());
+  SettingFactory().setKeyValue(SettingFactory::GLOBAL_UPDATE_INTERVAL_KEY, m_updateIntervalFieldRef->text().toUTF8().c_str());
+  applySourceChanges(m_sourceSelectionFieldRef->currentIndex());
 }
 
-void WebDataSourceSettings::applyChangesGivenSourceId(int index)
+void WebDataSourceSettings::applySourceChanges(int index)
 {
   if (! validateSourceSettingsFields()) {
     return ;
@@ -206,8 +182,7 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
 
   saveSourceInDatabase(sinfo);
 
-  WebBaseSettings settings;
-  DbSession dbSession(settings.getDbType(), settings.getDbConnectionString());
+  DbSession dbSession;
   for (const QString& mgroup: monitoredGroups.keys()) {
     NodeT gNode;
     gNode.type = NodeType::K8sClusterService;
@@ -223,12 +198,10 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
     CoreDataT cdata;
     cdata.monitor = sinfo.mon_type;
     cdata.bpnodes.insert(gNode.id, gNode);
-
-    auto destPath = QString("%1/mgroup_%2_%3.ms.ngrt4n.xml").arg(qgetenv("REALOPINSIGHT_CONFIG_DIR"),
+    auto destPath = QString("%1/mgroup_%2_%3.roi.xml").arg(SettingFactory::coreDataDir(),
                                                                  QString(mgroup).replace(" ", "_").replace("/", "_").replace("\\", "_"),
                                                                  ngrt4n::generateId());
     std::pair<int, QString> outSaveView = ngrt4n::saveViewDataToPath(cdata, destPath);
-
     if (outSaveView.first != ngrt4n::RcSuccess) {
       CORE_LOG("error", outSaveView.second.toStdString());
     } else {
@@ -244,8 +217,8 @@ void WebDataSourceSettings::applyChangesGivenSourceId(int index)
   }
 
   updateSourceDataModel(index);
-  m_sourceSelectionField.setCurrentIndex(findFormSourceIndex(index));
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Settings saved"));
+  m_sourceSelectionFieldRef->setCurrentIndex(findFormSourceIndex(index));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings udpated"));
 }
 
 
@@ -254,8 +227,7 @@ void WebDataSourceSettings::addAsSource(void)
   if (! validateSourceSettingsFields()) {
     return;
   }
-
-  m_sourceIndexSelector.show(); // accept action from this form triggers the method handleAddAsSourceOkAction
+  m_sourceIndexSelector.show();
 }
 
 
@@ -267,7 +239,7 @@ void WebDataSourceSettings::deleteSource(void)
     return;
   }
 
-  auto currentIndex = m_sourceSelectionField.currentIndex();
+  auto currentIndex = m_sourceSelectionFieldRef->currentIndex();
   if ( ! ngrt4n::DataSourceIndices.contains(QString::number(currentIndex)) ) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("cannot delete source (no valid source id)"));
     return;
@@ -279,7 +251,7 @@ void WebDataSourceSettings::deleteSource(void)
     return ;
   }
 
-  m_sourceDataModel.removeRow(currentIndex);
+  m_sourceDataModel->removeRow(currentIndex);
   updateFields();
 }
 
@@ -298,20 +270,20 @@ void WebDataSourceSettings::updateAllSourceWidgetStates(void)
     activeSourceIndices.push_back(QString(src.id.at(src.id.size() - 1)).toInt());
   }
 
-  m_sourceDataModel.setStringList( activeSourceLabels );
+  m_sourceDataModel->setStringList( activeSourceLabels );
   for (size_t i = 0; i < activeSourceLabels.size(); ++i) {
-    m_sourceDataModel.setData(static_cast<int>(i), 0, activeSourceIndices[i], Wt::UserRole);
+    m_sourceDataModel->setData(static_cast<int>(i), 0, activeSourceIndices[i], Wt::ItemDataRole::User);
   }
 
-  m_sourceDataModel.sort(0);
+  m_sourceDataModel->sort(0);
 }
 
 
 void WebDataSourceSettings::updateFields(void)
 {
-  int curIndex = m_sourceSelectionField.currentIndex();
+  int curIndex = m_sourceSelectionFieldRef->currentIndex();
   if ( ngrt4n::DataSourceIndices.contains(QString::number(curIndex)) ) {
-    m_sourceSelectionField.setCurrentIndex(curIndex);
+    m_sourceSelectionFieldRef->setCurrentIndex(curIndex);
     fillInFormGivenSourceId(curIndex);
   }
 }
@@ -323,13 +295,13 @@ void WebDataSourceSettings::saveSourceInDatabase(const SourceT& sinfo)
     return;
   }
 
-  auto addSourceOut = m_dbSession->addSource(sinfo);
-  if (addSourceOut.first == ngrt4n::RcDbDuplicationError) {
-    addSourceOut = m_dbSession->updateSource(sinfo);
+  auto dbResp = m_dbSession->addSource(sinfo);
+  if (dbResp.first == ngrt4n::RcDbDuplicationError) {
+    dbResp = m_dbSession->updateSource(sinfo);
   }
 
-  if (addSourceOut.first != ngrt4n::RcSuccess) {
-    m_operationCompleted.emit(ngrt4n::OperationFailed, addSourceOut.second.toStdString());
+  if (dbResp.first != ngrt4n::RcSuccess) {
+    m_operationCompleted.emit(ngrt4n::OperationFailed, dbResp.second.toStdString());
     return;
   }
 
@@ -347,75 +319,46 @@ void WebDataSourceSettings::fillInFormGivenSourceId(int sid)
     return;
   }
 
-  auto findSourceOut = m_dbSession->findSourceById(ngrt4n::sourceId(sid));
-  if (! findSourceOut.first) {
+  auto sourceLoaded = m_dbSession->findSourceById(ngrt4n::sourceId(sid));
+  if (! sourceLoaded.first) {
     return ;
   }
 
-  m_sourceSelectionField.setValueText(ngrt4n::sourceId(sid).toStdString());
-  m_monitorUrlField.setText(findSourceOut.second.mon_url.toStdString());
-  m_livestatusHostField.setText(findSourceOut.second.ls_addr.toStdString());
-  m_livestatusPortField.setText(QString::number(findSourceOut.second.ls_port).toStdString());
-  m_authStringField.setText(findSourceOut.second.auth.toStdString());
-  m_monitorTypeField.setCurrentIndex( m_monitorTypeField.findText( MonitorT::toString(findSourceOut.second.mon_type).toStdString() ) );
-  m_dontVerifyCertificateField.setCheckState(findSourceOut.second.verify_ssl_peer? Wt::Checked : Wt::Unchecked);
-  m_updateIntervalField.setValue(updateInterval());
+  m_sourceSelectionFieldRef->setValueText(ngrt4n::sourceId(sid).toStdString());
+  m_monitorUrlFieldRef->setText(sourceLoaded.second.mon_url.toStdString());
+  m_livestatusHostFieldRef->setText(sourceLoaded.second.ls_addr.toStdString());
+  m_livestatusPortFieldRef->setText(QString::number(sourceLoaded.second.ls_port).toStdString());
+  m_authStringFieldRef->setText(sourceLoaded.second.auth.toStdString());
+  m_monitorTypeFieldRef->setCurrentIndex( m_monitorTypeFieldRef->findText( MonitorT::toString(sourceLoaded.second.mon_type).toStdString() ) );
+  m_dontVerifyCertificateFieldRef->setCheckState(sourceLoaded.second.verify_ssl_peer? Wt::CheckState::Unchecked : Wt::CheckState::Checked);
+  m_updateIntervalFieldRef->setValue(updateInterval());
 
-  updateComponentsVisibiliy(m_monitorTypeField.currentIndex());
+  updateComponentsVisibiliy(m_monitorTypeFieldRef->currentIndex());
 
-  m_sourceSelectionField.setCurrentIndex(sid);
+  m_sourceSelectionFieldRef->setCurrentIndex(sid);
 }
 
-
-void WebDataSourceSettings::renderSourceIndexSelector(void)
-{
-  m_sourceSelectionField.setModel(&m_sourceDataModel);
-  m_sourceIndexSelector.rejectWhenEscapePressed();
-
-  m_sourceIndexSelector.setStyleClass("Wt-dialog");
-  m_sourceIndexSelector.titleBar()->setStyleClass("titlebar");
-  m_sourceIndexSelector.setWindowTitle(Q_TR("Select the source index"));
-
-  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the object
-  Wt::WComboBox* sourceIndexField = new Wt::WComboBox(m_sourceIndexSelector.contents());
-  for (const auto& src : ngrt4n::DataSourceIndices) {
-    sourceIndexField->addItem(src.toStdString());
-  }
-
-  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the oject
-  Wt::WPushButton *sourceIndexValidationBtn = new Wt::WPushButton("OK", m_sourceIndexSelector.footer());
-  sourceIndexValidationBtn->clicked().connect(std::bind(&WebDataSourceSettings::handleAddAsSourceOkAction, this, sourceIndexField));
-  sourceIndexValidationBtn->setDefault(true);
-
-  // m_sourceIndexSelector.contents() take ownership on the pointer and will free up the oject
-  Wt::WPushButton *sourceIndexCancellationBtn = new Wt::WPushButton("Cancel", m_sourceIndexSelector.footer());
-  sourceIndexCancellationBtn->clicked().connect(&m_sourceIndexSelector, &Wt::WDialog::reject);
-}
-
-
-
-void WebDataSourceSettings::handleAddAsSourceOkAction(Wt::WComboBox* sourceIndexSectionField)
+void WebDataSourceSettings::handleAddAsSource(Wt::WMouseEvent)
 {
   m_sourceIndexSelector.accept();
   bool isValidIndex;
-  int index = QString::fromStdString( sourceIndexSectionField->currentText().toUTF8() ).toInt(&isValidIndex);
+  int index = QString::fromStdString( m_sourceIndexFieldRef->currentText().toUTF8() ).toInt(&isValidIndex);
   if (isValidIndex) {
-    applyChangesGivenSourceId(index);
+    applySourceChanges(index);
   }
 }
-
 
 
 int WebDataSourceSettings::getSourceId(int sid)
 {
-  boost::any value = static_cast<Wt::WAbstractItemModel*>(&m_sourceDataModel)->data(sid, 0, Wt::UserRole);
-  return boost::any_cast<int>(value);
+  Wt::cpp17::any value = static_cast<Wt::WAbstractItemModel*>(m_sourceDataModel.get())->data(sid, 0, Wt::ItemDataRole::User);
+  return Wt::cpp17::any_cast<int>(value);
 }
 
 
 int WebDataSourceSettings::findFormSourceIndex(int sourceGlobalIndex)
 {
-  int index = m_sourceDataModel.rowCount() - 1;
+  int index = m_sourceDataModel->rowCount() - 1;
   while (index >= 0 && (getSourceId(index) != sourceGlobalIndex)) --index;
   return index;
 }
@@ -425,64 +368,64 @@ void WebDataSourceSettings::updateSourceDataModel(int sid)
 {
   int index = findFormSourceIndex(sid);
   if (index < 0) {
-    m_sourceDataModel.addString(ngrt4n::sourceId(sid).toStdString());
-    m_sourceDataModel.setData(m_sourceDataModel.rowCount() - 1, 0, sid, Wt::UserRole);
+    m_sourceDataModel->addString(ngrt4n::sourceId(sid).toStdString());
+    m_sourceDataModel->setData(m_sourceDataModel->rowCount() - 1, 0, sid, Wt::ItemDataRole::User);
   }
-  m_sourceDataModel.sort(0);
+  m_sourceDataModel->sort(0);
 }
 
 
 void WebDataSourceSettings::setEnabledInputs(bool enable)
 {
-  m_monitorUrlField.setEnabled(enable);
-  m_authStringField.setEnabled(enable);
-  m_livestatusHostField.setEnabled(enable);
-  m_livestatusPortField.setEnabled(enable);
-  m_monitorTypeField.setEnabled(enable);
-  m_showAuthStringField.setEnabled(enable);
-  m_dontVerifyCertificateField.setEnabled(enable);
-  m_updateIntervalField.setEnabled(enable);
-  m_applyChangeBtn.setEnabled(enable);
-  m_addAsSourceBtn.setEnabled(enable);
-  m_deleteSourceBtn.setEnabled(enable);
+  m_monitorUrlFieldRef->setEnabled(enable);
+  m_authStringFieldRef->setEnabled(enable);
+  m_livestatusHostFieldRef->setEnabled(enable);
+  m_livestatusPortFieldRef->setEnabled(enable);
+  m_monitorTypeFieldRef->setEnabled(enable);
+  m_showAuthStringFieldRef->setEnabled(enable);
+  m_dontVerifyCertificateFieldRef->setEnabled(enable);
+  m_updateIntervalFieldRef->setEnabled(enable);
+  m_applyBtnRef->setEnabled(enable);
+  m_addAsNewBtnRef->setEnabled(enable);
+  m_deleteBtnRef->setEnabled(enable);
 }
 
 
 
 void WebDataSourceSettings::handleSourceBoxChanged(void)
 {
-  fillInFormGivenSourceId(getSourceId(m_sourceSelectionField.currentIndex()));
+  fillInFormGivenSourceId(getSourceId(m_sourceSelectionFieldRef->currentIndex()));
 }
 
 
 void WebDataSourceSettings::updateComponentsVisibiliy(int monitorTypeCurrentIndex)
 {
-  const auto monitorType = QString::fromStdString(m_monitorTypeField.itemText(monitorTypeCurrentIndex).toUTF8());
+  const auto monitorType = QString::fromStdString(m_monitorTypeFieldRef->itemText(monitorTypeCurrentIndex).toUTF8());
 
   const auto NagiosSourceSelected = monitorType.contains("Nagios");
   if (NagiosSourceSelected) {
-    m_livestatusHostField.setFocus();
+    m_livestatusHostFieldRef->setFocus();
     wApp->doJavaScript("$('#livetstatus-settings').show();");
     wApp->doJavaScript("$('#source-api-settings').hide();");
   } else {
-    m_monitorUrlField.setFocus();
-    m_showAuthStringField.setCheckState(Wt::Unchecked);
+    m_monitorUrlFieldRef->setFocus();
+    m_showAuthStringFieldRef->setCheckState(Wt::CheckState::Unchecked);
     handleShowAuthStringChanged();
     wApp->doJavaScript("$('#livetstatus-settings').hide();");
     wApp->doJavaScript("$('#source-api-settings').show();");
   }
 
   const auto K8sSourceSelected = ! monitorType.contains("Kubernetes");
-  m_authStringField.setEnabled(K8sSourceSelected);
+  m_authStringFieldRef->setEnabled(K8sSourceSelected);
 }
 
 
 void WebDataSourceSettings::handleShowAuthStringChanged(void)
 {
-  if (m_showAuthStringField.isChecked()) {
-    m_authStringField.setEchoMode(Wt::WLineEdit::Normal);
+  if (m_showAuthStringFieldRef->isChecked()) {
+    m_authStringFieldRef->setEchoMode(Wt::EchoMode::Normal);
   } else {
-    m_authStringField.setEchoMode(Wt::WLineEdit::Password);
+    m_authStringFieldRef->setEchoMode(Wt::EchoMode::Password);
   }
 }
 
@@ -491,17 +434,11 @@ SourceT WebDataSourceSettings::extractSourceSettingsGivenIndex(int sourceIndex)
 {
   SourceT sinfo;
 
-  auto sourceName = QString( m_monitorTypeField.currentText().toUTF8().c_str() );
+  auto sourceName = QString( m_monitorTypeFieldRef->currentText().toUTF8().c_str() );
   if (sourceName.contains("Nagios")) {
     sinfo.mon_type = MonitorT::Nagios;
   } else if (sourceName.contains("Zabbix")) {
     sinfo.mon_type = MonitorT::Zabbix;
-  } else if (sourceName.contains("Zenoss")) {
-    sinfo.mon_type = MonitorT::Zenoss;
-  } else if (sourceName.contains("OpManager")) {
-    sinfo.mon_type = MonitorT::OpManager;
-  } else if (sourceName.contains("Pandora FMS")) {
-    sinfo.mon_type = MonitorT::Pandora;
   } else if (sourceName.contains("Kubernetes")) {
     sinfo.mon_type = MonitorT::Kubernetes;
   } else {
@@ -509,14 +446,14 @@ SourceT WebDataSourceSettings::extractSourceSettingsGivenIndex(int sourceIndex)
   }
 
   sinfo.id = ngrt4n::sourceId(sourceIndex);
-  sinfo.auth = QString( m_authStringField.text().toUTF8().c_str() );
+  sinfo.auth = QString( m_authStringFieldRef->text().toUTF8().c_str() );
 
   if (sinfo.mon_type == MonitorT::Nagios) {
-    sinfo.ls_addr = m_livestatusHostField.text().toUTF8().c_str();
-    sinfo.ls_port = QString( m_livestatusPortField.text().toUTF8().c_str() ).toInt();
+    sinfo.ls_addr = m_livestatusHostFieldRef->text().toUTF8().c_str();
+    sinfo.ls_port = QString( m_livestatusPortFieldRef->text().toUTF8().c_str() ).toInt();
   } else {
-    sinfo.mon_url = m_monitorUrlField.text().toUTF8().c_str();
-    sinfo.verify_ssl_peer = (m_dontVerifyCertificateField.checkState() == Wt::Checked);
+    sinfo.mon_url = m_monitorUrlFieldRef->text().toUTF8().c_str();
+    sinfo.verify_ssl_peer = (m_dontVerifyCertificateFieldRef->checkState() != Wt::CheckState::Checked);
   }
 
   return sinfo;

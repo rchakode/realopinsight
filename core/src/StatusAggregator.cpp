@@ -57,16 +57,17 @@ void StatusAggregator::addSeverity(int value, double weight)
 void StatusAggregator::addThresholdLimit(QVector<ThresholdT>& thresholdsLimits, const ThresholdT& th)
 {
   thresholdsLimits.push_back(th);
-  qSort(thresholdsLimits.begin(), thresholdsLimits.end(), ThresholdLessthanFnt());
+  std::sort(thresholdsLimits.begin(), thresholdsLimits.end(), ThresholdLessthanFnt());
 }
 
 
 void StatusAggregator::updateThresholds(void)
 {
-  if (m_nonEssentialTotalWeight > 0)
+  if (m_nonEssentialTotalWeight > 0) {
     for (int sev : m_severityWeightsMap.keys()) m_statusRatios[sev] = m_severityWeightsMap[sev] / m_nonEssentialTotalWeight;
-  else
+  } else {
     for (int sev : m_severityWeightsMap.keys()) m_statusRatios[sev] = DBL_MAX;
+  }
 }
 
 QString StatusAggregator::toDetailsString(void)

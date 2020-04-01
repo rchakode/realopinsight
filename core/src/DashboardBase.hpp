@@ -27,9 +27,7 @@
 
 #include "Base.hpp"
 #include "Parser.hpp"
-#include "BaseSettings.hpp"
 #include "ZbxHelper.hpp"
-#include "ZnsHelper.hpp"
 #include "dbo/src/DbSession.hpp"
 #include <QString>
 
@@ -46,11 +44,21 @@ public:
 
   static StringMapT propRules();
   static StringMapT calcRules();
-  void setSelectedNode(const QString& nodeid) {m_selectedNode = nodeid;}
-  QString selectedNode(void) const {return m_selectedNode;}
-  void setTimerId(qint32 id) {m_timerId = id;}
-  qint32 timerId(void) const {return m_timerId;}
-  qint32 timerInterval(void) const {return m_interval;}
+  void setSelectedNode(const QString& nodeid) {
+    m_selectedNode = nodeid;
+  }
+  QString selectedNode(void) const {
+    return m_selectedNode;
+  }
+  void setTimerId(qint32 id) {
+    m_timerId = id;
+  }
+  qint32 timerId(void) const {
+    return m_timerId;
+  }
+  qint32 timerInterval(void) const {
+    return m_interval;
+  }
   NodeT rootNode(void);
   int extractStatsData(CheckStatusCountT& statsData);
   void setDbSession(DbSession* dbSession) {m_dbSession = dbSession;}
@@ -63,7 +71,7 @@ public Q_SLOTS:
   void runDynamicViewByGroupUpdate(const SourceT& srcInfo);
   void resetStatData(void);
   ngrt4n::AggregatedSeverityT computeBpNodeStatus(const QString& _node, DbSession* p_dbSession);
-  virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& viewFile);
+  virtual std::pair<int, QString> initialize(const QString& vfile);
   qint32 userRole(void) const {return m_userRole;}
   SourceListT sources(void) {return m_sources;}
   void setShowOnlyProblemMsgsState(bool state) {m_showOnlyProblemMsgsState = state;}
@@ -80,9 +88,7 @@ protected:
   void updateNodeStatusInfo(NodeT& _node, const SourceT& src);
   int extractSourceIndex(const QString& sid) {return sid.at(6).digitValue();}
   virtual void updateDashboard(const NodeT& _node);
-  virtual void buildMap(void) = 0;
   virtual void updateMap(const NodeT& _node, const QString& _tip) = 0;
-  virtual void buildTree(void) = 0;
   virtual void updateTree(const NodeT& _node, const QString& _tip) = 0;
   virtual void updateMsgConsole(const NodeT& _node) = 0;
   virtual void finalizeUpdate(const SourceT& src);

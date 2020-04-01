@@ -24,24 +24,27 @@
 
 #ifndef WEBEVENTCONSOLE_HPP
 #define WEBEVENTCONSOLE_HPP
-#include <Wt/WTableView>
-#include <Wt/WStandardItemModel>
-#include <Wt/WStandardItem>
-#include <Wt/WSortFilterProxyModel>
-#include <boost/any.hpp>
 #include "Base.hpp"
+#include <boost/any.hpp>
+#include <Wt/WTableView.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WStandardItem.h>
+#include <Wt/WSortFilterProxyModel.h>
 
 class SortingProxyModel : public Wt::WSortFilterProxyModel {
 public:
-  SortingProxyModel(Wt::WObject* _parent=0)
-    : Wt::WSortFilterProxyModel(_parent) { }
+  SortingProxyModel()
+    : Wt::WSortFilterProxyModel() { }
   virtual ~SortingProxyModel() {}
 
 protected:
   virtual bool lessThan( const Wt::WModelIndex&lhs, const Wt::WModelIndex& rhs) const {
-    if(lhs.data(Wt::UserRole).empty() || rhs.data(Wt::UserRole).empty())
+    if (lhs.data(Wt::ItemDataRole::User).empty() || rhs.data(Wt::ItemDataRole::User).empty()) {
       return lhs < rhs;
-    return atol(boost::any_cast<std::string>(lhs.data(Wt::UserRole)).c_str())< atol(boost::any_cast<std::string>(rhs.data(Wt::UserRole)).c_str());
+    }
+    auto v1 = atol(Wt::cpp17::any_cast<std::string>(lhs.data(Wt::ItemDataRole::User)).c_str());
+    auto v2 = atol(Wt::cpp17::any_cast<std::string>(rhs.data(Wt::ItemDataRole::User)).c_str());
+    return v1 < v2;
   }
 };
 
@@ -50,24 +53,23 @@ class WebMsgConsole : public Wt::WTableView
 public:
   WebMsgConsole();
   virtual ~WebMsgConsole();
-  void clearAll(void) {m_model->clear(); setModelHeaders();}
+  void clearAll(void);
 
 
-  Wt::WStandardItemModel* getRenderingModel(void) const {return m_model;}
+  Wt::WStandardItemModel* getRenderingModel(void) const {return m_modelRef;}
   void updateNodeMsg(const NodeT& _node);
-  Wt::WStandardItem* createItem(const Wt::WString& text, int row);
-  Wt::WStandardItem* createDateTimeItem(const std::string& _lastcheck, int row);
+  std::unique_ptr<Wt::WStandardItem> createItem(const Wt::WString& text, int row);
+  std::unique_ptr<Wt::WStandardItem> createDateItem(const std::string& _lastcheck, int row);
 
 
 protected:
   void layoutSizeChanged (int width, int height);
+  void setModelHeaders();
 
 private:
-  Wt::WStandardItemModel* m_model;
+  Wt::WStandardItemModel* m_modelRef;
 
   int findServiceRow(const std::string& _id);
-  void setModel(void);
-  void setModelHeaders(void);
 };
 
 #endif /* WEBEVENTCONSOLE_HPP */

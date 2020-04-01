@@ -24,21 +24,23 @@
 #include "K8sHelper.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
+#include <fstream>
+#include <string>
+#include <utility>
+#include <boost/asio.hpp>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <utility>
 
 K8sHelper::K8sHelper(const QString& apiUrl, bool verifySslPeer)
-  : m_apiUrl(apiUrl),
-    m_verifySslPeer(verifySslPeer)
+  : m_verifySslPeer(verifySslPeer)
 {
-  if (m_apiUrl.endsWith("/")) {
-    m_apiUrl.append("api/v1");
+  m_hostname = QString::fromStdString(boost::asio::ip::host_name());
+  if (apiUrl.endsWith("/")) {
+    m_apiURL.setUrl(apiUrl + "api/v1");
   } else {
-    m_apiUrl.append("/api/v1");
+    m_apiURL.setUrl(apiUrl + "/api/v1");
   }
-
 }
 
 
@@ -101,13 +103,20 @@ std::pair<QString, int> K8sHelper::loadNamespaceView(const QString& in_namespace
 std::pair<QStringList, int> K8sHelper::listNamespaces(void)
 {
   //prepare http request
-  QNetworkRequest networkRequest;
-  networkRequest.setRawHeader("Accept", "application/json");
+  QNetworkRequest req;
+  req.setUrl(QUrl(QString("%1/namespaces").arg(m_apiURL.url())));
+  req.setRawHeader("Accept", "application/json");
 
-  networkRequest.setUrl( QUrl(QString("%1/namespaces").arg(m_apiUrl)) );
+  if (m_apiURL.host() != "127.0.0.1" && m_apiURL.host() != "localhost") {
+    req.setRawHeader("Host", m_hostname.toUtf8());
+    auto authString = getAuthString();
+    if (! authString.isEmpty()) {
+      req.setRawHeader("Authorization", authString.toUtf8());
+    }
+  }
 
   // make request and conncet to the processing handlers
-  QNetworkReply* reply = QNetworkAccessManager::get(networkRequest);
+  QNetworkReply* reply = QNetworkAccessManager::get(req);
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
 
@@ -134,13 +143,20 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(void)
 std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const QString& in_namespace, const QString& in_itemType)
 {
   //prepare http request
-  QNetworkRequest networkRequest;
-  networkRequest.setRawHeader("Accept", "application/json");
+  QNetworkRequest req;
+  req.setUrl( QUrl(QString("%1/namespaces/%2/%3").arg(m_apiURL.url(), in_namespace, in_itemType)));
+  req.setRawHeader("Accept", "application/json");
 
-  networkRequest.setUrl( QUrl(QString("%1/namespaces/%2/%3").arg(m_apiUrl, in_namespace, in_itemType)));
+  if (m_apiURL.host() != "127.0.0.1" && m_apiURL.host() != "localhost") {
+    req.setRawHeader("Host", m_hostname.toUtf8());
+    auto authString = getAuthString();
+    if (! authString.isEmpty()) {
+      req.setRawHeader("Authorization", authString.toUtf8());
+    }
+  }
 
   // make request and conncet to the processing handlers
-  QNetworkReply* reply = QNetworkAccessManager::get(networkRequest);
+  QNetworkReply* reply = QNetworkAccessManager::get(req);
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
 
@@ -306,49 +322,49 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
 
 
     switch (StatusPhase) {
-      // handle Failed and CrashLoopBackoff pods as IT services
-      case ngrt4n::K8sPodPhaseFailed:
-      case ngrt4n::K8sPodPhaseCrashLoopBackoff:
-        podNode.type = NodeType::ITService;
-        podNode.child_nodes = podFqdn;
-        podNode.check.id = podNode.child_nodes.toStdString();
-        podNode.check.host = podFqdn.toStdString();
-        podNode.check.host_groups = podFqdn.toStdString();
-        podNode.check.status = ngrt4n::K8sFailed;
-        podNode.check.last_state_change = ngrt4n::convertToTimet(podCreationTime, "yyyy-MM-ddThh:mm:ssZ");
-        podNode.check.alarm_msg = QString("pod is %1 because %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
-        out_cnodes.insert(podNode.id, podNode);
-        continue; // since there is not containerStatuses object to process
-        break;
-        // handle Pending, Running and Succeeded pods as business process nodes
-      case ngrt4n::K8sPodPhasePending:
-        podNode.type = NodeType::ITService;
-        podNode.child_nodes = podFqdn;
-        podNode.check.id = podNode.child_nodes.toStdString();
-        podNode.check.host = podFqdn.toStdString();
-        podNode.check.host_groups = podFqdn.toStdString();
-        podNode.check.status = ngrt4n::K8sFailed;
+    // handle Failed and CrashLoopBackoff pods as IT services
+    case ngrt4n::K8sPodPhaseFailed:
+    case ngrt4n::K8sPodPhaseCrashLoopBackoff:
+      podNode.type = NodeType::ITService;
+      podNode.child_nodes = podFqdn;
+      podNode.check.id = podNode.child_nodes.toStdString();
+      podNode.check.host = podFqdn.toStdString();
+      podNode.check.host_groups = podFqdn.toStdString();
+      podNode.check.status = ngrt4n::K8sFailed;
+      podNode.check.last_state_change = ngrt4n::convertToTimet(podCreationTime, "yyyy-MM-ddThh:mm:ssZ");
+      podNode.check.alarm_msg = QString("pod is %1 because %2 (%3)").arg(podPhaseStatus, podStatusData["reason"].toString(), podStatusData["message"].toString()).toLower().toStdString();
+      out_cnodes.insert(podNode.id, podNode);
+      continue; // since there is not containerStatuses object to process
+      break;
+      // handle Pending, Running and Succeeded pods as business process nodes
+    case ngrt4n::K8sPodPhasePending:
+      podNode.type = NodeType::ITService;
+      podNode.child_nodes = podFqdn;
+      podNode.check.id = podNode.child_nodes.toStdString();
+      podNode.check.host = podFqdn.toStdString();
+      podNode.check.host_groups = podFqdn.toStdString();
+      podNode.check.status = ngrt4n::K8sFailed;
 
-        if (! podStatusConditions.empty()) {
-          auto lastStatusCondition = podStatusConditions[0].toObject();
-          podNode.check.last_state_change = ngrt4n::convertToTimet(lastStatusCondition["lastTransitionTime"].toString(), "yyyy-MM-ddThh:mm:ssZ");
-          podNode.check.alarm_msg = QString("pod is %1 because %2 (%3)").arg(podPhaseStatus, lastStatusCondition["reason"].toString(), lastStatusCondition["message"].toString()).toLower().toStdString();
-        } else { // unexpected situation
-          podNode.check.last_state_change = "0";
-          podNode.check.alarm_msg = "cannot get condition for pending state";
-        }
+      if (! podStatusConditions.empty()) {
+        auto lastStatusCondition = podStatusConditions[0].toObject();
+        podNode.check.last_state_change = ngrt4n::convertToTimet(lastStatusCondition["lastTransitionTime"].toString(), "yyyy-MM-ddThh:mm:ssZ");
+        podNode.check.alarm_msg = QString("pod is %1 because %2 (%3)").arg(podPhaseStatus, lastStatusCondition["reason"].toString(), lastStatusCondition["message"].toString()).toLower().toStdString();
+      } else { // unexpected situation
+        podNode.check.last_state_change = "0";
+        podNode.check.alarm_msg = "cannot get condition for pending state";
+      }
 
-        out_cnodes.insert(podNode.id, podNode);
-        break;
-      case ngrt4n::K8sPodPhaseRunning:
-      case ngrt4n::K8sPodPhaseSucceeded:
-        podNode.type = NodeType::BusinessService;
-        out_bpnodes.insert(podNode.id, podNode);
-        break;
-      default:
-        qDebug() << QObject::tr("Unknown pod phase: %1").arg(podPhaseStatus);
-        continue;
-        break;
+      out_cnodes.insert(podNode.id, podNode);
+      break;
+    case ngrt4n::K8sPodPhaseRunning:
+    case ngrt4n::K8sPodPhaseSucceeded:
+      podNode.type = NodeType::BusinessService;
+      out_bpnodes.insert(podNode.id, podNode);
+      break;
+    default:
+      qDebug() << QObject::tr("Unknown pod phase: %1").arg(podPhaseStatus);
+      continue;
+      break;
     }
 
     auto&& containerStatuses = podStatusData["containerStatuses"].toArray();
@@ -382,8 +398,8 @@ std::pair<QString, int> K8sHelper::parseNamespacedPods(const QByteArray& in_data
 
       // format timestamp as seconds since epoch
       containerNode.check.last_state_change = ngrt4n::convertToTimet(
-                                                (containerNode.check.last_state_change.empty()? podCreationTime : containerNode.check.last_state_change.c_str()),
-                                                "yyyy-MM-ddThh:mm:ssZ");
+            (containerNode.check.last_state_change.empty()? podCreationTime : containerNode.check.last_state_change.c_str()),
+            "yyyy-MM-ddThh:mm:ssZ");
 
       // add container node as IT service
       out_cnodes.insert(containerNode.id, containerNode);
@@ -460,7 +476,6 @@ void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerO
   if (! reply) {
     return ;
   }
-
   QSslConfiguration sslConfig;
   if (verifyPeerOption) {
     sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
@@ -498,4 +513,19 @@ int K8sHelper::convertToPodPhaseStatusEnum(const QString& podPhaseStatusText)
   }
 
   return ngrt4n::K8sPodPhaseUndefined;
+}
+
+
+QString K8sHelper::getAuthString()
+{
+  QString tokenFile = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_K8S_SA_TOKEN"));
+  if (tokenFile.isEmpty()) {
+    tokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
+  }
+  std::ifstream ifs(tokenFile.toStdString());
+  std::string token(std::string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>())));
+  if (! token.empty()) {
+    return QString("Bearer %2").arg(token.c_str());
+  }
+  return "";
 }

@@ -29,51 +29,45 @@
 #include "WebTree.hpp"
 #include "WebPieChart.hpp"
 #include "WebUtils.hpp"
-#include <Wt/WGridLayout>
-#include <Wt/WVBoxLayout>
-#include <Wt/WHBoxLayout>
-#include <Wt/WPushButton>
-#include <Wt/WMenu>
-#include <Wt/WMenuItem>
-#include <Wt/WStackedWidget>
 #include "WebEventConsole.hpp"
 #include "WebMap.hpp"
-#include <Wt/WLocalizedStrings>
-#include <Wt/WLabel>
 #include <QHash>
-#include <Wt/WApplication>
-
-#define ROOT_DIV wApp->root()->id()
-#define TREEVIEW_DIV m_tree.id()
-#define MAP_DIV m_map.id()
-#define MAP_SCROLL_AREA_DIV m_map.renderingScrollArea()->id()
-#define CHART_SCROLL_AREA_DIV m_chart.id()
-#define MSG_CONSOLE_DIV m_msgConsole.id()
-#define MAP_AREA_HEIGHT_RATIO "0.4"
+#include <Wt/WGridLayout.h>
+#include <Wt/WVBoxLayout.h>
+#include <Wt/WHBoxLayout.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WMenu.h>
+#include <Wt/WMenuItem.h>
+#include <Wt/WStackedWidget.h>
+#include <Wt/WLocalizedStrings.h>
+#include <Wt/WLabel.h>
+#include <Wt/WApplication.h>
 
 /**
   This fonction take as parameter the height of the navigation window
   Important : the size of stacked container corresponds to the size of the windows
   minus the size of the navbar (40)
   */
-#define JS_AUTO_RESIZING_SCRIPT(computeWindowHeight) \
-  computeWindowHeight \
-  "var contentHeight = winH - 50;" \
-  "$('#stackcontentarea').height(contentHeight);" \
-  "var treeHeight=contentHeight*0.6 - 25;" \
-  "var chartAreaHeight=contentHeight - treeHeight - 25;" \
-  "$('#wrapper').height(winH);" \
-  "$('#maincontainer').height(winH);" \
-  "$('#"+ROOT_DIV+"').height(winH);" \
-  "$('#"+TREEVIEW_DIV+"').height(treeHeight);" \
-  "$('#"+CHART_SCROLL_AREA_DIV+"').height(chartAreaHeight);"
+#define JS_AUTO_RESIZING_SCRIPT(windowHeight) \
+  windowHeight \
+  "var maxHeight = windowHeight - 50;" \
+  "$('#stackcontentarea').height(maxHeight);" \
+  "var heightGridRow1 = maxHeight*0.60 - 15;" \
+  "var heightGridRow2 = maxHeight - heightGridRow1 - 15;" \
+  "$('#wrapper').height(windowHeight);" \
+  "$('#maincontainer').height(maxHeight);" \
+  "$('#"+wApp->root()->id()+"').height(windowHeight);" \
+  "$('#"+m_treeContainerId+"').height(heightGridRow1);" \
+  "$('#"+m_mapContainerId+"').height(heightGridRow1);" \
+  "$('#"+m_chartContainerId+"').height(heightGridRow2);" \
+  "$('#"+m_eventContainerId+"').height(heightGridRow2);"
 
 #define JS_AUTO_RESIZING_FUNCTION \
-  "function(self, winW, winH) {" \
-  JS_AUTO_RESIZING_SCRIPT("winH=winH;") \
-  "var mapH = winH*0.45 - 25;" \
-  "var mapW = $('#"+MAP_SCROLL_AREA_DIV+"').width();" \
-  "Wt.emit("+MAP_DIV+", 'containerSizeChanged', mapW, mapH, winW, winH);" \
+  "function(self, windowWidth, windowHeight) {" \
+  JS_AUTO_RESIZING_SCRIPT("windowHeight=windowHeight;") \
+  "var mapHeight = $('#"+m_mapContainerId+"').height();" \
+  "var mapWidth = $('#"+m_mapContainerId+"').width();" \
+  "Wt.emit("+m_mapRef->id()+", 'containerSizeChanged', mapWidth, mapHeight, windowWidth, windowHeight);" \
   "}"
 
 
@@ -85,25 +79,47 @@ public:
   WebDashboard(DbSession* dbSession);
   virtual ~WebDashboard();
   void updateMap(void);
-  WebMap* map(void) {return &m_map;}
-  void updateThumbnailInfo(void);
-  Wt::WImage* thumbnail(void) {return m_map.thumbnailImage();}
-  Wt::WLabel* thumbnailTitleBar(void) {return &m_thumbnailTitleBar;}
-  Wt::WLabel* thumbnailProblemDetailBar(void) {return &m_thumbnailProblemDetailsBar;}
-  std::string thumbnailCssClass(void) {return ngrt4n::thumbnailCssClass(rootNode().sev);}
-  virtual std::pair<int, QString> initialize(BaseSettings* p_settings, const QString& descriptionFile);
-  std::string tooltip(void) {return m_chart.toStdString();}
-  void doJavascriptAutoResize(void) { doJavaScript(JS_AUTO_RESIZING_SCRIPT("winH=$(window).height();"));}
+  void buildMap(void);
+  void buildTree(void);
+  void updateThumb(void);
+
+  WebMap* mapRef(void) {
+    return m_mapRef;
+  }
+  std::string thumbURL(void) {
+    return m_mapRef->thumbURL();
+  }
+  std::string thumbLink(void) {
+    return m_mapRef->thumbLink();
+  }
+  std::string thumbTitle(void) {
+    return m_thumbTitle;
+  }
+  std::string thumbMsg(void) {
+    return m_thumbMsg;
+  }
+  std::string thumbCss(void) {
+    return ngrt4n::thumbCss(rootNode().sev);
+  }
+  virtual std::pair<int, QString> initialize(const QString& vfile);
+  std::string tooltip(void) {
+    return m_chartRef->toStdString();
+  }
+  void doJavascriptAutoResize(void) {
+    doJavaScript(JS_AUTO_RESIZING_SCRIPT("windowHeight=$(window).height();"));
+  }
   void refreshMsgConsoleOnProblemStates(void);
-  Wt::WVBoxLayout* eventFeedLayout(void) {return &m_eventFeedLayout;}
-  void handleDashboardSelected(std::string viewName) {Q_EMIT dashboardSelected(viewName);}
+  std::unique_ptr<Wt::WVBoxLayout> eventItemsContainerLayout(void) {
+    return std::move(m_eventItemsContainerLayout);
+  }
+  void handleDashboardSelected(std::string viewName) {
+    Q_EMIT dashboardSelected(viewName);
+  }
 
 
 protected:
-  virtual void buildMap(void);
-  virtual void updateMap(const NodeT& _node, const QString& _tip);
-  virtual void buildTree(void);
-  virtual void updateTree(const NodeT& _node, const QString& _tip);
+  void updateMap(const NodeT& _node, const QString& _tip);
+  virtual void updateTree(const NodeT& node, const QString& tooltip);
   virtual void updateMsgConsole(const NodeT& node);
   virtual void updateChart(void);
   virtual void updateEventFeeds(const NodeT& node);
@@ -112,28 +128,23 @@ Q_SIGNALS:
   void dashboardSelected(std::string viewName);
 
 private:
-  typedef QHash<QString, Wt::WWidget*> EventFeedItemsT;
-  DbSession* m_dbSession;
-  WebTree m_tree;
-  WebMap m_map;
-  WebMsgConsole m_msgConsole;
-  WebPieChart m_chart;
-  Wt::WLabel m_thumbnailTitleBar;
-  Wt::WLabel m_thumbnailProblemDetailsBar;
-  Wt::WVBoxLayout m_eventFeedLayout;
-  EventFeedItemsT m_eventFeedItems;
+  WebTree* m_treeRef;
+  WebMap* m_mapRef;
+  WebMsgConsole* m_eventConsoleRef;
+  WebPieChart* m_chartRef;
+  std::string m_thumbTitle;
+  std::string m_thumbMsg;
+  std::unique_ptr<Wt::WVBoxLayout> m_eventItemsContainerLayout;
+  QHash<QString, Wt::WWidget*> m_eventItems;
+  Wt::WGridLayout* m_mainLayoutRef;
 
-  Wt::WHBoxLayout* m_mainLayout;
-  Wt::WVBoxLayout m_leftVBoxLayout;
-  Wt::WVBoxLayout m_rightVBoxLayout;
+  std::string m_treeContainerId;
+  std::string m_mapContainerId;
+  std::string m_chartContainerId;
+  std::string m_eventContainerId;
 
-  void setCData(CoreDataT* cdata) {m_tree.setCdata(cdata);  m_map.setCoreData(cdata);}
-  void bindFormWidgets(void);
-  void unbindWidgets(void);
-  void addJsEventScript(void);
-  void addEvents(void);
-  Wt::WWidget* createEventFeedTpl(const NodeT& node);
-  void hanleRenderingAreaSizeChanged(double mapW, double mapH, double winW, double winH) {}
+  std::unique_ptr<Wt::WWidget> createEventFeedTpl(const NodeT& node);
+  void hanleRenderingAreaSizeChanged(double mapWidth, double mapHeight, double windowWidth, double windowHeight) {}
 };
 
 

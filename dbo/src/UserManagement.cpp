@@ -26,19 +26,19 @@
 #include "DbSession.hpp"
 #include "WebUtils.hpp"
 #include "WebBaseSettings.hpp"
-#include <Wt/WMenu>
-#include <Wt/WPanel>
-#include <Wt/WComboBox>
-#include <Wt/WStandardItemModel>
-#include <Wt/WStandardItem>
-#include <Wt/Auth/PasswordStrengthValidator>
-#include <Wt/WMessageBox>
-#include <Wt/WApplication>
-#include <Wt/WTemplate>
-#include <Wt/WString>
 #include <QObject>
-#include <Wt/WImage>
-#include <Wt/WSpinBox>
+#include <Wt/WMenu.h>
+#include <Wt/WPanel.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WStandardItem.h>
+#include <Wt/Auth/PasswordStrengthValidator.h>
+#include <Wt/WMessageBox.h>
+#include <Wt/WApplication.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WString.h>
+#include <Wt/WImage.h>
+#include <Wt/WSpinBox.h>
 
 
 ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model, Wt::WFormModel::Field passField)
@@ -52,12 +52,12 @@ ConfirmPasswordValidator::ConfirmPasswordValidator(UserFormModel* model, Wt::WFo
 Wt::WValidator::Result ConfirmPasswordValidator::validate(const Wt::WString &input) const
 {
   return (m_model->valueText(m_passwordField) == input)?
-        Wt::WValidator::Result(Wt::WValidator::Valid):
-        Wt::WValidator::Result(Wt::WValidator::Invalid, Q_TR("Confirmation don't match"));
+        Wt::WValidator::Result(Wt::ValidationState::Valid):
+        Wt::WValidator::Result(Wt::ValidationState::Invalid, Q_TR("Confirmation don't match"));
 }
 
-UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool userForm, Wt::WObject *parent)
-  : Wt::WFormModel(parent),
+UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool userForm)
+  : Wt::WFormModel(),
     m_userForm(userForm)
 {
   addField(UsernameField);
@@ -74,7 +74,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
 
   setValidator(UsernameField, createNameValidator());;
   setValidator(PasswordField, createPasswordValidator());
-  setValidator(PasswordConfimationField, new ConfirmPasswordValidator(this, PasswordField));
+  setValidator(PasswordConfimationField, std::make_unique<ConfirmPasswordValidator>(this, PasswordField));
   setValidator(FirstNameField, createNameValidator());
   setValidator(FirstNameField, createNameValidator());
   setValidator(LastNameField, createNameValidator());
@@ -141,64 +141,65 @@ void UserFormModel::setData(const DboUserT & user)
   setValue(RegistrationDateField, user.registrationDate);
 }
 
-Wt::WValidator* UserFormModel::createNameValidator(void)
+std::unique_ptr<Wt::WValidator> UserFormModel::createNameValidator(void)
 {
-  Wt::WLengthValidator* validator = new Wt::WLengthValidator();
+  auto validator = std::make_unique<Wt::WLengthValidator>();
   validator->setInvalidBlankText(Q_TR("Required field"));
   validator->setMandatory(true);
   validator->setMinimumLength(1);
   validator->setMaximumLength(MAX_LENGTH);
-  return validator;
+  return std::move(validator);
 }
 
-Wt::WValidator* UserFormModel::createPasswordValidator(void)
+std::unique_ptr<Wt::WValidator> UserFormModel::createPasswordValidator(void)
 {
-  Wt::Auth::PasswordStrengthValidator* v = new Wt::Auth::PasswordStrengthValidator();
-  v->setMinimumLength(Wt::Auth::PasswordStrengthValidator::TwoCharClass, 6);
-  v->setMandatory(true);
-  return v;
+  auto validator = std::make_unique<Wt::Auth::PasswordStrengthValidator>();
+  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 6);
+  validator->setMandatory(true);
+  return std::move(validator);
 }
 
-Wt::WValidator* UserFormModel::createEmailValidator(void)
+std::unique_ptr<Wt::WValidator> UserFormModel::createEmailValidator(void)
 {
-  Wt::WRegExpValidator* validator = new Wt::WRegExpValidator("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
+  auto validator = std::make_unique<Wt::WRegExpValidator>("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}");
   validator->setInvalidBlankText(Q_TR("Required field"));
   validator->setInvalidBlankText(Q_TR("Invalid email"));
   validator->setMandatory(true);
-  return validator;
+  return std::move(validator);
 }
 
-Wt::WValidator* UserFormModel::createConfirmPasswordValidator(void)
+std::unique_ptr<Wt::WValidator> UserFormModel::createConfirmPasswordValidator(void)
 {
   return createPasswordValidator();
 }
 
-UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userForm)
-  : m_changePassword(changePassword),
-    m_infoBox(new Wt::WText("")),
-    m_validated(this),
-    m_deleteTriggered(this),
-    m_changePasswordTriggered(this)
+UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, bool userForm)
+  : m_changePassword(changePasswordTriggered),
+    m_infoBox(new Wt::WText(""))
 {
-  m_model = new UserFormModel(user, changePassword, userForm, this);
+  m_modelRef = new UserFormModel(user, changePasswordTriggered, userForm);
+  std::unique_ptr<Wt::WPushButton> changedPwdButton;
+  std::unique_ptr<Wt::WPushButton> submitButton;
+  std::unique_ptr<Wt::WPushButton> cancelButton;
+  std::unique_ptr<Wt::WComboBox> dashboardDispalyModeField = createDashboardDisplayModeField();
+  std::unique_ptr<Wt::WSpinBox> dashboardTilesPerRowField = createDashboardTilesPerRowField();
+  m_dashboardDispalyModeFieldRef = dashboardDispalyModeField.get();
+  m_dashboardTilesPerRowFieldRef = dashboardTilesPerRowField.get();
 
-  Wt::WPushButton* changedPwdButton = NULL;
-  Wt::WPushButton* submitButton = NULL;
-  Wt::WPushButton* cancelButton = NULL;
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
-  setFormWidget(UserFormModel::UsernameField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::UsernameField, std::make_unique<Wt::WLineEdit>());
   setFormWidget(UserFormModel::CurrentPasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordField, createPaswordField());
   setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
-  setFormWidget(UserFormModel::FirstNameField, new Wt::WLineEdit());
-  setFormWidget(UserFormModel::LastNameField, new Wt::WLineEdit());
-  setFormWidget(UserFormModel::EmailField, new Wt::WLineEdit());
+  setFormWidget(UserFormModel::FirstNameField, std::make_unique<Wt::WLineEdit>());
+  setFormWidget(UserFormModel::LastNameField, std::make_unique<Wt::WLineEdit>());
+  setFormWidget(UserFormModel::EmailField, std::make_unique<Wt::WLineEdit>());
   setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
-  setFormWidget(UserFormModel::RegistrationDateField, new Wt::WLineEdit());
-  setFormWidget(UserFormModel::DashboardDisplayMode, m_dashboardDispalyModeField = createDashboardDisplayModeField());
-  setFormWidget(UserFormModel::DashboardTilesPerRow, m_dashboardTilesPerRowField = createDashboardTilesPerRowField());
+  setFormWidget(UserFormModel::RegistrationDateField, std::make_unique<Wt::WLineEdit>());
+  setFormWidget(UserFormModel::DashboardDisplayMode, std::move(dashboardDispalyModeField));
+  setFormWidget(UserFormModel::DashboardTilesPerRow, std::move(dashboardTilesPerRowField));
 
   if (user) {
     m_user = *user;
@@ -206,10 +207,10 @@ UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userF
       bindString("change-password-link", "");
     } else {
       if (! userForm) {
-        changedPwdButton = new Wt::WPushButton(Q_TR("Change password"));
-        changedPwdButton->setStyleClass("btn btn-warning");
         bindEmpty("title");
-        bindWidget("change-password-link", changedPwdButton);
+        auto changedPwdButton = bindNew<Wt::WPushButton>("change-password-link");
+        changedPwdButton->setText(Q_TR("Change password"));
+        changedPwdButton->setStyleClass("btn btn-warning");
         changedPwdButton->clicked().connect(std::bind([=, &user]() { m_changePasswordDialog->show();}));
       } else {
         bindEmpty("change-password-link");
@@ -220,55 +221,61 @@ UserFormView::UserFormView(const DboUserT* user, bool changePassword, bool userF
   }
 
   // Bind buttons, but alter later
-  submitButton = new Wt::WPushButton( Q_TR("Submit") );
-  cancelButton = new Wt::WPushButton( Q_TR("Clear") );
-  bindWidget("submit-button", submitButton);
-  bindWidget("cancel-button", cancelButton);
+  submitButton = std::make_unique<Wt::WPushButton>(Q_TR("Submit") );
+  cancelButton = std::make_unique<Wt::WPushButton>(Q_TR("Clear") );
+  Wt::WPushButton* submitButtonRef = submitButton.get();
+  Wt::WPushButton* cancelButtonRef = cancelButton.get();
 
   Wt::WString title = Wt::WString( Q_TR("User information") );
   if (user) {
-    submitButton->setStyleClass("btn btn-success");
-    if (changePassword) {
+    submitButtonRef->setStyleClass("btn btn-success");
+    if (changePasswordTriggered) {
       title = Wt::WString( Q_TR("Set password information") );
-      submitButton->setText( Q_TR("Change password") );
-      cancelButton->setText( Q_TR("Close") );
-      cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
+      submitButtonRef->setText( Q_TR("Change password") );
+      cancelButtonRef->setText( Q_TR("Close") );
+      //FIXED me uncomment connect
+      cancelButtonRef->clicked().connect(this, &UserFormView::handleCancelClick);
     } else {
       createChangePasswordDialog();
-      submitButton->setText( Q_TR("Update") );
+      submitButtonRef->setText( Q_TR("Update") );
       if (! userForm) {
-        cancelButton->setText( Q_TR("Delete") );
-        cancelButton->setStyleClass("btn btn-danger");
-        cancelButton->clicked().connect(this, &UserFormView::handleDeleteRequest);
+        cancelButtonRef->setText( Q_TR("Delete") );
+        cancelButtonRef->setStyleClass("btn btn-danger");
+        cancelButtonRef->clicked().connect(this, &UserFormView::handleDeleteClick);
       } else {
-        cancelButton->setText( Q_TR("Close") );
-        cancelButton->clicked().connect(std::bind([=](){m_close.emit();}));
-        cancelButton->hide();
+        cancelButtonRef->setText( Q_TR("Close") );
+        cancelButtonRef->clicked().connect(this, &UserFormView::handleCloseClick);
+        cancelButtonRef->hide();
       }
     }
   } else {
-    submitButton->setStyleClass("btn btn-success");
-    cancelButton->clicked().connect(std::bind([=]() {m_model->reset(); updateView(m_model);}));
+    submitButtonRef->setStyleClass("btn btn-success");
+    cancelButtonRef->clicked().connect(std::bind([=]() {m_modelRef->reset(); updateView(m_modelRef);}));
   }
 
   // If user, it's for update. At first time the fields are disable
-  if (user && ! changePassword) {
-    submitButton->clicked().connect(std::bind([=](){
-      setWritable(true);
-      submitButton->clicked().connect(this, &UserFormView::process);
-    }));
+  if (user && ! changePasswordTriggered) {
+    submitButtonRef->clicked().connect(std::bind([=](){setWritable(true); submitButtonRef->clicked().connect(this, &UserFormView::process);}));
   } else {
-    submitButton->clicked().connect(this, &UserFormView::process);
+    submitButtonRef->clicked().connect(this, &UserFormView::process);
   }
 
   if (user && user->authsystem == WebBaseSettings::LDAP) {
-    if (submitButton) submitButton->setDisabled(true);
-    if (cancelButton) cancelButton->setDisabled(true);
-    if (changedPwdButton) changedPwdButton->setDisabled(true);
+    if (submitButtonRef) {
+      submitButtonRef->setDisabled(true);
+    }
+    if (cancelButtonRef) {
+      cancelButtonRef->setDisabled(true);
+    }
+    if (changedPwdButton) {
+      changedPwdButton->setDisabled(true);
+    }
   }
 
+  bindWidget("submit-button", std::move(submitButton));
+  bindWidget("cancel-button", std::move(cancelButton));
   bindString("title", title);
-  updateView(m_model);
+  updateView(m_modelRef);
 }
 
 UserFormView::~UserFormView(void)
@@ -277,42 +284,43 @@ UserFormView::~UserFormView(void)
 
 void UserFormView::reset(void)
 {
-  m_model->reset();
-  updateView(m_model);
+  m_modelRef->reset();
+  updateView(m_modelRef);
 }
 
 void UserFormView::setWritable(bool writtable)
 {
-  m_model->setWritable(writtable);
-  updateView(m_model);
+  m_modelRef->setWritable(writtable);
+  updateView(m_modelRef);
 }
 
 void UserFormView::resetValidationState(bool writtable)
 {
-  m_model->reset();
-  m_model->setData(m_user);
+  m_modelRef->reset();
+  m_modelRef->setData(m_user);
   setWritable(writtable);
 }
 
 void UserFormView::process(void)
 {
-  updateModel(m_model);
-  bool isvalid = m_model->validate();
-  updateView(m_model);
+  updateModel(m_modelRef);
+  bool isvalid = m_modelRef->validate();
+  updateView(m_modelRef);
   if (isvalid) {
     if (m_changePassword) {
       m_changePasswordTriggered.emit(m_user.username,
-                                     m_model->valueText(UserFormModel::CurrentPasswordField).toUTF8(),
-                                     m_model->valueText(UserFormModel::PasswordField).toUTF8());
+                                     m_modelRef->valueText(UserFormModel::CurrentPasswordField).toUTF8(),
+                                     m_modelRef->valueText(UserFormModel::PasswordField).toUTF8()
+                                     );
     } else {
-      m_user.username = m_model->valueText(UserFormModel::UsernameField).toUTF8();
-      m_user.password = m_model->valueText(UserFormModel::PasswordField).toUTF8();
-      m_user.firstname = m_model->valueText(UserFormModel::FirstNameField).toUTF8();
-      m_user.lastname = m_model->valueText(UserFormModel::LastNameField).toUTF8();
-      m_user.email = m_model->valueText(UserFormModel::EmailField).toUTF8();
-      m_user.role = DboUser::role2Int(m_model->valueText(UserFormModel::UserLevelField).toUTF8());
-      m_user.dashboardDisplayMode = m_dashboardDispalyModeField->currentIndex();
-      m_user.dashboardTilesPerRow = m_dashboardTilesPerRowField->value();
+      m_user.username = m_modelRef->valueText(UserFormModel::UsernameField).toUTF8();
+      m_user.password = m_modelRef->valueText(UserFormModel::PasswordField).toUTF8();
+      m_user.firstname = m_modelRef->valueText(UserFormModel::FirstNameField).toUTF8();
+      m_user.lastname = m_modelRef->valueText(UserFormModel::LastNameField).toUTF8();
+      m_user.email = m_modelRef->valueText(UserFormModel::EmailField).toUTF8();
+      m_user.role = DboUser::role2Int(m_modelRef->valueText(UserFormModel::UserLevelField).toUTF8());
+      m_user.dashboardDisplayMode = m_dashboardDispalyModeFieldRef->currentIndex();
+      m_user.dashboardTilesPerRow = m_dashboardTilesPerRowFieldRef->value();
       m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
       m_validated.emit(m_user);
     }
@@ -320,49 +328,60 @@ void UserFormView::process(void)
 }
 
 
-void UserFormView::handleDeleteRequest(void)
+void UserFormView::handleDeleteClick(void)
 {
-  Wt::WMessageBox *confirmationBox = new Wt::WMessageBox
-                                     ("Warning !",
-                                      "<p>Do you really want to delete this user?</p>",
-                                      Wt::Information, Wt::Yes | Wt::No);
+  auto confirmationBox = std::make_shared<Wt::WMessageBox>("Warning !", "<p>Do you really want to delete this user?</p>",
+                                                           Wt::Icon::Information, Wt::StandardButton::Yes | Wt::StandardButton::No);
   confirmationBox->setModal(false);
   confirmationBox->buttonClicked().connect(std::bind([=] () {
-    if (confirmationBox->buttonResult() == Wt::Yes) {
-      m_deleteTriggered.emit(m_model->valueText(UserFormModel::UsernameField).toUTF8());
+    if (confirmationBox->buttonResult() == Wt::StandardButton::Yes) {
+      m_deleteTriggered.emit(m_modelRef->valueText(UserFormModel::UsernameField).toUTF8());
     }
-    delete confirmationBox;
   }));
   confirmationBox->show();
 }
 
-
-Wt::WComboBox* UserFormView::createUserLevelField(void)
+void UserFormView::handleCloseClick(Wt::WMouseEvent ev)
 {
-  Wt::WStandardItemModel* fieldModel =  new Wt::WStandardItemModel(2, 1, this);
-  Wt::WStandardItem* item = new Wt::WStandardItem(DboUser::role2Text(DboUser::OpRole));
-  item->setData(DboUser::OpRole, Wt::UserRole);
-  fieldModel->setItem(0, 0, item);
+  m_close.emit(ev);
+}
 
-  item = new Wt::WStandardItem(DboUser::role2Text(DboUser::AdmRole));
-  item->setData(DboUser::AdmRole, Wt::UserRole);
-  fieldModel->setItem(1, 0, item);
+void UserFormView::handleCancelClick(Wt::WMouseEvent ev)
+{
+  m_close.emit(ev);
+}
 
-  Wt::WComboBox* fieldWidget = new Wt::WComboBox();
+
+void UserFormView::handleChangePasswordClick(const std::string& login, const std::string& currentPass,const std::string& newPass)
+{
+  m_changePasswordTriggered.emit(login, currentPass, newPass);
+  m_changePasswordDialog->accept();
+}
+
+std::unique_ptr<Wt::WComboBox> UserFormView::createUserLevelField(void)
+{
+  auto fieldModel = std::make_shared<Wt::WStandardItemModel>(2, 1);
+
+  auto opRoleItem = std::make_unique<Wt::WStandardItem>(DboUser::role2Text(DboUser::OpRole));
+  opRoleItem->setData(DboUser::OpRole, Wt::ItemDataRole::User);
+  fieldModel->setItem(0, 0, std::move(opRoleItem));
+
+  auto admRoleItem = std::make_unique<Wt::WStandardItem>(DboUser::role2Text(DboUser::AdmRole));
+  admRoleItem->setData(DboUser::AdmRole, Wt::ItemDataRole::User);
+  fieldModel->setItem(1, 0, std::move(admRoleItem));
+
+  auto fieldWidget = std::make_unique<Wt::WComboBox>();
   fieldWidget->setModel(fieldModel);
-  return fieldWidget;
+  return std::move(fieldWidget);
 }
 
 
-
-
-Wt::WLineEdit* UserFormView::createPaswordField(void)
+std::unique_ptr<Wt::WLineEdit> UserFormView::createPaswordField(void)
 {
-  Wt::WLineEdit* field(new Wt::WLineEdit());
-  field->setEchoMode(Wt::WLineEdit::Password);
-  return field;
+  auto field = std::make_unique<Wt::WLineEdit>();
+  field->setEchoMode(Wt::EchoMode::Password);
+  return std::move(field);
 }
-
 
 
 void UserFormView::createChangePasswordDialog(void)
@@ -371,125 +390,113 @@ void UserFormView::createChangePasswordDialog(void)
   bool forUserProfile(false);
   m_changePasswordDialog = new Wt::WDialog( Q_TR("Change password") );
   m_changePasswordDialog->setStyleClass("Wt-dialog");
-  UserFormView* changedPasswdForm = new UserFormView(&m_user,
-                                                     changedPasswd,
-                                                     forUserProfile);
-  m_changePasswordDialog->contents()->addWidget(changedPasswdForm);
-  changedPasswdForm->changePasswordTriggered().connect(
-        std::bind([=](const std::string& login, const std::string& currentPass,
-                  const std::string& newPass){
-    m_changePasswordTriggered.emit(login, currentPass, newPass);
-    m_changePasswordDialog->accept();
-  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+  auto changedPasswdForm = std::make_unique<UserFormView>(&m_user, changedPasswd, forUserProfile);
+  changedPasswdForm->changePasswordTriggered().connect(this, &UserFormView::handleChangePasswordClick);
   changedPasswdForm->closeTriggered().connect(std::bind([=](){m_changePasswordDialog->accept();}));
+  m_changePasswordDialog->contents()->addWidget(std::move(changedPasswdForm));
 }
 
-
-
-Wt::WComboBox* UserFormView::createDashboardDisplayModeField(void)
+std::unique_ptr<Wt::WComboBox> UserFormView::createDashboardDisplayModeField(void)
 {
-  Wt::WStandardItemModel* selectionModel =  new Wt::WStandardItemModel(2, 1, this);
-  Wt::WStandardItem* selectionItem = NULL;
-  selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::CompleteDashboard));
-  selectionItem->setData(DboUser::CompleteDashboard, Wt::UserRole);
-  selectionModel->setItem(DboUser::CompleteDashboard, 0, selectionItem);
+  auto displayModel = std::make_shared<Wt::WStandardItemModel>(2, 1);
 
-  selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::NoReportDashboard));
-  selectionItem->setData(DboUser::NoReportDashboard, Wt::UserRole);
-  selectionModel->setItem(DboUser::NoReportDashboard, 0, selectionItem);
+  auto dashboardModeOnlyTiles = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::TileDashboard));
+  dashboardModeOnlyTiles->setData(DboUser::TileDashboard, Wt::ItemDataRole::User);
+  displayModel->setItem(DboUser::TileDashboard, 0, std::move(dashboardModeOnlyTiles));
 
-  selectionItem = new Wt::WStandardItem(DboUser::dashboardMode2Text(DboUser::TileDashboard));
-  selectionItem->setData(DboUser::TileDashboard, Wt::UserRole);
-  selectionModel->setItem(DboUser::TileDashboard, 0, selectionItem);
+  auto dashboardModeFull = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::CompleteDashboard));
+  dashboardModeFull->setData(DboUser::CompleteDashboard, Wt::ItemDataRole::User);
+  displayModel->setItem(DboUser::CompleteDashboard, 0, std::move(dashboardModeFull));
 
-  Wt::WComboBox* fieldWidget = new Wt::WComboBox();
-  fieldWidget->setModel(selectionModel);
+  auto dashboardModeNoRepport = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::NoReportDashboard));
+  dashboardModeNoRepport->setData(DboUser::NoReportDashboard, Wt::ItemDataRole::User);
+  displayModel->setItem(DboUser::NoReportDashboard, 0, std::move(dashboardModeNoRepport));
+
+  auto fieldWidget = std::make_unique<Wt::WComboBox>();
+  fieldWidget->setModel(displayModel);
 
   return fieldWidget;
 }
 
-Wt::WSpinBox* UserFormView::createDashboardTilesPerRowField(void)
+std::unique_ptr<Wt::WSpinBox> UserFormView::createDashboardTilesPerRowField(void)
 {
-  Wt::WSpinBox* spinbox = new Wt::WSpinBox();
+  auto spinbox = std::make_unique<Wt::WSpinBox>();
   spinbox->setMinimum(1);
   spinbox->setMaximum(16);
   spinbox->setValue(5);
-  return spinbox;
+  return std::move(spinbox);
 }
 
 
 DbUserManager::DbUserManager(DbSession* dbSession)
-  : m_updateCompleted(this),
-    m_dbSession(dbSession),
-    m_userForm(new UserFormView(NULL, false, false)),
-    m_usersListContainer(new Wt::WContainerWidget()),
-    m_contents(new Wt::WStackedWidget(0)),
-    m_dbUserListWidget(new Wt::WTemplate(Wt::WString::tr("user-list-tpl")))
+  : m_dbSession(dbSession),
+    m_contents(new Wt::WStackedWidget())
 {
-  m_dbUserListWidget->bindString("title", Q_TR("User list"));
-  m_dbUserListWidget->bindWidget("user-list", m_usersListContainer);
-  m_userForm->validated().connect(std::bind([=](DboUserT user) {
-    auto addUserOut = m_dbSession->addUser(user);
-    m_updateCompleted.emit(addUserOut.first);
-  },
-  std::placeholders::_1));
+  m_userForm = std::make_unique<UserFormView>(nullptr, false, false);
+  m_userFormRef = m_userForm.get();
+  m_dbUserListWidget = std::make_unique<Wt::WTemplate>(Wt::WString::tr("user-list-tpl"));
+  m_dbUserListWidgetRef =  m_dbUserListWidget.get();
+  setOverflow(Wt::Overflow::Scroll);
+  m_dbUserListWidgetRef->bindString("title", Q_TR("User list"));
+  m_userFormRef->validated().connect(this, &DbUserManager::handleFormAddUser);
 }
 
-DbUserManager::~DbUserManager(void)
-{
-  delete m_userForm;
-  delete m_usersListContainer;
-}
+DbUserManager::~DbUserManager(void){}
 
 
 void DbUserManager::updateDbUsers(void)
 {
-  m_usersListContainer->clear();
+  m_dbUserListWidgetRef->bindWidget("user-list", nullptr);
   for (auto user: m_dbSession->listUsers()) {
-    m_usersListContainer->addWidget( createUserPanel(user.data()) );
+    auto usersListContainer = std::make_unique<Wt::WContainerWidget>();
+    usersListContainer->addWidget(createUserPanel(user.data()));
+    m_dbUserListWidgetRef->bindWidget("user-list", std::move(usersListContainer));
   }
 }
 
 
-Wt::WPanel* DbUserManager::createUserPanel(const DboUserT& user)
+std::unique_ptr<Wt::WPanel> DbUserManager::createUserPanel(const DboUserT& user)
 {
   bool changePassword(false);
   bool userForm(false);
-  Wt::WAnimation animation(Wt::WAnimation::SlideInFromTop,
-                           Wt::WAnimation::EaseOut, 100);
-
-  UserFormView* form(new UserFormView(&user,  changePassword, userForm));
-
-  // connect signal for add user
-  form->validated().connect(std::bind([=](DboUserT userToUpdate) {
-    auto updateUserOut = m_dbSession->updateUser(userToUpdate);
-    m_updateCompleted.emit(updateUserOut.first);
-  }, std::placeholders::_1));
-
-  // connect signal for change password
-  form->changePasswordTriggered().connect(std::bind([=](const std::string& login,
-                                                    const std::string& currentPass,
-                                                    const std::string& newPass) {
-    auto updatePasswordOut = m_dbSession->updatePassword(login, currentPass, newPass);
-    m_updateCompleted.emit(updatePasswordOut.first);
-  }, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
-  // connect signal for delete user
-  form->deleteTriggered().connect(std::bind([=](std::string username) {
-    m_updateCompleted.emit(m_dbSession->deleteUser(username));
-    updateDbUsers();
-  }, std::placeholders::_1));
-
-  Wt::WPanel *panel(new Wt::WPanel());
-  panel->setTitle(Wt::WString("{1} ({2})")
-                  .arg(user.username)
-                  .arg(WebBaseSettings::authTypeString(user.authsystem)));
-  panel->setAnimation(animation);
-  panel->setCentralWidget(form);
+  auto form = std::make_unique<UserFormView>(&user,  changePassword, userForm);
+  form->validated().connect(this, &DbUserManager::handleFormUpdateUser);
+  form->changePasswordTriggered().connect(this, &DbUserManager::handleFormChangePassword);
+  form->deleteTriggered().connect(this, &DbUserManager::handleDeleteUser);
+  auto panel = std::make_unique<Wt::WPanel>();
+  panel->setTitle(Wt::WString("{1} ({2})").arg(user.username).arg(WebBaseSettings::authTypeString(user.authsystem)));
+  panel->setAnimation(Wt::WAnimation(Wt::AnimationEffect::SlideInFromTop,  Wt::TimingFunction::EaseOut, 100));
+  panel->setCentralWidget(std::move(form));
   panel->setCollapsible(true);
   panel->setCollapsed(true);
+  return std::move(panel);
+}
 
-  return panel;
+void DbUserManager::handleFormAddUser(DboUserT dboUser)
+{
+  auto addUserOut = m_dbSession->addUser(dboUser);
+  m_updateCompleted.emit(addUserOut.first);
+}
+
+
+void DbUserManager::handleFormUpdateUser(DboUserT dboUser)
+{
+  auto updateUserOut = m_dbSession->updateUser(dboUser);
+  m_updateCompleted.emit(updateUserOut.first);
+}
+
+
+void DbUserManager::handleDeleteUser(std::string username)
+{
+  m_updateCompleted.emit(m_dbSession->deleteUser(username));
+  updateDbUsers();
+}
+
+
+void DbUserManager::handleFormChangePassword(std::string username, std::string oldPass, std::string newPass)
+{
+  auto updatePasswordOut = m_dbSession->updatePassword(username, oldPass, newPass);
+  m_updateCompleted.emit(updatePasswordOut.first);
 }
 
 

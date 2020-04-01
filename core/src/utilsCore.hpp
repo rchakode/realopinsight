@@ -29,32 +29,33 @@
 #include <QString>
 #include <unistd.h>
 
-namespace {
-  const QString SRC_BASENAME = "Source";
+namespace
+{
+const QString SRC_BASENAME = "Source";
 }
 
 namespace ngrt4n
 {
-  const int DefaultPort = 1983;
-  const int DefaultUpdateInterval = 300;
-  const int MaxMsg = 512;
+const int DefaultPort = 1983;
+const int DefaultUpdateInterval = 300;
+const int MaxMsg = 512;
 
-  const QString ROOT_ID = "root";
-  const QString PLUS = "plus";
-  const QString MINUS = "minus";
-  const QString DEFAULT_ICON = "Business Process";
-  const QString CONTAINER_ICON = "Container";
-  const QString APPLICATION_ICON = "Application";
-  const QString GENERIC_CHECK_ICON = "Other Check";
-  const QString K8S_POD = "Kubernetes Pod";
-  const QString K8S_SVC = "Kubernetes Service";
-  const QString K8S_NS = "Kubernetes Namespace";
-  const double SCALIN_FACTOR = 1.1;
-  const double SCALOUT_FACTOR = 1/SCALIN_FACTOR;
-  const qint32 CHART_WIDTH=200;
-  const qint32 CHART_HEIGHT=150;
+const QString ROOT_ID = "root";
+const QString PLUS = "plus";
+const QString MINUS = "minus";
+const QString DEFAULT_ICON = "Business Process";
+const QString CONTAINER_ICON = "Container";
+const QString APPLICATION_ICON = "Application";
+const QString GENERIC_CHECK_ICON = "Other Check";
+const QString K8S_POD = "Kubernetes Pod";
+const QString K8S_SVC = "Kubernetes Service";
+const QString K8S_NS = "Kubernetes Namespace";
+const double SCALIN_FACTOR = 1.1;
+const double SCALOUT_FACTOR = 1 / SCALIN_FACTOR;
+const qint32 CHART_WIDTH = 200;
+const qint32 CHART_HEIGHT = 150;
 
-  const IconMapT NodeIcons = {
+const IconMapT NodeIcons = {
     {DEFAULT_ICON, "images/business-process.png"},
     {CONTAINER_ICON, "images/docker-container.png"},
     {K8S_POD, "images/k8s-pod.png"},
@@ -91,98 +92,106 @@ namespace ngrt4n
     {"Nagios", "images/nagios-logo-n.png"},
     {"Zabbix", "images/zabbix-logo-z.png"},
     {"Zenoss", "images/zenoss-logo-o.png"},
-    {"Tree", "images/hierarchy.png"}
-  };
+    {"Tree", "images/hierarchy.png"}};
 
-  const QStringList DataSourceIndices = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-  const QStringList MonitorSourceTypes = {MonitorT::toString(MonitorT::Kubernetes),
-                                   MonitorT::toString(MonitorT::OpManager),
-                                   MonitorT::toString(MonitorT::Pandora),
-                                   MonitorT::toString(MonitorT::Nagios),
-                                   MonitorT::toString(MonitorT::Zabbix),
-                                   MonitorT::toString(MonitorT::Zenoss)};
+const QStringList DataSourceIndices = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+const QStringList MonitorSourceTypes = {
+    MonitorT::toString(MonitorT::Kubernetes),
+    MonitorT::toString(MonitorT::Nagios),
+    MonitorT::toString(MonitorT::Zabbix)};
 
+inline void delay(unsigned int d)
+{
+  sleep(d);
+}
 
-  inline void delay(unsigned int d)
-  { sleep(d); }
+inline std::string convertToTimet(const QString &dt, const QString &format)
+{
+  return QString::number(QDateTime::fromString(dt, format).toTime_t()).toStdString();
+}
 
-  inline std::string convertToTimet(const QString& dt, const QString& format)
-  { return QString::number(QDateTime::fromString(dt, format).toTime_t()).toStdString(); }
+inline std::string humanTimeText(const std::string &mytime_t)
+{
+  return QDateTime::fromTime_t(QString(mytime_t.c_str()).toUInt()).toString().toStdString();
+}
 
-  inline std::string humanTimeText(const std::string& mytime_t)
-  { return QDateTime::fromTime_t(QString(mytime_t.c_str()).toUInt()).toString().toStdString(); }
+inline QString generateId()
+{
+  static int i = 0;
+  return QString("roi_%1%2")
+      .arg(QUuid::createUuid().toString().replace("{", "").replace("}", "").replace("-", ""))
+      .arg(QString::number(++i));
+}
 
-  inline QString generateId()
-  {
-    static int i = 0;
-    return QString("roi_%1%2")
-        .arg(QUuid::createUuid().toString().replace("{", "").replace("}", "").replace("-",""))
-        .arg(QString::number(++i));
-  }
+inline QString md5IdFromString(const QString &str)
+{
+  return QString("roi_%1").arg(QString(QCryptographicHash::hash((str.toUtf8()), QCryptographicHash::Md5).toHex()));
+}
 
+inline QString sourceId(const qint32 &idx)
+{
+  return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));
+}
 
-  inline QString md5IdFromString(const QString& str)
-  { return QString("roi_%1").arg(QString(QCryptographicHash::hash((str.toUtf8()), QCryptographicHash::Md5).toHex())); }
+inline QString sourceKey(const qint32 &sourceIndex)
+{
+  return QString("/Sources/%1").arg(sourceId(sourceIndex));
+}
 
-  inline QString sourceId(const qint32& idx)
-  { return QString("%1%2").arg(SRC_BASENAME, QString::number(idx));}
+inline QString sourceKey(const QString &sourceId)
+{
+  return QString("/Sources/%1").arg(sourceId);
+}
 
-  inline QString sourceKey(const qint32& sourceIndex)
-  { return QString("/Sources/%1").arg(sourceId(sourceIndex));}
+inline QString realCheckId(const QString &srcid, const QString &chkid)
+{
+  return QString("%1:%2").arg(srcid, chkid);
+}
 
-  inline QString sourceKey(const QString& sourceId)
-  { return QString("/Sources/%1").arg(sourceId);}
+QString getAbsolutePath(const QString &_path);
 
-  inline QString realCheckId(const QString& srcid, const QString& chkid)
-  { return QString("%1:%2").arg(srcid, chkid);}
+qint8 severityFromProbeStatus(const int &monitorType, const int &statusValue);
 
-  inline QString libVersion(void)
-  { return PKG_VERSION; }
+QString getIconPath(int _severity);
 
-  QString getAbsolutePath(const QString& _path);
+bool findNode(CoreDataT *coreData, const QString &nodeId, NodeListT::iterator &node);
 
-  qint8 severityFromProbeStatus(const int& monitorType, const int& statusValue);
+bool findNode(NodeListT &bpnodes, NodeListT &cnodes, const QString &nodeId, NodeListT::iterator &node);
 
-  QString getIconPath(int _severity);
+bool findNode(const NodeListT &bpnodes, const NodeListT &cnodes, const QString &nodeId, NodeListT::const_iterator &node);
 
-  bool findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node);
+bool findNode(const NodeListT &nodes, const QString &nodeId, NodeListT::const_iterator &node);
 
-  bool findNode(NodeListT& bpnodes, NodeListT& cnodes,const QString& nodeId, NodeListT::iterator& node);
+void setCheckOnError(int status, const QString &msg, CheckT &invalidCheck);
 
-  bool findNode(const NodeListT& bpnodes, const NodeListT& cnodes, const QString& nodeId, NodeListT::const_iterator& node);
+StringPairT splitDataPointInfo(const QString &info); /* return <[sourcei:]hostaddr, checkid> */
 
-  bool findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node);
+StringPairT splitSourceDataPointInfo(const QString &info); /* return <source, hostaddr> */
 
-  void setCheckOnError(int status, const QString& msg, CheckT& invalidCheck);
+QString getSourceIdFromStr(const QString &str);
 
-  StringPairT splitDataPointInfo(const QString& info); /* return <[sourcei:]hostaddr, checkid> */
+inline QByteArray toByteArray(const QString &str) { return QByteArray(str.toStdString().c_str(), str.length()); }
 
-  StringPairT splitSourceDataPointInfo(const QString& info); /* return <source, hostaddr> */
+QStringList getAuthInfo(const QString &authString);
 
-  QString getSourceIdFromStr(const QString& str);
+QString basename(const QString &path);
 
-  inline QByteArray toByteArray(const QString& str) { return QByteArray(str.toStdString().c_str(), str.length()); }
+std::pair<int, QString> loadDynamicViewByGroup(const SourceT &sinfo, const QString &filter, CoreDataT &cdata);
 
-  QStringList getAuthInfo(const QString& authString);
+std::pair<int, QString> loadDataItems(const SourceT &sinfo, const QString &filter, ChecksT &checks);
 
-  QString basename(const QString& path);
+std::pair<int, QString> saveViewDataToPath(const CoreDataT &cdata, const QString &path);
 
-  std::pair<int, QString> loadDynamicViewByGroup(const SourceT& sinfo, const QString& filter, CoreDataT& cdata);
+QString generateNodeXml(const NodeT &node);
 
-  std::pair<int, QString> loadDataItems(const SourceT& sinfo, const QString& filter, ChecksT& checks);
+void fixupDependencies(CoreDataT &cdata);
 
-  std::pair<int, QString> saveViewDataToPath(const CoreDataT& cdata, const QString& path);
+void setParentChildDependency(const QString &childId, const QString &parentId, NodeListT &pnodes);
 
-  QString generateNodeXml(const NodeT & node);
+QString encodeXml(const QString &data);
 
-  void fixupDependencies(CoreDataT& cdata);
+QString decodeXml(const QString &data);
 
-  void setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes);
-
-  QString encodeXml(const QString& data);
-
-  QString decodeXml(const QString& data);
-
-} //NAMESPACE
+} // namespace ngrt4n
 
 #endif // UTILS_CLIENT_HPP

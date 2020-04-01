@@ -21,10 +21,7 @@
 
 set -e
 
-WT_VERSION=3.3.4
-WT_SRC_DIR=wt/extlibs
-BASE_BUILD_DIR=`pwd`
-QT_PROJECT_FILE=ngrt4n-web.pro
+QT_PROJECT_FILE=realopinsight.pro
 REALOPINSIGHT_USER=realopinsight
 REALOPINSIGHT_GROUP=$REALOPINSIGHT_USER
 REALOPINSIGHT_INSTALL_PREFIX=/opt/realopinsight
@@ -70,25 +67,25 @@ prompt_copyright()
 check_prerequisites()
 {
   echo -n "[DEBUG] Checking if is QT_ROOT set... "
-  [ -z $QT_ROOT ] && echo "[ERROR] QT_ROOT environment variable not set." && exit 1
-  echo "done"
+  [ -z "$QT_ROOT" ] && echo "[ERROR] QT_ROOT environment variable not set." && exit 1
+  echo "$QT_ROOT"
   
   
   QMAKE=${QT_ROOT}/bin/qmake
-  echo -n "[DEBUG] Checking qmake at ${QMAKE}... "
+  echo -n "[DEBUG] Checking qmake... "
   [ ! -e $QMAKE ] && echo "[ERROR] qmake not found." && exit 1
-  echo "done"
+  echo "${QMAKE}"
   
   QLRELEASE=${QT_ROOT}/bin/lrelease
-  echo -n "[DEBUG] Checking lrelease at ${QRELEASE}... "
+  echo -n "[DEBUG] Checking lrelease... "
   [ ! -e $QLRELEASE ] && echo "[ERROR] lrelease not found." && exit 1
-  echo "done" 
+  echo "${QRELEASE}" 
   
   echo -n "[DEBUG] Checking if WT_ROOT is set... "
   [ -z $WT_ROOT ] && echo "[ERROR] WT_ROOT environment variable is not set." && exit 1
-  echo "done"
+  echo "$WT_ROOT"
   
-  WT_DBO_SQLITE=${WT_ROOT}/include/Wt/Dbo/backend/Sqlite3
+  WT_DBO_SQLITE=${WT_ROOT}/include/Wt/Dbo/backend/Sqlite3.h
   echo -n "[DEBUG] Checking Wt include files from $WT_ROOT... "
   [ ! -e $WT_DBO_SQLITE ] && echo -en "[ERROR] $WT_DBO_SQLITE not found.\n => $WT_ROOT does not seem to be a Wt installation base directory." && exit 1
   echo "done"   

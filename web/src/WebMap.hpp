@@ -25,16 +25,14 @@
 #ifndef WEBSERVICEMAP_HPP
 #define WEBSERVICEMAP_HPP
 
-#include <Wt/WPaintedWidget>
-#include <Wt/WContainerWidget>
-#include <Wt/WPainter>
-#include <Wt/WObject>
-#include <Wt/WLength>
-#include <Wt/WSignal>
-#include <Wt/WScrollArea>
-#include <Wt/WImage>
-#include <QtGlobal>
 #include <QString>
+#include <Wt/WPaintedWidget.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WPainter.h>
+#include <Wt/WObject.h>
+#include <Wt/WLength.h>
+#include <Wt/WSignal.h>
+#include <Wt/WImage.h>
 
 struct CoreDataT;
 struct NodeT;
@@ -42,18 +40,21 @@ struct NodeT;
 class WebMap : public Wt::WPaintedWidget
 {
 public:
-  WebMap(void);
+  WebMap(CoreDataT* cdata);
   virtual ~WebMap();
-  void setCoreData(CoreDataT* cdata) {m_cdata = cdata;}
   void drawMap(void);
-  Wt::WWidget* renderingScrollArea(void) {return &m_scrollArea;}
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
-  Wt::JSignal<double, double, double, double>& containerSizeChanged(void) {return m_containerSizeChanged;}
-  void updateThumbnail(void);
-  std::string thumbnailPath(void) {return m_thumbUrlPath;}
-  Wt::WImage* thumbnailImage(void) {return &m_thumbImage;}
-  void setThumbnailTooltip(const std::string& tooltip) {m_thumbImage.setToolTip(tooltip);}
+  void updateThumb(void);
+  Wt::JSignal<double, double, double, double>& containerSizeChanged(void) {
+    return m_containerSizeChanged;
+  }
+  std::string thumbURL(void) {
+    return m_thumbURL;
+  }
+  std::string thumbLink(void) {
+    return m_thumbLink;
+  }
 
 
 protected:
@@ -64,20 +65,20 @@ private:
   double m_scaleX;
   double m_scaleY;
   std::shared_ptr<Wt::WPainter> m_painter;
-  Wt::WScrollArea m_scrollArea;
   bool m_initialLoading;
   Wt::JSignal<double, double, double, double> m_containerSizeChanged;
-  Wt::Signal<void> m_loaded;
-  std::string m_thumbUrlPath;
+  Wt::Signal<> m_loaded;
+  std::string m_thumbURL;
+  std::string m_thumbLink;
   double m_translateY;
-  Wt::WImage m_thumbImage;
+  std::string m_thumbImg;
 
   void drawNode(const NodeT& node, bool drawIcon = true);
   void drawEdge(const QString& parentId, const QString& childId);
   void createNodeLink(const NodeT& node, const Wt::WPointF& pos);
   void createExpIconLink(const NodeT& node, const Wt::WPointF& expIconPos);
   void setPreferredMethod(void);
-  void handleContainedSizeChanged(double w, double h);
+  void handleContainedSizeChanged(double mapW, double mapH, double winW, double winH);
   void expandCollapse(const QString& nodeId);
   void applyVisibilityToChild(const NodeT& node, qint8 mask);
   void removeThumdImage(void);

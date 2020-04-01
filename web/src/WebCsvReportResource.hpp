@@ -2,8 +2,8 @@
 #define WEBCSVREPORTRESOURCE_HPP
 
 #include "dbo/src/DbSession.hpp"
-#include <Wt/WResource>
-#include <Wt/WAnchor>
+#include <Wt/WResource.h>
+#include <Wt/WAnchor.h>
 
 class WebCsvExportResource : public Wt::WResource
 {
@@ -30,7 +30,7 @@ public:
   void updateData(const std::string& viewName, const QosDataList& qosData);
 
 private:
-  WebCsvExportResource m_csvResource;
+  std::shared_ptr<WebCsvExportResource> m_csvResource;
 };
 
 

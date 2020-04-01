@@ -24,31 +24,27 @@
 #ifndef WEBMSGDIALOG_HPP
 #define WEBMSGDIALOG_HPP
 
-#include <QMap>
-#include <Wt/WDialog>
 #include "Base.hpp"
 #include "dbo/src/DbSession.hpp"
 #include "dbo/src/NotificationTableView.hpp"
+#include <QMap>
+#include <Wt/WDialog.h>
 
 class WebMsgDialog : public Wt::WDialog
 {
 public:
-  WebMsgDialog(DbSession* dbSession, Wt::WContainerWidget* parent=0);
+  WebMsgDialog(DbSession* dbSession);
   ~WebMsgDialog();
 
   Wt::Signal<int, std::string>& operationCompleted(void) {return m_operationCompleted;}
   void show(void);
-  void clearAllServicesData(void) {m_notificationTableView->clearAllServicesData(); }
-  void updateServiceData(const NodeT& node) { m_notificationTableView->updateServiceData(node); }
+  void clearAllServicesData(void) {m_notifTableRef->clearAllServicesData(); }
+  void updateServiceData(const NodeT& node) { m_notifTableRef->updateServiceData(node); }
 
 private:
-  /** Signals **/
   Wt::Signal<int, std::string> m_operationCompleted;
-
-
-  /** other members **/
-  Wt::WText* m_infoBox;
-  NotificationTableView* m_notificationTableView;
+  Wt::WText* m_infoBoxRef;
+  NotificationTableView* m_notifTableRef;
 };
 
 #endif // WEBMSGDIALOG_HPP

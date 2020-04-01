@@ -25,18 +25,18 @@
 #define WEBNOTIFICATIONSETTINGS_HPP
 
 #include "WebBaseSettings.hpp"
-#include <Wt/WDialog>
-#include <Wt/WRadioButton>
-#include <Wt/WLineEdit>
-#include <Wt/WComboBox>
-#include <Wt/WPushButton>
-#include <Wt/WSpinBox>
-#include <Wt/WCheckBox>
-#include <Wt/WObject>
-#include <Wt/WStringListModel>
-#include <Wt/WLengthValidator>
-#include <Wt/WTemplate>
 #include <memory>
+#include <Wt/WDialog.h>
+#include <Wt/WRadioButton.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WSpinBox.h>
+#include <Wt/WCheckBox.h>
+#include <Wt/WObject.h>
+#include <Wt/WStringListModel.h>
+#include <Wt/WLengthValidator.h>
+#include <Wt/WTemplate.h>
 
 
 class WebNotificationSettings : public WebBaseSettings, public Wt::WTemplate
@@ -46,28 +46,22 @@ public:
   WebNotificationSettings(void);
   virtual ~WebNotificationSettings(void);
   void updateContents(void) { updateFields(); }
+  Wt::Signal<int, std::string>& operationCompleted() { return m_operationCompleted; }
 
-
-Q_SIGNALS:
-  void operationCompleted(int, std::string);
 
 protected:
   virtual void updateFields(void);
 
 private:
-  Wt::WComboBox m_notificationTypeBox;
-  Wt::WLineEdit m_smtpServerAddrField;
-  Wt::WLineEdit m_smtpServerPortField;
-  Wt::WCheckBox m_smtpUseSslField;
-  Wt::WLineEdit m_smtpUsernameField;
-  Wt::WLineEdit m_smtpPasswordField;
-  Wt::WPushButton m_notificationSettingsSaveBtn;
+  Wt::Signal<int, std::string> m_operationCompleted;
+  Wt::WComboBox* m_notificationTypeFieldRef;
+  Wt::WLineEdit* m_smtpServerFieldRef;
+  Wt::WLineEdit* m_smtpPortFieldRef;
+  Wt::WCheckBox* m_smtpUseSslFieldRef;
+  Wt::WLineEdit* m_smtpUserFieldRef;
+  Wt::WLineEdit* m_smtpPassFieldRef;
+  Wt::WPushButton* m_applyBtnRef;
 
-  void createFormWidgets(void);
-
-  void addEvent(void);
-  void bindFormWidgets(void);
-  void unbindFormWidgets(void);
   void saveChanges(void);
   void updateEmailFieldsEnabledState(void);
   void handleLdapUseSslChanged(void);

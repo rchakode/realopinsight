@@ -59,12 +59,14 @@ public Q_SLOTS:
   void exitEventLoop(const QNetworkReply::NetworkError& code) { m_eventLoop.exit(code);}
 
 private:
-  QString m_apiUrl;
+  QUrl m_apiURL;
+  QString m_hostname;
   bool m_verifySslPeer;
   QEventLoop m_eventLoop;
   void setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption);
   QSet<QString> findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors, const QMap<QString, QVariant>& podLabels);
   int convertToPodPhaseStatusEnum(const QString& podPhaseStatusText);
+  QString getAuthString();
 };
 
 #endif // K8SHELPER_H

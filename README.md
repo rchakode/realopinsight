@@ -1,5 +1,5 @@
 # Overview
-RealOpInsight is an open-source dashboard and visualization tool providing federation and application operations monitoring over Kubernetes®, Nagios®, Zabbix®, Centreon®, Icinga®, ManageEngine OpManager®, Zenoss®, Pandora FMS®, OP5 Monitor®, and various other monitoring systems.
+RealOpInsight is an open source tool providing federated dashboards for application operations monitoring on top of Kubernetes®, Zabbix®, Nagios® and alike (Centreon®, Icinga®...).
 
 Among others, RealOpinsight features include:
 

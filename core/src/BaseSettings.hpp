@@ -45,8 +45,7 @@ public:
     NoForm
   };
 
-  BaseSettings(void);
-  BaseSettings(const QString& settingFile);
+  BaseSettings();
   ~BaseSettings(void);
   int getGraphLayout(void) const;
 
@@ -59,23 +58,17 @@ Q_SIGNALS:
 public Q_SLOTS:
   qint32 updateInterval(void) const;
 
-protected :
+protected:
   virtual void fillInFormGivenSourceId(int sid) = 0;
   virtual void updateAllSourceWidgetStates(void) = 0;
   virtual void loadProperties(void);
   virtual void updateFields(void) = 0;
-  void sync(void);
-  QString keyValue(const QString& key, const QString& defaultValue);
-  void setKeyValue(const QString & _key, const QString & _value);
 
 protected Q_SLOTS:
   virtual void applyChanges(void) = 0;
   virtual void handleCancel(void) = 0;
   virtual void addAsSource(void) = 0;
   virtual void deleteSource(void) = 0;
-
-protected:
-  SettingFactory* m_settingFactory;
 };
 
 

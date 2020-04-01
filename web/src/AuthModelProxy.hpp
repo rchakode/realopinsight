@@ -25,27 +25,25 @@
 #ifndef LDAPAUTHMODEL_HPP
 #define LDAPAUTHMODEL_HPP
 
-#include <Wt/Auth/AuthModel>
-#include <Wt/Auth/Login>
-#include <QString>
+#include "dbo/src/DbSession.hpp"
 #include <string>
+#include <QString>
+#include <Wt/Auth/AuthModel.h>
+#include <Wt/Auth/Login.h>
 
 
 class AuthModelProxy : public Wt::Auth::AuthModel
 {
 public:
-  AuthModelProxy(const Wt::Auth::AuthService& baseAuth,
-                 Wt::Auth::AbstractUserDatabase& users,
-                 Wt::WObject* parent=0);
+  AuthModelProxy(DbSession* dbSessionRef);
   virtual bool login(Wt::Auth::Login& login);
+
 
   Wt::Signal<std::string>& loginFailed(void) {return m_loginFailed;}
 
 private:
-  /** Signals **/
+  DbSession* m_dbSessionRef;
   Wt::Signal<std::string> m_loginFailed;
-
-  /** Private member **/
   QString m_lastError;
 };
 

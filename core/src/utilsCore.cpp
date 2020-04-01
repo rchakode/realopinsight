@@ -25,139 +25,78 @@
 #include "utilsCore.hpp"
 #include "ZbxHelper.hpp"
 #include "LsHelper.hpp"
-#include "ZnsHelper.hpp"
-#include "PandoraHelper.hpp"
-#include "OpManagerHelper.hpp"
 #include "ThresholdHelper.hpp"
 #include "K8sHelper.hpp"
 
 #include <QFileInfo>
 
-
-QString ngrt4n::getAbsolutePath(const QString& _path)
+QString ngrt4n::getAbsolutePath(const QString &_path)
 {
   QFileInfo fileInfo(_path);
   return fileInfo.absoluteFilePath();
 }
 
-qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusValue)
+qint8 ngrt4n::severityFromProbeStatus(const int &monitorType, const int &statusValue)
 {
   qint8 criticity = ngrt4n::Unknown;
-  if (monitorType == MonitorT::Nagios) {
-    switch(statusValue) {
-      case ngrt4n::NagiosOk:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::NagiosWarning:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::NagiosCritical:
-        criticity = ngrt4n::Critical;
-        break;
-      default:
-        break;
+  if (monitorType == MonitorT::Nagios)
+  {
+    switch (statusValue)
+    {
+    case ngrt4n::NagiosOk:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::NagiosWarning:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::NagiosCritical:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
     }
     return static_cast<ngrt4n::SeverityT>(criticity);
   }
 
-  if (monitorType == MonitorT::Zabbix) {
-    switch(statusValue) {
-      case ngrt4n::ZabbixClear:
-      case ngrt4n::ZabbixInfo:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::ZabbixWarn:
-        criticity = ngrt4n::Minor;
-        break;
-      case ngrt4n::ZabbixAverage:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::ZabbixHigh:
-      case ngrt4n::ZabbixDisaster:
-        criticity = ngrt4n::Critical;
-        break;
-      default:
-        break;
+  if (monitorType == MonitorT::Zabbix)
+  {
+    switch (statusValue)
+    {
+    case ngrt4n::ZabbixClear:
+    case ngrt4n::ZabbixInfo:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::ZabbixWarn:
+      criticity = ngrt4n::Minor;
+      break;
+    case ngrt4n::ZabbixAverage:
+      criticity = ngrt4n::Major;
+      break;
+    case ngrt4n::ZabbixHigh:
+    case ngrt4n::ZabbixDisaster:
+      criticity = ngrt4n::Critical;
+      break;
+    default:
+      break;
     }
     return static_cast<ngrt4n::SeverityT>(criticity);
   }
-
-  if (monitorType == MonitorT::Zenoss){
-    switch(statusValue) {
-      case ngrt4n::ZenossClear:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::ZenossDebug:
-        criticity = ngrt4n::Minor;
-        break;
-      case ngrt4n::ZenossWarning:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::ZenossError:
-      case ngrt4n::ZenossCritical:
-        criticity = ngrt4n::Critical;
-        break;
-      default:
-        break;
-    }
-    return static_cast<ngrt4n::SeverityT>(criticity);
-  }
-
-  if (monitorType == MonitorT::Pandora) {
-    switch(statusValue) {
-      case ngrt4n::PandoraNormal:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::PandoraWarning:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::PandoraCritical:
-        criticity = ngrt4n::Critical;
-        break;
-      case ngrt4n::PandoraUnknown:
-      default:
-        criticity = ngrt4n::Unknown;
-        break;
-    }
-
-    return static_cast<ngrt4n::SeverityT>(criticity);
-  }
-
-  if (monitorType == MonitorT::OpManager) {
-    switch(statusValue) {
-      case ngrt4n::OpManagerClear:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::OpManagerAttention:
-        criticity = ngrt4n::Minor;
-        break;
-      case ngrt4n::OpManagerTrouble:
-        criticity = ngrt4n::Major;
-        break;
-      case ngrt4n::OpManagerCritical:
-        criticity = ngrt4n::Critical;
-        break;
-      case ngrt4n::OpManagerDown:
-      default:
-        criticity = ngrt4n::Unknown;
-        break;
-    }
-    return static_cast<ngrt4n::SeverityT>(criticity);
-  }
-
-  if (monitorType == MonitorT::Kubernetes) {
-    switch(statusValue) {
-      case ngrt4n::K8sRunning:
-      case ngrt4n::K8sSucceeded:
-        criticity = ngrt4n::Normal;
-        break;
-      case ngrt4n::K8sFailed:
-        criticity = ngrt4n::Critical;
-        break;
-      case ngrt4n::K8sPending:
-      default:
-        criticity = ngrt4n::Unknown;
-        break;
+  
+  if (monitorType == MonitorT::Kubernetes)
+  {
+    switch (statusValue)
+    {
+    case ngrt4n::K8sRunning:
+    case ngrt4n::K8sSucceeded:
+      criticity = ngrt4n::Normal;
+      break;
+    case ngrt4n::K8sFailed:
+      criticity = ngrt4n::Critical;
+      break;
+    case ngrt4n::K8sPending:
+    default:
+      criticity = ngrt4n::Unknown;
+      break;
     }
     return static_cast<ngrt4n::SeverityT>(criticity);
   }
@@ -165,82 +104,90 @@ qint8 ngrt4n::severityFromProbeStatus(const int& monitorType, const int& statusV
   return ngrt4n::Unknown;
 }
 
-
 QString ngrt4n::getIconPath(int _severity)
 {
   QString ipath("images/built-in/unknown.png");
-  switch (static_cast<ngrt4n::SeverityT>(_severity)) {
-    case ngrt4n::Normal:
-      ipath = "images/built-in/normal.png";
-      break;
-    case ngrt4n::Minor:
-      ipath = "images/built-in/minor.png";
-      break;
-    case ngrt4n::Major:
-      ipath = "images/built-in/major.png";
-      break;
-    case ngrt4n::Critical:
-      ipath = "images/built-in/critical.png";
-      break;
-    default:
-      break;
+  switch (static_cast<ngrt4n::SeverityT>(_severity))
+  {
+  case ngrt4n::Normal:
+    ipath = "images/built-in/normal.png";
+    break;
+  case ngrt4n::Minor:
+    ipath = "images/built-in/minor.png";
+    break;
+  case ngrt4n::Major:
+    ipath = "images/built-in/major.png";
+    break;
+  case ngrt4n::Critical:
+    ipath = "images/built-in/critical.png";
+    break;
+  default:
+    break;
   }
   return ipath;
 }
 
-bool ngrt4n::findNode(CoreDataT* coreData, const QString& nodeId, NodeListT::iterator& node)
+bool ngrt4n::findNode(CoreDataT *coreData, const QString &nodeId, NodeListT::iterator &node)
 {
   return findNode(coreData->bpnodes, coreData->cnodes, nodeId, node);
 }
 
-bool ngrt4n::findNode(NodeListT& bpnodes,
-                      NodeListT& cnodes,
-                      const QString& nodeId,
-                      NodeListT::iterator& node)
+bool ngrt4n::findNode(NodeListT &bpnodes,
+                      NodeListT &cnodes,
+                      const QString &nodeId,
+                      NodeListT::iterator &node)
 {
   bool found = false;
   node = bpnodes.find(nodeId);
-  if(node != bpnodes.end()) {
+  if (node != bpnodes.end())
+  {
     found = true;
-  } else {
+  }
+  else
+  {
     node = cnodes.find(nodeId);
-    if(node != cnodes.end()) {
+    if (node != cnodes.end())
+    {
       found = true;
     }
   }
   return found;
 }
 
-bool ngrt4n::findNode(const NodeListT& bpnodes,
-                      const NodeListT& cnodes,
-                      const QString& nodeId,
-                      NodeListT::const_iterator& node)
+bool ngrt4n::findNode(const NodeListT &bpnodes,
+                      const NodeListT &cnodes,
+                      const QString &nodeId,
+                      NodeListT::const_iterator &node)
 {
   bool found = false;
   node = bpnodes.find(nodeId);
-  if(node != bpnodes.end()) {
+  if (node != bpnodes.end())
+  {
     found = true;
-  } else {
+  }
+  else
+  {
     node = cnodes.find(nodeId);
-    if(node != cnodes.end()) {
+    if (node != cnodes.end())
+    {
       found = true;
     }
   }
   return found;
 }
 
-bool ngrt4n::findNode(const NodeListT& nodes, const QString& nodeId, NodeListT::const_iterator& node)
+bool ngrt4n::findNode(const NodeListT &nodes, const QString &nodeId, NodeListT::const_iterator &node)
 {
   bool found = false;
   node = nodes.find(nodeId);
-  if(node != nodes.end()) {
+  if (node != nodes.end())
+  {
     found = true;
   }
   return found;
 }
 
-
-void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidCheck)
+void ngrt4n::setCheckOnError(int status, const QString &msg, CheckT &invalidCheck)
 {
   invalidCheck.status = status;
   invalidCheck.last_state_change = humanTimeText("0");
@@ -249,55 +196,52 @@ void ngrt4n::setCheckOnError(int status, const QString& msg, CheckT& invalidChec
   invalidCheck.alarm_msg = msg.toStdString();
 }
 
-
 /* return <[SourceId:]hostaddr, checkid> */
-StringPairT ngrt4n::splitDataPointInfo(const QString& info)
+StringPairT ngrt4n::splitDataPointInfo(const QString &info)
 {
   int pos = info.indexOf("/");
-  QString second = ((pos == -1)? "ping" : info.mid(pos+1));
+  QString second = ((pos == -1) ? "ping" : info.mid(pos + 1));
   return QPair<QString, QString>(info.left(pos), second);
 }
 
-
 /* return <source, hostaddr> */
-StringPairT ngrt4n::splitSourceDataPointInfo(const QString& info)
+StringPairT ngrt4n::splitSourceDataPointInfo(const QString &info)
 {
   int pos = info.indexOf(":");
   QString first;
-  if (pos == -1) {
-    first = SRC_BASENAME%"0";
+  if (pos == -1)
+  {
+    first = SRC_BASENAME % "0";
     return QPair<QString, QString>(first, info);
   }
 
-  return QPair<QString, QString>(info.left(pos), info.mid(pos+1));
+  return QPair<QString, QString>(info.left(pos), info.mid(pos + 1));
 }
 
-
-QString ngrt4n::getSourceIdFromStr(const QString& str)
+QString ngrt4n::getSourceIdFromStr(const QString &str)
 {
   QString srcid = "";
   int pos = str.indexOf(":");
-  if (pos != -1) {
+  if (pos != -1)
+  {
     srcid = str.mid(0, pos);
   }
   return srcid;
 }
 
-
-QStringList ngrt4n::getAuthInfo(const QString& authString)
+QStringList ngrt4n::getAuthInfo(const QString &authString)
 {
   QStringList authInfo = QStringList();
   int pos = authString.indexOf(":");
-  if (pos != -1) {
+  if (pos != -1)
+  {
     authInfo.push_back(authString.left(pos));
-    authInfo.push_back(authString.mid(pos+1, -1));
+    authInfo.push_back(authString.mid(pos + 1, -1));
   }
   return authInfo;
 }
 
-
-
-QString ngrt4n::basename(const QString& path)
+QString ngrt4n::basename(const QString &path)
 {
   int lastSlash = path.lastIndexOf('/');
 
@@ -307,19 +251,20 @@ QString ngrt4n::basename(const QString& path)
   return path.mid(lastSlash + 1, -1);
 }
 
-
-std::pair<int, QString> ngrt4n::loadDynamicViewByGroup(const SourceT& sinfo, const QString& filter, CoreDataT& cdata)
+std::pair<int, QString> ngrt4n::loadDynamicViewByGroup(const SourceT &sinfo, const QString &filter, CoreDataT &cdata)
 {
   const auto MONITOR_NAME = MonitorT::toString(sinfo.mon_type);
 
   ChecksT checks;
   auto loadSourceItemsOut = loadDataItems(sinfo, filter, checks);
-  if (loadSourceItemsOut.first != ngrt4n::RcSuccess) {
+  if (loadSourceItemsOut.first != ngrt4n::RcSuccess)
+  {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("%1: %2").arg(MONITOR_NAME, loadSourceItemsOut.second));
   }
 
   // handle results
-  if (checks.empty()) {
+  if (checks.empty())
+  {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("no item found (monitor: %1, filter: %2)").arg(MONITOR_NAME, filter));
   }
 
@@ -341,16 +286,19 @@ std::pair<int, QString> ngrt4n::loadDynamicViewByGroup(const SourceT& sinfo, con
   hostNode.type = NodeType::BusinessService;
   itemNode.type = NodeType::ITService;
 
-  for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check) {
-    hostNode.parents = QSet<QString>{ rootService.id };
+  for (ChecksT::ConstIterator check = checks.begin(); check != checks.end(); ++check)
+  {
+    hostNode.parents = QSet<QString>{rootService.id};
     hostNode.name = hostNode.description = QString::fromStdString(check->host);
     hostNode.id = "";
     hostNode.weight = ngrt4n::WEIGHT_UNIT;
     hostNode.sev_crule = CalcRules::Worst;
     hostNode.sev_prule = PropRules::Unchanged;
 
-    for (auto c : hostNode.name) {
-      if (c.isLetterOrNumber()) {
+    for (auto c : hostNode.name)
+    {
+      if (c.isLetterOrNumber())
+      {
         hostNode.id.append(c);
       }
     }
@@ -361,7 +309,7 @@ std::pair<int, QString> ngrt4n::loadDynamicViewByGroup(const SourceT& sinfo, con
     itemNode.sev_prule = PropRules::Unchanged;
     itemNode.id = ngrt4n::generateId();
     itemNode.parents.insert(hostNode.id);
-    itemNode.name = checkId.startsWith(hostNode.name+"/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
+    itemNode.name = checkId.startsWith(hostNode.name + "/") ? checkId.mid(hostNode.name.size() + 1) : checkId;
     itemNode.child_nodes = QString::fromStdString("%1:%2").arg(sinfo.id, checkId);
     cdata.bpnodes.insert(hostNode.id, hostNode);
     cdata.cnodes.insert(itemNode.id, itemNode);
@@ -373,69 +321,35 @@ std::pair<int, QString> ngrt4n::loadDynamicViewByGroup(const SourceT& sinfo, con
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
-
-std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& sinfo, const QString& filter, ChecksT& checks)
+std::pair<int, QString> ngrt4n::loadDataItems(const SourceT &sinfo, const QString &filter, ChecksT &checks)
 {
   // Nagios
-  if (sinfo.mon_type == MonitorT::Nagios) {
+  if (sinfo.mon_type == MonitorT::Nagios)
+  {
     int retcode = ngrt4n::RcGenericFailure;
     LsHelper handler(sinfo.ls_addr, static_cast<uint16_t>(sinfo.ls_port));
-    if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0) {
+    if (handler.setupSocket() == 0 && handler.loadChecks(filter, checks) == 0)
+    {
       retcode = ngrt4n::RcSuccess;
     }
     return std::make_pair(retcode, handler.lastError());
   }
 
   // Zabbix
-  if (sinfo.mon_type == MonitorT::Zabbix) {
+  if (sinfo.mon_type == MonitorT::Zabbix)
+  {
     ZbxHelper handler;
     int retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::GroupFilter);
-    if (checks.empty()) {
+    if (checks.empty())
+    {
       retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::HostFilter);
     }
     return std::make_pair(retcode, handler.lastError());
   }
 
-
-  // Zenoss
-  if (sinfo.mon_type == MonitorT::Zenoss) {
-    ZnsHelper handler(sinfo.mon_url);
-    int retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::HostFilter);
-    if (checks.empty()) {
-      retcode = handler.loadChecks(sinfo, checks, filter, ngrt4n::GroupFilter);
-    }
-    return std::make_pair(retcode, handler.lastError());
-  }
-
-
-  // Pandora
-  if (sinfo.mon_type == MonitorT::Pandora) {
-    PandoraHelper handler(sinfo.mon_url);
-    int retcode = handler.loadChecks(sinfo, checks, filter);
-    return std::make_pair(retcode, handler.lastError());
-  }
-
-
-  // OpManager
-  if (sinfo.mon_type == MonitorT::OpManager) {
-    int retcode = ngrt4n::RcGenericFailure;
-    OpManagerHelper handler(sinfo.mon_url);
-    if (filter.isEmpty()) {
-      retcode = handler.loadChecks(sinfo, OpManagerHelper::ListAllDevices, filter, checks);
-    } else {
-      retcode = handler.loadChecks(sinfo, OpManagerHelper::ListDeviceByName, filter, checks);
-      if (checks.empty()) {
-        retcode = handler.loadChecks(sinfo, OpManagerHelper::ListDeviceByCategory, filter, checks);
-        if (checks.empty()) {
-          retcode = handler.loadChecks(sinfo, OpManagerHelper::ListDeviceByType, filter, checks);
-        }
-      }
-    }
-    return std::make_pair(retcode, handler.lastError());
-  }
-
   // Kubernetes
-  if (sinfo.mon_type == MonitorT::Kubernetes) {
+  if (sinfo.mon_type == MonitorT::Kubernetes)
+  {
     K8sHelper k8s(sinfo.mon_url, sinfo.verify_ssl_peer);
     return std::make_pair(ngrt4n::RcGenericFailure, "TODO import k8s data points");
   }
@@ -443,63 +357,53 @@ std::pair<int, QString> ngrt4n::loadDataItems(const SourceT& sinfo, const QStrin
   return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot load data points for unknown data source: %1").arg(sinfo.mon_type));
 }
 
-
-std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT& cdata, const QString& path)
+std::pair<int, QString> ngrt4n::saveViewDataToPath(const CoreDataT &cdata, const QString &path)
 {
-  if (! ngrt4n::MonitorSourceTypes.contains(MonitorT::toString(cdata.monitor))) {
-    const_cast<CoreDataT&>(cdata).monitor = MonitorT::Any;
+  if (!ngrt4n::MonitorSourceTypes.contains(MonitorT::toString(cdata.monitor))) {
+    const_cast<CoreDataT &>(cdata).monitor = MonitorT::Any;
   }
-
   QFile file(path);
-  if (! file.open(QIODevice::WriteOnly|QIODevice::Text)) {
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("Cannot open file: %1").arg(path));
   }
-
-
   QTextStream outStream(&file);
   outStream << "<?xml version=\"1.0\"?>\n";
-
-  outStream << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg( QString::number(cdata.monitor) );
-
-  for (auto&& bpnode: cdata.bpnodes) {
+  outStream << QString("<ServiceView compat=\"3.1\" monitor=\"%1\">\n").arg(QString::number(cdata.monitor));
+  for (auto &&bpnode : cdata.bpnodes) {
     outStream << generateNodeXml(bpnode);
   }
-
-  for (auto&& cnode: cdata.cnodes) {
-    if (! cnode.parents.isEmpty()) {
+  for (auto &&cnode : cdata.cnodes) {
+    if (!cnode.parents.isEmpty()) {
       outStream << generateNodeXml(cnode);
     }
   }
-
   outStream << "</ServiceView>\n";
-
   file.close();
-  return std::make_pair(ngrt4n::RcSuccess, "");;
+  return std::make_pair(ngrt4n::RcSuccess, "");
 }
 
-
-QString ngrt4n::generateNodeXml(const NodeT& node)
+QString ngrt4n::generateNodeXml(const NodeT &node)
 {
   QString xml = QString("<Service id=\"%1\" "
                         " type=\"%2\" "
                         " statusCalcRule=\"%3\" "
                         " statusPropRule=\"%4\" "
-                        " weight=\"%5\"> \n"
-                        ).arg(node.id,
-                              QString::number(node.type),
-                              QString::number(node.sev_crule),
-                              QString::number(node.sev_prule),
-                              QString::number(node.weight));
+                        " weight=\"%5\"> \n")
+                    .arg(node.id,
+                         QString::number(node.type),
+                         QString::number(node.sev_crule),
+                         QString::number(node.sev_prule),
+                         QString::number(node.weight));
 
-  xml.append( QString(" <Name>%1</Name>\n").arg( encodeXml(node.name) ) )
-      .append( QString(" <Icon>%1</Icon>\n").arg(node.icon) )
-      .append( QString(" <Description>%1</Description>\n").arg( encodeXml(node.description) ) )
-      .append( QString(" <AlarmMsg>%1</AlarmMsg>\n").arg( encodeXml(node.alarm_msg) ) )
-      .append( QString(" <NotificationMsg>%1</NotificationMsg>\n").arg( encodeXml(node.notification_msg) ) )
-      .append( QString(" <SubServices>%1</SubServices>\n").arg( encodeXml(node.child_nodes) ) ) ;
+  xml.append(QString(" <Name>%1</Name>\n").arg(encodeXml(node.name)))
+      .append(QString(" <Icon>%1</Icon>\n").arg(node.icon))
+      .append(QString(" <Description>%1</Description>\n").arg(encodeXml(node.description)))
+      .append(QString(" <AlarmMsg>%1</AlarmMsg>\n").arg(encodeXml(node.alarm_msg)))
+      .append(QString(" <NotificationMsg>%1</NotificationMsg>\n").arg(encodeXml(node.notification_msg)))
+      .append(QString(" <SubServices>%1</SubServices>\n").arg(encodeXml(node.child_nodes)));
 
   if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
-    xml.append( QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)) );
+    xml.append(QString(" <Thresholds>%1</Thresholds>\n").arg(ThresholdHelper::listToData(node.thresholdLimits)));
   }
 
   xml.append("</Service>\n");
@@ -507,39 +411,36 @@ QString ngrt4n::generateNodeXml(const NodeT& node)
   return xml;
 }
 
-
-void ngrt4n::fixupDependencies(CoreDataT& cdata)
+void ngrt4n::fixupDependencies(CoreDataT &cdata)
 {
   // First clear all existing children for bpnodes
-  for (auto& node: cdata.bpnodes) {
+  for (auto &node : cdata.bpnodes) {
     if (node.type != NodeType::ExternalService) {
       node.child_nodes.clear();
     }
   }
 
   // bpnodes
-  for (const auto& node: cdata.bpnodes) {
-    for (const auto& parentId: node.parents) {
+  for (const auto &node : cdata.bpnodes) {
+    for (const auto &parentId : node.parents) {
       setParentChildDependency(node.id, parentId, cdata.bpnodes);
     }
   }
 
   // cnodes
-  for (const auto& node: cdata.cnodes) {
-    for (const auto& parentId: node.parents) {
+  for (const auto &node : cdata.cnodes) {
+    for (const auto &parentId : node.parents) {
       setParentChildDependency(node.id, parentId, cdata.bpnodes);
     }
   }
 }
 
-
-void ngrt4n::setParentChildDependency(const QString& childId, const QString& parentId, NodeListT& pnodes)
+void ngrt4n::setParentChildDependency(const QString &childId, const QString &parentId, NodeListT &pnodes)
 {
   auto parentRef = pnodes.find(parentId);
   if (parentRef == pnodes.end()) {
-    return ;
+    return;
   }
-
   if (parentRef->child_nodes.isEmpty()) {
     parentRef->child_nodes = childId;
   } else {
@@ -547,36 +448,35 @@ void ngrt4n::setParentChildDependency(const QString& childId, const QString& par
   }
 }
 
-
-QString ngrt4n::encodeXml(const QString& data)
+QString ngrt4n::encodeXml(const QString &data)
 {
   QString encodedData("");
-  for(const auto& character : data) {
-    switch (character.unicode())
-    {
-      case '&':
-        encodedData += "&amp;";
-        break;
-      case '\'':
-        encodedData += "&apos;";
-        break;
-      case '"':
-        encodedData += "&quot;"; break;
-      case '<':
-        encodedData += "&lt;";
-        break;
-      case '>':
-        encodedData += "&gt;";
-        break;
-      default:
-        encodedData += character;
-        break;
+  for (const auto &character : data) {
+    switch (character.unicode()) {
+    case '&':
+      encodedData += "&amp;";
+      break;
+    case '\'':
+      encodedData += "&apos;";
+      break;
+    case '"':
+      encodedData += "&quot;";
+      break;
+    case '<':
+      encodedData += "&lt;";
+      break;
+    case '>':
+      encodedData += "&gt;";
+      break;
+    default:
+      encodedData += character;
+      break;
     }
   }
   return encodedData;
 }
 
-QString ngrt4n::decodeXml(const QString& data)
+QString ngrt4n::decodeXml(const QString &data)
 {
   return QString(data)
       .replace("&amp;", "&")

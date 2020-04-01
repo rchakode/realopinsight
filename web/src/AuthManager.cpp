@@ -27,55 +27,48 @@
 #include "WebMainUI.hpp"
 #include "AuthManager.hpp"
 #include "AuthModelProxy.hpp"
-#include <Wt/Auth/Login>
-#include <Wt/Auth/AuthService>
-#include <Wt/Auth/AbstractUserDatabase>
-#include <Wt/WLineEdit>
 #include <functional>
-#include <Wt/Auth/AuthModel>
-#include <Wt/WPushButton>
-#include <Wt/WImage>
-#include <Wt/WApplication>
-#include <Wt/WEnvironment>
 #include <ctime>
+#include <Wt/Auth/Login.h>
+#include <Wt/Auth/AuthService.h>
+#include <Wt/Auth/AbstractUserDatabase.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/Auth/AuthModel.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WImage.h>
+#include <Wt/WApplication.h>
+#include <Wt/WEnvironment.h>
 
 AuthManager::AuthManager(DbSession* dbSession)
-  : Wt::Auth::AuthWidget(dbSession->loginObject()),
-    m_isActivatedLicense(false),
+  : Wt::Auth::AuthWidget(dbSession->wtAuthLogin()),
     m_dbSession(dbSession),
-    m_mainUI(nullptr)
+    m_mainUIRef(nullptr)
 {
-  AuthModelProxy* authModelProxy = new AuthModelProxy(m_dbSession->auth(), m_dbSession->users());
-  authModelProxy->loginFailed().connect(this, &AuthManager::handleLoginFailed);
-  authModelProxy->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
-  authModelProxy->addPasswordAuth(m_dbSession->passwordAuthentificator());
-  setModel(authModelProxy);
+  auto authProxyModel = std::make_unique<AuthModelProxy>(m_dbSession);
+  authProxyModel->loginFailed().connect(this, &AuthManager::handleLoginFailed);
+  authProxyModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
+  authProxyModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
+  setModel(std::move(authProxyModel));
   setRegistrationEnabled(false);
-  m_dbSession->loginObject().changed().connect(this, &AuthManager::handleAuthentication);
+  m_dbSession->wtAuthLogin().changed().connect(this, &AuthManager::handleAuthorization);
 }
 
 
-void AuthManager::handleAuthentication(void)
+void AuthManager::handleAuthorization(void)
 {
-  if (m_dbSession->isLogged()) {
-    m_dbSession->setLoggedUser();
+  if (! m_dbSession->isLogged()) {
+    wApp->removeCookie("realopinsightcookie", "", "");
+    CORE_LOG("info", QObject::tr("%1 logged out").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
+  } else {
+    m_dbSession->decodeLoggedUser();
     DboLoginSession sessionInfo;
     sessionInfo.username = m_dbSession->loggedUser().username;
     sessionInfo.sessionId = wApp->sessionId();
-    sessionInfo.firstAccess
-        = sessionInfo.lastAccess
-          = Wt::WDateTime::currentDateTime().toString().toUTF8();
+    sessionInfo.firstAccess = sessionInfo.lastAccess = Wt::WDateTime::currentDateTime().toString().toUTF8();
     sessionInfo.status = DboLoginSession::ActiveCookie;
-
     m_dbSession->addSession(sessionInfo);
     wApp->setCookie(sessionInfo.username, sessionInfo.sessionId, 3600, "", "", false);
-
-    QString logMsg = QObject::tr("%1 logged in. Session Id: %2")
-                     .arg(m_dbSession->loggedUser().username.c_str(), sessionInfo.sessionId.c_str());
-    CORE_LOG("info",logMsg.toStdString());
-  } else {
-    wApp->removeCookie(m_dbSession->loggedUser().username, "", "");
-    CORE_LOG("info", QObject::tr("%1 logged out").arg(m_dbSession->loggedUser().username.c_str()).toStdString());
+    CORE_LOG("info", QObject::tr("%1 logged in. Session Id: %2").arg(m_dbSession->loggedUser().username.c_str(), sessionInfo.sessionId.c_str()).toStdString());
   }
 }
 
@@ -83,45 +76,39 @@ void AuthManager::createLoginView(void)
 {
   Wt::Auth::AuthWidget::createLoginView();
   bindWidget("footer", ngrt4n::footer());
-  bindWidget("info-box", m_infoBox = new Wt::WText());
+  auto infoBox = std::make_unique<Wt::WText>();
+  m_infoBoxRef = infoBox.get();
+  bindWidget("info-box", std::move(infoBox));
 }
 
 void AuthManager::createLoggedInView(void)
 {
   setTemplateText(tr("Wt.Auth.template.logged-in"));
-  m_dbSession->setLoggedUser();
+  m_dbSession->decodeLoggedUser();
   DboLoginSession sessionInfo;
   sessionInfo.username = m_dbSession->loggedUser().username;
   try {
-    bindWidget("main-ui", m_mainUI = new WebMainUI(this));
+    auto mainUI = std::make_unique<WebMainUI>(this);
+    m_mainUIRef = mainUI.get();
+    m_mainUIRef->signoutTriggered().connect(this, &AuthManager::logout);
+    bindWidget("main-ui", std::move(mainUI));
     bindEmpty("update-banner");
   } catch (const std::bad_alloc& ) {
     bindString("main-ui", "You are likely running low on memory, please upgrade your system !");
   }
-
-  // create the logout button
-  Wt::WImage* image = new Wt::WImage(Wt::WLink("images/built-in/logout.png"), m_mainUI);
-  image->setToolTip(QObject::tr("Sign out").toStdString());
-  image->clicked().connect(this, &AuthManager::logout);
-  bindWidget("logout-item", image);
 }
+
 
 void AuthManager::logout(void)
 {
-  m_dbSession->loginObject().logout();
-  // reload the application => don't use refresh();
-  wApp->doJavaScript("location.reload();");
-}
-
-
-bool AuthManager::isLogged(void)
-{
-  return m_dbSession->loginObject().loggedIn();
+  m_dbSession->wtAuthLogin().logout();
+  m_mainUIRef->removeGlobalWidget();
+  CORE_LOG("debug", "disconnected");
 }
 
 
 void AuthManager::handleLoginFailed(std::string data)
 {
-  m_infoBox->setText(data);
-  m_infoBox->setStyleClass("alert alert-danger");
+  m_infoBoxRef->setText(data);
+  m_infoBoxRef->setStyleClass("alert alert-danger");
 }

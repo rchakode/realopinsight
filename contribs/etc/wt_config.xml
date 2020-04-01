@@ -83,7 +83,7 @@
 	       the URL will not be cluttered with a sessionid.
 	       However, WApplication::refresh() will never be called.
 	      -->
-	    <reload-is-new-session>true</reload-is-new-session>
+        <reload-is-new-session>true</reload-is-new-session>
 
 	    <!-- Session timeout (seconds).
 

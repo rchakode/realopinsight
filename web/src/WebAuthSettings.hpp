@@ -25,19 +25,18 @@
 #define WEBAUTHSETTINGS_HPP
 
 #include "WebBaseSettings.hpp"
-#include <Wt/WTemplate>
-#include <Wt/WDialog>
-#include <Wt/WRadioButton>
-#include <Wt/WLineEdit>
-#include <Wt/WComboBox>
-#include <Wt/WPushButton>
-#include <Wt/WSpinBox>
-#include <Wt/WCheckBox>
-#include <Wt/WObject>
-#include <Wt/WStringListModel>
-#include <Wt/WLengthValidator>
 #include <memory>
-
+#include <Wt/WTemplate.h>
+#include <Wt/WDialog.h>
+#include <Wt/WRadioButton.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WSpinBox.h>
+#include <Wt/WCheckBox.h>
+#include <Wt/WObject.h>
+#include <Wt/WStringListModel.h>
+#include <Wt/WLengthValidator.h>
 
 class WebAuthSettings : public WebBaseSettings, public Wt::WTemplate
 {
@@ -57,33 +56,21 @@ private:
   Wt::Signal<int> m_authSystemChanged;
 
   // auth settings properties
-  Wt::WComboBox m_authenticationModeField;
-  Wt::WLineEdit m_ldapServerUriField;
-  Wt::WComboBox m_ldapVersionField;
-  Wt::WLineEdit m_ldapBindUserDnField;
-  Wt::WLineEdit m_ldapBindUserPasswordField;
-  Wt::WLineEdit m_ldapIdField;
-  Wt::WLineEdit m_ldapSearchBaseField;
-  Wt::WPushButton m_authSettingsSaveBtn;
-  Wt::WCheckBox m_ldapSslUseCertField;
-  Wt::WLineEdit m_ldapSslCertFileField;
-  Wt::WLineEdit m_ldapSslCaFileField;
-  Wt::WLineEdit m_authStringField;
-  Wt::WCheckBox m_showAuthStringField;
+  Wt::WComboBox* m_authModeFieldRef;
+  Wt::WLineEdit* m_ldapServerURIFieldRef;
+  Wt::WComboBox* m_ldapVersionFieldRef;
+  Wt::WLineEdit* m_ldapBindDnFieldRef;
+  Wt::WLineEdit* m_ldapBindPassFieldRef;
+  Wt::WLineEdit* m_ldapUIDFieldRef;
+  Wt::WLineEdit* m_ldapSearchBaseFieldRef;
+  Wt::WPushButton* m_applyBtnRef;
+  Wt::WCheckBox* m_ldapSslUseCertFieldRef;
+  Wt::WLineEdit* m_ldapSslCertFileFieldRef;
+  Wt::WLineEdit* m_ldapSslCaFileFieldRef;
 
-
-  void createLdapSettingsFields(void);
-  void createAuthSettingsFields(void);
-  void createButtons(void);
-
-  void addEvent(void);
-  void bindFormWidgets(void);
-  void unbindFormWidgets(void);
   void saveChanges(void);
   bool validateAuthSettingsFields(void);
-  void showLdapSslSettings(bool display);
   void handleAuthTypeChanged(void);
-  void handleShowAuthStringChanged(void);
   void handleLdapUseSslChanged(void);
 };
 

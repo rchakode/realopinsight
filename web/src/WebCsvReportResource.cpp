@@ -1,7 +1,7 @@
 #include "WebCsvReportResource.hpp"
-#include <Wt/Http/Request>
-#include <Wt/Http/Response>
-#include <Wt/WImage>
+#include <Wt/Http/Request.h>
+#include <Wt/Http/Response.h>
+#include <Wt/WImage.h>
 
 
 
@@ -43,16 +43,16 @@ void WebCsvExportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Res
 WebCsvExportIcon::WebCsvExportIcon(void)
   : Wt::WAnchor()
 {
+  m_csvResource = std::make_shared<WebCsvExportResource>();
+  Wt::WLink link(m_csvResource);
+  link.setTarget(Wt::LinkTarget::NewWindow);
+  setLink(link);
   setToolTip(Q_TR("Export data in a CSV file"));
-  setTarget(Wt::TargetNewWindow);
-  // note that the ownership of the resource is not translated to the link
-  setLink( Wt::WLink(&m_csvResource) );
-  // the ownership of the image is transfered to the Anchor
-  setImage( new Wt::WImage("images/built-in/csv-file.png") );
+  setImage(std::make_unique<Wt::WImage>("images/built-in/csv-file.png"));
 }
 
 
 void WebCsvExportIcon::updateData(const std::string& viewName, const QosDataList& qosData)
 {
-  m_csvResource.updateData(viewName, qosData);
+  m_csvResource->updateData(viewName, qosData);
 }

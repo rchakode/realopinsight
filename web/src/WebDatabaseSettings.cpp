@@ -28,99 +28,89 @@
 #include "Validators.hpp"
 #include "dbo/src/DbSession.hpp"
 #include <QString>
-#include <Wt/WTemplate>
-#include <Wt/WContainerWidget>
-#include <Wt/WButtonGroup>
-#include <Wt/WLabel>
-#include <Wt/WLineEdit>
-#include <Wt/WPushButton>
-#include <Wt/WIntValidator>
-#include <Wt/WApplication>
+#include <Wt/WTemplate.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WButtonGroup.h>
+#include <Wt/WLabel.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WIntValidator.h>
+#include <Wt/WApplication.h>
 
 
 WebDatabaseSettings::WebDatabaseSettings(void)
   : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("database-settings-form.tpl"))
 {
-  setMargin(0, Wt::All);
-  createFormWidgets();
-  bindFormWidgets();
-  addEvent();
+  setMargin(0, Wt::AllSides);
+
+  auto dbType = std::make_unique<Wt::WComboBox>();
+  m_dbTypeBoxRef = dbType.get();
+  dbType->addItem(Q_TR("Sqlite3"));
+  dbType->addItem(Q_TR("PostgreSQL"));
+  dbType->changed().connect(this, &WebDatabaseSettings::updateFieldEnabledState);
+  bindWidget("database-type", std::move(dbType));
+
+  auto applyBtn = std::make_unique<Wt::WPushButton>();
+  m_applyBtnRef = applyBtn.get();
+  applyBtn->setText(Q_TR("Save"));
+  applyBtn->setToolTip(Q_TR("Changes will be saved. Then you should disconnect manually to have the changes take effect"));
+  applyBtn->setStyleClass("btn btn-info");
+  applyBtn->clicked().connect(this, &WebDatabaseSettings::applySettings);
+  bindWidget("database-save-settings-btn", std::move(applyBtn));
+
+  auto dbServer = std::make_unique<Wt::WLineEdit>();
+  m_dbServerFieldRef = dbServer.get();
+  m_dbServerFieldRef->setPlaceholderText("hostname or IP address");
+  bindWidget("database-server-addr", std::move(dbServer));
+
+  auto dbPort = std::make_unique<Wt::WLineEdit>();
+  m_dbPortFieldRef = dbPort.get();
+  m_dbPortFieldRef->setPlaceholderText("5432");
+  bindWidget("database-server-port", std::move(dbPort));
+
+  auto dbName = std::make_unique<Wt::WLineEdit>();
+  m_dbNameFieldRef = dbName.get();
+  bindWidget("database-name", std::move(dbName));
+
+  auto dbEmptyState = std::make_unique<Wt::WCheckBox>();
+  m_dbEmptyStateRef = dbEmptyState.get();
+  dbEmptyState->setChecked(true);
+  bindWidget("database-empty-state", std::move(dbEmptyState));
+
+  auto dbUser = std::make_unique<Wt::WLineEdit>();
+  m_dbUserFieldRef = dbUser.get();
+  bindWidget("database-user", std::move(dbUser));
+
+  auto dbPass = std::make_unique<Wt::WLineEdit>();
+  m_dbPassFieldRef = dbPass.get();
+  m_dbPassFieldRef->setEchoMode(Wt::EchoMode::Password);
+  bindWidget("database-password", std::move(dbPass));
+
   updateContents();
 }
 
 
-WebDatabaseSettings::~WebDatabaseSettings(void)
-{
-  unbindFormWidgets();
-}
-
-
-void WebDatabaseSettings::addEvent(void)
-{
-  m_saveSettingsBtn.clicked().connect(this, &WebDatabaseSettings::applySettings);
-  m_dbTypeBox.changed().connect(this, &WebDatabaseSettings::updateFieldEnabledState);
-}
-
-
-
-void WebDatabaseSettings::bindFormWidgets(void)
-{
-  bindWidget("database-type", &m_dbTypeBox);
-  bindWidget("database-save-settings-btn", &m_saveSettingsBtn);
-  bindWidget("database-server-addr", &m_dbServerAddrField);
-  bindWidget("database-server-port", &m_dbServerPortField);
-  bindWidget("database-name", &m_dbNameField);
-  bindWidget("database-empty-state", &m_dbEmptyState);
-  bindWidget("database-user", &m_dbUserField);
-  bindWidget("database-password", &m_dbPasswordField);
-
-  // Initialize fields when applicable
-  m_dbEmptyState.setChecked(true);
-}
-
-
-void WebDatabaseSettings::unbindFormWidgets(void)
-{
-  takeWidget("database-type");
-  takeWidget("database-save-settings-btn");
-  takeWidget("database-server-addr");
-  takeWidget("database-server-port");
-  takeWidget("database-name");
-  takeWidget("database-empty-state");
-  takeWidget("database-user");
-  takeWidget("database-password");
-}
-
-
-void WebDatabaseSettings::createFormWidgets(void)
-{
-  m_dbTypeBox.addItem(Q_TR("Sqlite3"));
-  m_dbTypeBox.addItem(Q_TR("PostgreSQL"));
-  m_dbPasswordField.setEchoMode(Wt::WLineEdit::Password);
-  m_saveSettingsBtn.setText(Q_TR("Save"));
-  m_saveSettingsBtn.setToolTip(Q_TR("Changes will be saved. Then you should disconnect manually to have the changes take effect"));
-  m_saveSettingsBtn.setStyleClass("btn btn-info");
-}
-
+WebDatabaseSettings::~WebDatabaseSettings(void){ }
 
 void WebDatabaseSettings::applySettings(void)
 {
-  m_settingFactory->setEntry(SettingFactory::DB_TYPE, QString::number(m_dbTypeBox.currentIndex()));
-
-  // save PostgreSQL settings if applicable
-  if (m_dbTypeBox.currentIndex() == PostgresqlDb) {
-    m_settingFactory->setEntry(SettingFactory::DB_SERVER_ADDR, m_dbServerAddrField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::DB_SERVER_PORT, m_dbServerPortField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::DB_USER, m_dbUserField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::DB_PASSWORD, m_dbPasswordField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::DB_NAME, m_dbNameField.text().toUTF8().c_str());
+  SettingFactory settings;
+  settings.setKeyValue(SettingFactory::DB_TYPE, QString::number(m_dbTypeBoxRef->currentIndex()));
+  // PostgreSQL-specific settings
+  if (m_dbTypeBoxRef->currentIndex() == PostgresqlDb) {
+    auto pass =  m_dbPassFieldRef->text().toUTF8();
+    auto passEncoded = SettingFactory::base64Encode(reinterpret_cast<const unsigned char *>(pass.c_str()), pass.size());
+    settings.setKeyValue(SettingFactory::DB_PASSWORD, QString::fromStdString(passEncoded));
+    settings.setKeyValue(SettingFactory::DB_USER, m_dbUserFieldRef->text().toUTF8().c_str());
+    settings.setKeyValue(SettingFactory::DB_SERVER_ADDR, m_dbServerFieldRef->text().toUTF8().c_str());
+    settings.setKeyValue(SettingFactory::DB_SERVER_PORT, m_dbPortFieldRef->text().toUTF8().c_str());
+    settings.setKeyValue(SettingFactory::DB_NAME, m_dbNameFieldRef->text().toUTF8().c_str());
   }
-
   // test connection and initialize the database if needed
-  if (m_dbEmptyState.checkState() == Wt::Checked) {
-    DbSession dbSession(getDbType(), getDbConnectionString());
-    if (dbSession.isConnected() && dbSession.initDb() == ngrt4n::RcSuccess) {
+  if (m_dbEmptyStateRef->checkState() == Wt::CheckState::Checked) {
+    DbSession dbSession;
+    if (dbSession.isReady() && dbSession.initDb() == ngrt4n::RcSuccess) {
       m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("Changes applied: Please *disconnect* and *reconnect* to have the changes take effect"));
     } else {
       m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Failed to initialize the database. Check logs for more details"));
@@ -135,25 +125,25 @@ void WebDatabaseSettings::applySettings(void)
 
 void WebDatabaseSettings::updateFieldEnabledState(void)
 {
-  bool enable = m_dbTypeBox.currentIndex() == PostgresqlDb;
-  m_dbServerAddrField.setEnabled(enable);
-  m_dbServerPortField.setEnabled(enable);
-  m_dbNameField.setEnabled(enable);
-  m_dbUserField.setEnabled(enable);
-  m_dbPasswordField.setEnabled(enable);
-  m_dbEmptyState.setEnabled(enable);
+  m_dbEmptyStateRef->setEnabled(true);
+  bool enable = m_dbTypeBoxRef->currentIndex() == PostgresqlDb;
+  m_dbServerFieldRef->setEnabled(enable);
+  m_dbPortFieldRef->setEnabled(enable);
+  m_dbNameFieldRef->setEnabled(enable);
+  m_dbUserFieldRef->setEnabled(enable);
+  m_dbPassFieldRef->setEnabled(enable);
 }
 
 
 void WebDatabaseSettings::updateFields(void)
 {
-  m_dbTypeBox.setCurrentIndex( getDbType() );
-  m_dbServerAddrField.setText( getDbServerAddr() );
-  m_dbServerPortField.setText( QString::number(getDbServerPort()).toStdString().c_str() );
-  m_dbUserField.setText( getDbUser() );
-  m_dbPasswordField.setEchoMode(Wt::WLineEdit::Password);
-  m_dbPasswordField.setText( getDbPassword() );
-  m_dbNameField.setText( getDbName() );
+  m_dbTypeBoxRef->setCurrentIndex( getDbType() );
+  m_dbServerFieldRef->setText( getDbServerAddr() );
+  m_dbPortFieldRef->setText( QString::number(getDbServerPort()).toStdString().c_str() );
+  m_dbUserFieldRef->setText( getDbUser() );
+  m_dbPassFieldRef->setEchoMode(Wt::EchoMode::Password);
+  m_dbPassFieldRef->setText( getDbPassword() );
+  m_dbNameFieldRef->setText( getDbName() );
   updateFieldEnabledState();
 }
 

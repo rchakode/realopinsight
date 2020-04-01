@@ -9,10 +9,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,7 +25,7 @@
 #include <iostream>
 #include <boost/thread/condition.hpp>
 
-#include "WQApplication"
+#include "WQApplication.h"
 #include "DispatchThread.h"
 
 namespace {
@@ -33,60 +33,60 @@ namespace {
 
 namespace Wt {
 
-WQApplication::WQApplication(const WEnvironment& env, bool withEventLoop)
-  : WApplication(env),
-    withEventLoop_(withEventLoop),
-    thread_(0),
-    finalized_(false)
-{ }
+  WQApplication::WQApplication(const WEnvironment& env, bool withEventLoop)
+    : WApplication(env),
+      withEventLoop_(withEventLoop),
+      thread_(0),
+      finalized_(false)
+  { }
 
-void WQApplication::initialize()
-{
-  WApplication::initialize();
+  void WQApplication::initialize()
+  {
+    WApplication::initialize();
 
-  create();
-}
-
-void WQApplication::finalize()
-{
-  WApplication::finalize();
-
-  destroy();
-  thread_->destroy();
-
-  finalized_ = true;
-}
-
-void WQApplication::notify(const WEvent& e)
-{
-  if (!thread_) {
-    thread_ = new DispatchThread(this, withEventLoop_);
-    thread_->start();
-    thread_->waitDone();
+    create();
   }
 
-  thread_->notify(e);
+  void WQApplication::finalize()
+  {
+    WApplication::finalize();
 
-  if (finalized_) {
-    thread_->wait();
-    delete thread_;
-    thread_ = 0;
+    destroy();
+    thread_->destroy();
+
+    finalized_ = true;
   }
-}
 
-void WQApplication::realNotify(const WEvent& e)
-{
-  WApplication::notify(e);
-}
+  void WQApplication::notify(const WEvent& e)
+  {
+    if (!thread_) {
+      thread_ = new DispatchThread(this, withEventLoop_);
+      thread_->start();
+      thread_->waitDone();
+    }
 
-WString toWString(const QString& s)
-{
-  return WString::fromUTF8((const char *)s.toUtf8());
-}
+    thread_->notify(e);
 
-QString toQString(const WString& s)
-{
-  return QString::fromUtf8(s.toUTF8().c_str());
-}
+    if (finalized_) {
+      thread_->wait();
+      delete thread_;
+      thread_ = 0;
+    }
+  }
+
+  void WQApplication::realNotify(const WEvent& e)
+  {
+    WApplication::notify(e);
+  }
+
+  WString toWString(const QString& s)
+  {
+    return WString::fromUTF8((const char *)s.toUtf8());
+  }
+
+  QString toQString(const WString& s)
+  {
+    return QString::fromUtf8(s.toUTF8().c_str());
+  }
 
 }

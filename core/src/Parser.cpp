@@ -32,13 +32,9 @@
 #include <cassert>
 
 
-Parser::Parser(CoreDataT* _cdata,
-               int _parsingMode,
-               const BaseSettings* settings,
-               DbSession* dbSession)
+Parser::Parser(CoreDataT* _cdata, int _parsingMode, DbSession* dbSession)
   : m_cdata(_cdata),
     m_parsingMode(_parsingMode),
-    m_settings(settings),
     m_dbSession(dbSession)
 {
 }
@@ -117,7 +113,7 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
     if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
       QString thdata = xmlNode.firstChildElement("Thresholds").text().trimmed();
       node.thresholdLimits = ThresholdHelper::dataToList(thdata);
-      qSort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
+      std::sort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
     }
 
     node.check.status = -1;
@@ -263,7 +259,8 @@ int Parser::computeCoordinates(void)
   QStringList arguments = QStringList() << "-Tplain"<< "-o" << m_plainFile << m_dotFile;
 
   int exitCode = -2;
-  switch (m_settings->getGraphLayout()) {
+  SettingFactory settings;
+  switch (settings.getGraphLayout()) {
     case ngrt4n::DotLayout:
       exitCode = process.execute("dot", arguments);
       break;
@@ -300,8 +297,8 @@ int Parser::computeCoordinates(void)
     return ngrt4n::RcGenericFailure;
   }
 
-  const ScaleFactors SCALE_FACTORS(m_settings->getGraphLayout());
-  m_cdata->graph_mode = static_cast<qint8>(m_settings->getGraphLayout());
+  const ScaleFactors SCALE_FACTORS(settings.getGraphLayout());
+  m_cdata->graph_mode = static_cast<qint8>(settings.getGraphLayout());
   auto maxWidthRaw = splitedLine[2].trimmed().toDouble();
   m_cdata->map_width = maxWidthRaw * SCALE_FACTORS.x() + NEATO_X_TRANSLATION_FACTOR * maxWidthRaw;
   m_cdata->map_height = splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
@@ -342,7 +339,7 @@ int Parser::computeCoordinates(void)
 
   qfile.close();
 
-  if (m_settings->getGraphLayout() == ngrt4n::NeatoLayout) {
+  if (settings.getGraphLayout() == ngrt4n::NeatoLayout) {
     m_cdata->min_x -= (max_text_w * 0.6);
     m_cdata->min_y -= (max_text_h * 0.6);
   }
