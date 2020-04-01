@@ -25,15 +25,15 @@
 #ifndef USER_HPP
 #define USER_HPP
 
+#include "WebUtils.hpp"
 #include <string>
 #include <list>
-#include <Wt/Dbo/Dbo>
 #include <string>
 #include <set>
-#include <Wt/WDateTime>
-#include <QString>
 #include <QMap>
-#include "WebUtils.hpp"
+#include <QString>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/WDateTime.h>
 
 namespace dbo = Wt::Dbo;
 
@@ -323,7 +323,11 @@ struct NotificationT {
   int view_status;
   std::string view_name;
   std::string ack_username;
-  NotificationT(): view_status(-1) { }
+  NotificationT():
+    timestamp(0),
+    last_change(0),
+    ack_status(0),
+    view_status(-1) { }
 };
 
 /** holds notification info like a wt::dbo object */

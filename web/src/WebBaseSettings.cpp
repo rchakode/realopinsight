@@ -21,122 +21,137 @@
 #--------------------------------------------------------------------------#
  */
 
-
 #include "WebBaseSettings.hpp"
 #include "utilsCore.hpp"
 #include <ldap.h>
+#include <Wt/WGlobal.h>
 
 WebBaseSettings::WebBaseSettings(void)
-  : BaseSettings("/opt/realopinsight/etc/realopinsight.conf")
+  : BaseSettings()
 {
 }
 
+bool WebBaseSettings::getLdapSslUseMyCert(void) const
+{
+  return SettingFactory().keyValue(SettingFactory::AUTH_LDAP_SSL_USE_CERT).toInt() == int(Wt::CheckState::Checked);
+}
 
 int WebBaseSettings::getLdapVersion(void) const
 {
-  std::string val = m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_VERSION).toStdString();
-  if (val != LDAP_VERSION3_LABEL)
+  std::string val =SettingFactory().keyValue(SettingFactory::AUTH_LDAP_VERSION).toStdString();
+  if (val != LDAP_VERSION3_LABEL) {
     return LDAP_VERSION2;
-
+  }
   return LDAP_VERSION3;
 }
 
-
 int WebBaseSettings::getAuthenticationMode(void) const
 {
-  int val = m_settingFactory->keyValue(SettingFactory::AUTH_MODE_KEY).toInt();
-  if (val != LDAP)
+  int val = SettingFactory().keyValue(SettingFactory::AUTH_MODE_KEY).toInt();
+  if (val != LDAP) {
     return BuiltIn;
-
+  }
   return val;
 }
 
-
-
 std::string WebBaseSettings::getLdapIdField(void) const
 {
-  QString val = m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_ID_FIELD);
-  if (val.isEmpty())
+  QString val = SettingFactory().keyValue(SettingFactory::AUTH_LDAP_ID_FIELD);
+  if (val.isEmpty()) {
     return "uid";
-
+  }
   return val.toStdString();
 }
 
-
 int WebBaseSettings::getDbType(void) const
 {
-  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_TYPE") );
-  if (! configValueStr.isEmpty()) {
-    return configValueStr.toInt();
+  QString v = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_DB_TYPE"));
+  if (!v.isEmpty()) {
+    return v.toInt();
   }
-  return m_settingFactory->keyValue(SettingFactory::DB_TYPE).toInt();
+  return SettingFactory().keyValue(SettingFactory::DB_TYPE).toInt();
 }
 
 std::string WebBaseSettings::getDbServerAddr(void) const
 {
-  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_SERVER_ADDR") );
-  if (! configValueStr.isEmpty()) {
-    return configValueStr.toStdString();
+  QString v = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_DB_SERVER_ADDR"));
+  if (!v.isEmpty()) {
+    return v.toStdString();
   }
-  return m_settingFactory->keyValue(SettingFactory::DB_SERVER_ADDR).toStdString();
+  return SettingFactory().keyValue(SettingFactory::DB_SERVER_ADDR).toStdString();
 }
-
 
 int WebBaseSettings::getDbServerPort(void) const
 {
-  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_SERVER_PORT") );
-  if (! configValueStr.isEmpty()) {
-    return configValueStr.toInt();
+  QString v = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_DB_SERVER_PORT"));
+  if (!v.isEmpty()) {
+    return v.toInt();
   }
-  return m_settingFactory->keyValue(SettingFactory::DB_SERVER_PORT).toInt();
+  return SettingFactory().keyValue(SettingFactory::DB_SERVER_PORT).toInt();
 }
-
 
 std::string WebBaseSettings::getDbName(void) const
 {
-  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_NAME") );
-  if (! configValueStr.isEmpty()) {
-    return configValueStr.toStdString();
+  QString v = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_DB_NAME"));
+  if (!v.isEmpty()) {
+    return v.toStdString();
   }
-  return m_settingFactory->keyValue(SettingFactory::DB_NAME).toStdString();
+  return SettingFactory().keyValue(SettingFactory::DB_NAME).toStdString();
 }
-
 
 std::string WebBaseSettings::getDbUser(void) const
 {
-  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_USER") );
-  if (! configValueStr.isEmpty()) {
-    return configValueStr.toStdString();
+  QString v = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_DB_USER"));
+  if (! v.isEmpty()) {
+    return v.toStdString();
   }
-  return m_settingFactory->keyValue(SettingFactory::DB_USER).toStdString();
+  return SettingFactory().keyValue(SettingFactory::DB_USER).toStdString();
 }
-
 
 std::string WebBaseSettings::getDbPassword(void) const
 {
-  QString configValueStr = QString::fromLocal8Bit( qgetenv("REALOPINSIGHT_DB_PASSWORD") );
-  if (! configValueStr.isEmpty()) {
-    return configValueStr.toStdString();
+  auto v = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_DB_PASSWORD"));
+  if (! v.isEmpty()) {
+    return v.toStdString();
   }
-  return m_settingFactory->keyValue(SettingFactory::DB_PASSWORD).toStdString();
+  return SettingFactory::base64Decode(SettingFactory().keyValue(SettingFactory::DB_PASSWORD).toStdString());
 }
 
-std::string WebBaseSettings::getDbConnectionString(void) const
+std::string WebBaseSettings::getDbConnectionName(void) const
 {
-  std::string connectionString = "";
+  std::string cn = "";
   if (getDbType() == PostgresqlDb) {
     CORE_LOG("info", Q_TR("Using PostgreSQL database"));
-    connectionString = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
-                       .arg(getDbServerAddr())
-                       .arg(getDbServerPort())
-                       .arg(getDbName())
-                       .arg(getDbUser())
-                       .arg(getDbPassword())
-                       .toUTF8();
-  } else { // use Sqlite3 as default database
+    cn = Wt::WString("host={1} port={2} dbname={3} user={4} password={5}")
+        .arg(getDbServerAddr())
+        .arg(getDbServerPort())
+        .arg(getDbName())
+        .arg(getDbUser())
+        .arg(getDbPassword())
+        .toUTF8();
+  } else{
     CORE_LOG("info", Q_TR("Using Sqlite3 database"));
-    connectionString = ngrt4n::sqliteDbPath();
+    cn = ngrt4n::sqliteDbPath();
   }
 
-  return connectionString;
+  return cn;
+}
+
+std::string WebBaseSettings::getDbConnectionNameDebug(void) const
+{
+  std::string cn = "";
+  if (getDbType() == PostgresqlDb) {
+    CORE_LOG("info", Q_TR("Using PostgreSQL database"));
+    cn = Wt::WString("host={1} port={2} dbname={3} user={4} password=*****")
+        .arg(getDbServerAddr())
+        .arg(getDbServerPort())
+        .arg(getDbName())
+        .arg(getDbUser())
+        .toUTF8();
+  } else{
+    CORE_LOG("info", Q_TR("Using Sqlite3 database"));
+    cn = ngrt4n::sqliteDbPath();
+  }
+
+  return cn;
 }

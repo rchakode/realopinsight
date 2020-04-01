@@ -26,66 +26,102 @@
 #include "WebDashboard.hpp"
 #include "Base.hpp"
 #include "utilsCore.hpp"
+#include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <fstream>
-#include <QDebug>
-#include <Wt/WApplication>
-#include <Wt/WPanel>
-#include <Wt/WPointF>
-#include <Wt/WText>
-#include <Wt/WLink>
-#include <Wt/WImage>
-#include <Wt/WTemplate>
+#include <Wt/WApplication.h>
+#include <Wt/WPanel.h>
+#include <Wt/WPointF.h>
+#include <Wt/WText.h>
+#include <Wt/WLink.h>
+#include <Wt/WImage.h>
+#include <Wt/WTemplate.h>
 
 
 
 WebDashboard::WebDashboard(DbSession* dbSession)
   : DashboardBase(dbSession)
 {
-  setCData(&m_cdata);
-  bindFormWidgets();
-  addJsEventScript();
-  map()->containerSizeChanged().connect(this, & WebDashboard::hanleRenderingAreaSizeChanged);
+  m_eventItemsContainerLayout = std::make_unique<Wt::WVBoxLayout>();
+  auto mainLayout = std::make_unique<Wt::WGridLayout>();
+  m_mainLayoutRef = mainLayout.get();
+  mainLayout->setColumnResizable(0);
+  mainLayout->setColumnResizable(1);
+  mainLayout->setRowResizable(0);
+  mainLayout->setRowResizable(1);
+
+  auto tree = std::make_unique<WebTree>(&m_cdata);
+  m_treeRef = tree.get();
+  auto treeContainer = std::make_unique<Wt::WContainerWidget>();
+  m_treeContainerId = treeContainer->id();
+  treeContainer->setOverflow(Wt::Overflow::Auto);
+  treeContainer->addWidget(std::move(tree));
+  mainLayout->addWidget(std::move(treeContainer), 0, 0);
+
+  auto map = std::make_unique<WebMap>(&m_cdata);
+  m_mapRef = map.get();
+  map->containerSizeChanged().connect(this, & WebDashboard::hanleRenderingAreaSizeChanged);
+  auto mapContainer = std::make_unique<Wt::WContainerWidget>();
+  m_mapContainerId = mapContainer->id();
+  mapContainer->setOverflow(Wt::Overflow::Auto);
+  mapContainer->addWidget(std::move(map));
+  mainLayout->addWidget(std::move(mapContainer), 0, 1);
+
+  auto chart = std::make_unique<WebPieChart>();
+  m_chartRef = chart.get();
+  auto chartContainer = std::make_unique<Wt::WContainerWidget>();
+  m_chartContainerId = chartContainer->id();
+  chartContainer->setOverflow(Wt::Overflow::Auto);
+  chartContainer->addWidget(std::move(chart));
+  mainLayout->addWidget(std::move(chartContainer), 1, 0);
+
+  auto eventConsole = std::make_unique<WebMsgConsole>();
+  m_eventConsoleRef = eventConsole.get();
+  auto eventContainer = std::make_unique<Wt::WContainerWidget>();
+  m_eventContainerId = m_eventConsoleRef->id();
+  eventContainer->setOverflow(Wt::Overflow::Auto);
+  eventContainer->addWidget(std::move(eventConsole));
+  mainLayout->addWidget(std::move(eventContainer), 1, 1);
+
+  setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
+  doJavascriptAutoResize();
+  setLayout(std::move(mainLayout));
 }
 
-WebDashboard::~WebDashboard()
-{
-  unbindWidgets();
-}
+WebDashboard::~WebDashboard(){ }
 
-std::pair<int, QString> WebDashboard::initialize(BaseSettings* p_settings, const QString& viewFile)
+std::pair<int, QString> WebDashboard::initialize(const QString& vfile)
 {
-  auto outInitilization = DashboardBase::initialize(p_settings, viewFile);
-  if (outInitilization.first != ngrt4n::RcSuccess) {
-    CORE_LOG("error", outInitilization.second.toStdString());
+  auto initResult = DashboardBase::initialize(vfile);
+  if (initResult.first != ngrt4n::RcSuccess) {
+    CORE_LOG("error", initResult.second.toStdString());
   } else {
-    m_thumbnailTitleBar.setText( rootNode().name.toStdString() );
-    m_thumbnailProblemDetailsBar.setText("");
+    m_thumbTitle = rootNode().name.toStdString();
+    m_thumbMsg = "";
   }
-  return outInitilization;
+  return initResult;
 }
 
 void WebDashboard::buildTree(void)
 {
-  m_tree.build();
-  m_tree.expandNodeById(ngrt4n::ROOT_ID);
+  m_treeRef->build();
+  m_treeRef->expandNodeById(ngrt4n::ROOT_ID);
 }
 
 
-void WebDashboard::updateTree(const NodeT& _node, const QString& _tip)
+void WebDashboard::updateTree(const NodeT& node, const QString& tooltip)
 {
-  m_tree.updateItemDecoration(_node, _tip);
+  m_treeRef->updateItemDecoration(node, tooltip);
 }
 
 void WebDashboard::updateMsgConsole(const NodeT& node)
 {
   if (node.sev != ngrt4n::Normal) {
-    m_msgConsole.updateNodeMsg(node);
+    m_eventConsoleRef->updateNodeMsg(node);
   } else {
     if (! m_showOnlyProblemMsgsState) {
-      m_msgConsole.updateNodeMsg(node);
+      m_eventConsoleRef->updateNodeMsg(node);
     }
   }
 }
@@ -94,123 +130,71 @@ void WebDashboard::updateChart(void)
 {
   CheckStatusCountT statsData;
   qint32 statCount = extractStatsData(statsData);
-  m_chart.updateStatsData(statsData, statCount);
-  m_chart.repaint();
+  m_chartRef->updateStatsData(statsData, statCount);
+  m_chartRef->repaint();
 }
 
 void WebDashboard::buildMap(void)
 {
-  m_map.drawMap();
+  m_mapRef->drawMap();
 }
 
 
 void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 {
-  m_map.updateNode(_node, _tip);
+  m_mapRef->updateNode(_node, _tip);
 }
 
-void WebDashboard::updateThumbnailInfo(void)
+void WebDashboard::updateThumb(void)
 {
-  m_thumbnailProblemDetailsBar.setText(m_chart.problemsDetailsText());
+  m_thumbMsg = m_chartRef->problemsMsg();
 }
 
 
 void WebDashboard::updateMap(void)
 {
-  m_map.drawMap();
-}
-
-void WebDashboard::bindFormWidgets(void)
-{
-  setLayout(m_mainLayout = new Wt::WHBoxLayout());
-
-  m_mainLayout->setContentsMargins(0, 0, 0, 0);
-  m_leftVBoxLayout.setContentsMargins(0, 0, 0, 0);
-  m_rightVBoxLayout.setContentsMargins(0, 0, 0, 0);
-
-  m_mainLayout->setSpacing(2);
-  m_leftVBoxLayout.setSpacing(2);
-  m_rightVBoxLayout.setSpacing(2);
-
-  m_leftVBoxLayout.addWidget(&m_tree);
-  m_leftVBoxLayout.addWidget(&m_chart);
-
-  m_rightVBoxLayout.addWidget(m_map.renderingScrollArea());
-  m_rightVBoxLayout.addWidget(&m_msgConsole);
-  m_mainLayout->addLayout(&m_leftVBoxLayout);
-  m_mainLayout->addLayout(&m_rightVBoxLayout);
-
-  m_leftVBoxLayout.setResizable(0, true);
-  m_mainLayout->setResizable(0, true);
-  m_mainLayout->setResizable(1, true);
-  m_leftVBoxLayout.setResizable(0, true);
-  m_leftVBoxLayout.setResizable(1, true);
-  m_rightVBoxLayout.setResizable(0, true);
-  m_rightVBoxLayout.setResizable(1, true);
-}
-
-
-void WebDashboard::unbindWidgets(void)
-{
-  m_eventFeedLayout.clear();
-  m_leftVBoxLayout.removeWidget(&m_tree);
-  m_leftVBoxLayout.removeWidget(&m_chart);
-  m_rightVBoxLayout.removeWidget(m_map.renderingScrollArea());
-  m_rightVBoxLayout.removeWidget(&m_msgConsole);
-  m_mainLayout->removeItem(&m_leftVBoxLayout);
-  m_mainLayout->removeItem(&m_rightVBoxLayout);
-  clear();
-}
-
-
-void WebDashboard::addJsEventScript(void)
-{
-  setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
-  doJavascriptAutoResize();
+  m_mapRef->drawMap();
 }
 
 
 void WebDashboard::updateEventFeeds(const NodeT &node)
 {
-  EventFeedItemsT::Iterator feed = m_eventFeedItems.find(node.id);
-  if (feed != m_eventFeedItems.end()) {
-    m_eventFeedLayout.removeWidget(*feed);
-    delete *feed;
-    m_eventFeedItems.erase(feed);
+  auto oldItem = m_eventItems.find(node.id);
+  if (oldItem != m_eventItems.end()) {
+    auto itemPtr = m_eventItemsContainerLayout->removeWidget(*oldItem);
+    itemPtr.reset(nullptr);
+    m_eventItems.erase(oldItem);
   }
-
   if (node.sev != ngrt4n::Normal) {
-    Wt::WWidget* widget = createEventFeedTpl(node);
-    m_eventFeedLayout.insertWidget(0, widget);
-    m_eventFeedItems.insert(node.id, widget);
+    auto newEventItem = createEventFeedTpl(node);
+    m_eventItems.insert(node.id, newEventItem.get());
+    m_eventItemsContainerLayout->insertWidget(0, std::move(newEventItem));
   }
 }
 
 
-Wt::WWidget* WebDashboard::createEventFeedTpl(const NodeT& node)
+std::unique_ptr<Wt::WWidget> WebDashboard::createEventFeedTpl(const NodeT& node)
 {
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("event-feed.tpl"));
-  Wt::WAnchor* anchor = new Wt::WAnchor(Wt::WLink("#"), node.child_nodes.toStdString());
+  std::string vname = rootNode().name.toStdString();
+  auto anchor = std::make_unique<Wt::WAnchor>(Wt::WLink("#"), node.child_nodes.toStdString());
+  anchor->clicked().connect(std::bind(&WebDashboard::handleDashboardSelected, this, vname));
 
-  std::string viewName = rootNode().name.toStdString();
+  auto page = std::make_unique<Wt::WTemplate>(Wt::WString::tr("event-feed.tpl"));
+  page->bindWidget("event-feed-title", std::move(anchor));
+  page->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
+  page->bindString("event-feed-icon", ngrt4n::NodeIcons[node.icon]);
+  page->bindString("event-feed-details", node.check.alarm_msg);
+  page->bindString("platform", vname);
+  page->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
 
-  anchor->clicked().connect(std::bind(&WebDashboard::handleDashboardSelected, this, viewName));
-
-  //FIXME: clear widget
-  tpl->bindWidget("event-feed-title", anchor);
-  tpl->bindString("severity-css-class", ngrt4n::severityCssClass(node.sev));
-  tpl->bindString("event-feed-icon", ngrt4n::NodeIcons[node.icon]);
-  tpl->bindString("event-feed-details", node.check.alarm_msg);
-  tpl->bindString("platform", viewName);
-  tpl->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
-  return tpl;
+  return std::move(page);
 }
 
 
 void WebDashboard::refreshMsgConsoleOnProblemStates(void)
 {
   setDisabled(true);
-  m_msgConsole.clearAll();
+  m_eventConsoleRef->clearAll();
   for(const auto& node: m_cdata.cnodes) {
     updateMsgConsole(node);
   }

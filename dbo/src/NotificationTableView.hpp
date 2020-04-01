@@ -28,9 +28,9 @@
 #include "Base.hpp"
 #include "dbo/src/DbSession.hpp"
 #include "dbo/src/DbObjects.hpp"
-#include <Wt/WTableView>
-#include <Wt/WStandardItemModel>
-#include <Wt/WStandardItem>
+#include <Wt/WTableView.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WStandardItem.h>
 
 class NotificationTableView : public Wt::WTableView
 {
@@ -44,7 +44,7 @@ public:
 private:
   /** other members **/
   std::string m_lastError;
-  Wt::WStandardItemModel* m_model;
+  std::shared_ptr<Wt::WStandardItemModel> m_model;
   DbSession* m_dbSession;
   NodeListT m_services;
 

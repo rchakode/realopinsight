@@ -1,0 +1,64 @@
+envs:
+  REALOPINSIGHT_ROOT_DIR: /app
+  REALOPINSIGHT_DATA_DIR: /data
+  REALOPINSIGHT_DB_TYPE: 0                  # 0 => Built-in SQLite3, 1 => PostgreSQL
+  REALOPINSIGHT_DB_SERVER_ADDR: 127.0.0.1
+  REALOPINSIGHT_DB_SERVER_PORT: 5432
+  REALOPINSIGHT_DB_NAME: realopinsight
+  REALOPINSIGHT_DB_USER: dbuser
+  REALOPINSIGHT_DB_PASSWORD: dbsecret
+
+dataVolume:
+  persist: true
+  capacity: 4Gi
+
+securityContext:
+  enabled: true
+
+replicaCount: 1
+
+image:
+  repository: rchakode/realopinsight
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+metadata:
+  labels:
+    app: realopinsight
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 4583
+
+ingress:
+  enabled: false
+  hosts:
+    - host: realopinsight.local
+      paths: []
+# uncomment the following lines and ajust the values to enable TLS
+  # tls: 
+  #  - secretName: realopinsight-tls
+  #    hosts:
+  #      - realopinsight.local
+
+resources: {}
+# No resource requests not limits is specified by default.
+# We leave this as a conscious choice for the user, as this increases chances charts run 
+# on environments with little resources, such as Minikube. 
+# If you do want to specify resources, uncomment the following lines, adjust them as necessary, 
+# and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 256m
+  #   memory: 512Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

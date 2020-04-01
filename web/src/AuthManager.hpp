@@ -25,35 +25,35 @@
 #ifndef AUTHWIDGET_HPP
 #define AUTHWIDGET_HPP
 
-
-#include <Wt/Auth/AuthWidget>
-#include <Wt/WContainerWidget>
-#include <Wt/Auth/Login>
+#include "dbo/src/DbSession.hpp"
+#include <Wt/Auth/AuthWidget.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/Auth/Login.h>
 
 class DbSession;
 class WebMainUI;
 
 class AuthManager : public Wt::Auth::AuthWidget
 {
-
 public:
   AuthManager(DbSession* dbSession);
   DbSession* session(void) {return m_dbSession;}
   void logout(void);
-  bool isLogged(void);
+  bool isLogged(void) {
+    return m_dbSession->wtAuthLogin().loggedIn();
+  }
 
 protected:
   virtual void createLoggedInView(void);
   virtual void createLoginView(void);
 
 private:
-  bool m_isActivatedLicense;
   DbSession* m_dbSession;
-  WebMainUI* m_mainUI;
-  Wt::WText* m_infoBox;
+  WebMainUI* m_mainUIRef;
+  Wt::WText* m_infoBoxRef;
   Wt::WText* m_licenseWarningBox;
 
-  void handleAuthentication(void);
+  void handleAuthorization(void);
   void handleLoginFailed(std::string data);
 };
 

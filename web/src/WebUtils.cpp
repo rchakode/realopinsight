@@ -25,16 +25,17 @@
 #include "web/src/utils/Logger.hpp"
 #include "Base.hpp"
 #include "WebUtils.hpp"
-#include <Wt/WTemplate>
-#include <Wt/WDateTime>
+#include <memory>
+#include <any>
+#include <fcntl.h>
 #include <QObject>
 #include <QString>
+#include <Wt/WTemplate.h>
+#include <Wt/WDateTime.h>
 #include <QDateTime>
-#include <Wt/WColor>
-#include <Wt/WApplication>
-#include <Wt/WStandardItem>
-#include <memory>
-#include <fcntl.h>
+#include <Wt/WColor.h>
+#include <Wt/WApplication.h>
+#include <Wt/WStandardItem.h>
 
 
 namespace {
@@ -44,7 +45,7 @@ namespace {
 
 void ngrt4n::initCoreLogger(void)
 {
-  coreLogger = new Logger(Logger::CoreLogger, "/opt/realopinsight/log/");
+  coreLogger = new Logger(Logger::CoreLogger);
 }
 
 void ngrt4n::freeCoreLogger(void)
@@ -55,7 +56,7 @@ void ngrt4n::freeCoreLogger(void)
 
 void ngrt4n::initReportdLogger(void)
 {
-  reportdLogger = new Logger(Logger::ReportdLogger, "/opt/realopinsight/log/");
+  reportdLogger = new Logger(Logger::ReportdLogger);
 }
 
 void ngrt4n::freeReportdLogger(void)
@@ -91,24 +92,24 @@ std::string ngrt4n::severityCssClass(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-    case ngrt4n::Normal:
-      cssClass.append("severity-normal");
-      break;
-    case ngrt4n::Minor:
-      cssClass.append("severity-minor");
-      break;
-    case ngrt4n::Major:
-      cssClass.append("severity-major");
-      break;
-    case ngrt4n::Critical:
-      cssClass.append("severity-critical");
-      break;
-    case ngrt4n::Unknown:
-      cssClass.append("severity-unknown");
-      break;
-    default:
-      cssClass.append("default-item-background");
-      break;
+  case ngrt4n::Normal:
+    cssClass.append("severity-normal");
+    break;
+  case ngrt4n::Minor:
+    cssClass.append("severity-minor");
+    break;
+  case ngrt4n::Major:
+    cssClass.append("severity-major");
+    break;
+  case ngrt4n::Critical:
+    cssClass.append("severity-critical");
+    break;
+  case ngrt4n::Unknown:
+    cssClass.append("severity-unknown");
+    break;
+  default:
+    cssClass.append("default-item-background");
+    break;
   }
   return cssClass;
 }
@@ -117,22 +118,22 @@ std::string ngrt4n::severityHtmlColor(int severity)
 {
   std::string color = "#ffffff";
   switch (static_cast<ngrt4n::SeverityT>(severity)) {
-    case ngrt4n::Normal:
-      color = "#4b7";
-      break;
-    case ngrt4n::Minor:
-      color ="#fa4";
-      break;
-    case ngrt4n::Major:
-      color = "#ffa500";
-      break;
-    case ngrt4n::Critical:
-      color = "#f56";
-      break;
-    case ngrt4n::Unknown:
-    default:
-      color = "#c0c0c0";
-      break;
+  case ngrt4n::Normal:
+    color = "#4b7";
+    break;
+  case ngrt4n::Minor:
+    color ="#fa4";
+    break;
+  case ngrt4n::Major:
+    color = "#ffa500";
+    break;
+  case ngrt4n::Critical:
+    color = "#f56";
+    break;
+  case ngrt4n::Unknown:
+  default:
+    color = "#c0c0c0";
+    break;
   }
   return color;
 }
@@ -143,46 +144,50 @@ Wt::WColor ngrt4n::severityWColor(int severity)
   return Wt::WColor(severityHtmlColor(severity));
 }
 
-std::string ngrt4n::thumbnailCssClass(int severity)
+std::string ngrt4n::thumbCss(int severity)
 {
   std::string cssClass = "";
   switch(severity) {
-    case ngrt4n::Normal:
-      cssClass.append("btn btn-normal");
-      break;
-    case ngrt4n::Minor:
-      cssClass.append("btn btn-minor");
-      break;
-    case ngrt4n::Major:
-      cssClass.append("btn btn-major");
-      break;
-    case ngrt4n::Critical:
-      cssClass.append("btn btn-critical");
-      break;
-    case ngrt4n::Unknown:
-    default:
-      cssClass.append("btn btn-unknown");
-      break;
+  case ngrt4n::Normal:
+    cssClass.append("btn btn-normal");
+    break;
+  case ngrt4n::Minor:
+    cssClass.append("btn btn-minor");
+    break;
+  case ngrt4n::Major:
+    cssClass.append("btn btn-major");
+    break;
+  case ngrt4n::Critical:
+    cssClass.append("btn btn-critical");
+    break;
+  case ngrt4n::Unknown:
+  default:
+    cssClass.append("btn btn-unknown");
+    break;
   }
   return cssClass;
 }
 
 
-Wt::WWidget* ngrt4n::footer(void)
+std::unique_ptr<Wt::WWidget> ngrt4n::footer(void)
 {
-  Wt::WTemplate* tpl = new Wt::WTemplate(Wt::WString::tr("copyright-footer.tpl"));
-  tpl->bindString("software-name", APP_NAME.toStdString());
-  tpl->bindString("version", PKG_VERSION.toStdString());
-  tpl->bindString("package-url", PKG_URL.toStdString());
-  tpl->bindString("release-year", REL_YEAR.toStdString());
-  return tpl;
+  auto page = std::make_unique<Wt::WTemplate>(Wt::WString::tr("copyright-footer.tpl"));
+  page->bindString("software-name", APP_NAME.toStdString());
+  page->bindString("version", PKG_VERSION.toStdString());
+  page->bindString("package-url", PKG_URL.toStdString());
+  page->bindString("release-year", REL_YEAR.toStdString());
+  return std::move(page);
 }
 
 
 
 std::string ngrt4n::sqliteDbPath(void)
 {
-  return "/opt/realopinsight/data/realopinsight.db";
+  auto cdir = SettingFactory::coreDataDir();
+  if (cdir.endsWith("/")) {
+    return cdir.append("realopinsight.db").toStdString();
+  }
+  return cdir.append("/realopinsight.db").toStdString();
 }
 
 
@@ -229,14 +234,11 @@ Wt::WString ngrt4n::timet2String(long mytime_t, const std::string& format)
   return dt.toString(format);
 }
 
-Wt::WText* ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
+std::unique_ptr<Wt::WText>  ngrt4n::createFontAwesomeTextButton(const std::string& iconClasses, const std::string& tip)
 {
-  Wt::WText* link = new Wt::WText(QObject::tr("<span class=\"btn\">"
-                                              " <i class=\"%1\"></i>"
-                                              "</span>").arg(iconClasses.c_str()).toStdString(),
-                                  Wt::XHTMLText);
+  auto link = std::make_unique<Wt::WText>(QObject::tr("<span class=\"btn\"><i class=\"%1\"></i></span>").arg(iconClasses.c_str()).toStdString(), Wt::TextFormat::XHTML);
   link->setToolTip(tip);
-  return link;
+  return std::move(link);
 }
 
 void ngrt4n::logCore(const std::string& level, const std::string& msg)
@@ -302,41 +304,42 @@ void ngrt4n::googleAnalyticsLogger(void)
 }
 
 
-Wt::WStandardItem* ngrt4n::createStandardItem(const std::string& text, const std::string& data)
+std::unique_ptr<Wt::WStandardItem> ngrt4n::createStandardItem(const std::string& text, const std::string& data)
 {
-  Wt::WStandardItem* item = new Wt::WStandardItem(text);
-  item->setData(data, Wt::UserRole);
+  auto item = std::make_unique<Wt::WStandardItem>(text);
+  item.get()->setData(data, Wt::ItemDataRole::User);
   return item;
 }
 
-Wt::WStandardItem* ngrt4n::createCheckableStandardItem(const std::string& data, bool checked)
+std::unique_ptr<Wt::WStandardItem> ngrt4n::createCheckableStandardItem(const std::string& data, bool checked)
 {
-  Wt::WStandardItem* item = createStandardItem("", data);
-  item->setCheckable(true);
-  item->setChecked(checked);
+  auto item = std::make_unique<Wt::WStandardItem>("", data);
+  item.get()->setCheckable(true);
+  item.get()->setChecked(checked);
   return item;
 }
 
-Wt::WStandardItem* ngrt4n::createSeverityStandardItem(const NodeT& _node)
+std::unique_ptr<Wt::WStandardItem> ngrt4n::createSeverityStandardItem(const NodeT& _node)
 {
-  Wt::WStandardItem* item = new Wt::WStandardItem();
-  item->setData(QString::number(_node.sev).toStdString(), Wt::UserRole);
-  item->setText(Severity(_node.sev).toString().toStdString());
-  updateSeverityItem(item, _node.sev);
-  return item;
+  auto item = std::make_unique<Wt::WStandardItem>();
+  auto itemRef = item.get();
+  itemRef->setData(QString::number(_node.sev).toStdString(), Wt::ItemDataRole::User);
+  itemRef->setText(Severity(_node.sev).toString().toStdString());
+  updateSeverityItem(itemRef, _node.sev);
+  return std::move(item);
 }
 
-void ngrt4n::updateSeverityItem(Wt::WStandardItem* item, int severity)
+void ngrt4n::updateSeverityItem(Wt::WStandardItem* itemRef, int severity)
 {
-  item->setText(Severity(severity).toString().toStdString());
-  item->setStyleClass(ngrt4n::severityCssClass(severity));
+  itemRef->setText(Severity(severity).toString().toStdString());
+  itemRef->setStyleClass(ngrt4n::severityCssClass(severity));
 }
 
-std::string ngrt4n::getItemData(Wt::WStandardItem* item)
+std::string ngrt4n::getItemData(Wt::WStandardItem* itemRef)
 {
   std::string data;
   try {
-    data = boost::any_cast<std::string>(item->data(Wt::UserRole));
+    data = Wt::cpp17::any_cast<std::string>(itemRef->data(Wt::ItemDataRole::User));
   } catch(...) {
     data = "";
   }
@@ -351,16 +354,16 @@ sem_t* ngrt4n::createSemaphoreOrDie(const std::string& sem_name)
   if (my_sem == SEM_FAILED) {
     std::string errorMsg = Q_TR("Failed while initializing semaphore: ");
     switch (errno) {
-      case EACCES:
-        errorMsg += QObject::tr("permission denied to access to the semaphore %1")
-                    .arg(sem_name.c_str())
-                    .toStdString();
-        break;
-      default:
-        errorMsg += QObject::tr("sem_open returned errno %1")
-                    .arg(QString::number(errno))
-                    .toStdString();
-        break;
+    case EACCES:
+      errorMsg += QObject::tr("permission denied to access to the semaphore %1")
+          .arg(sem_name.c_str())
+          .toStdString();
+      break;
+    default:
+      errorMsg += QObject::tr("sem_open returned errno %1")
+          .arg(QString::number(errno))
+          .toStdString();
+      break;
     }
     CORE_LOG("fatal", errorMsg);
     qFatal("%s", errorMsg.c_str());

@@ -71,9 +71,6 @@ public:
   enum {
     Nagios  = 0,
     Zabbix  = 1,
-    Zenoss  = 2,
-    Pandora = 3,
-    OpManager = 4,
     Kubernetes = 5,
     Any   = 99
   };
@@ -86,15 +83,6 @@ public:
         break;
       case Zabbix:
         value = QObject::tr("Zabbix");
-        break;
-      case Zenoss:
-        value = QObject::tr("Zenoss");
-        break;
-      case Pandora:
-        value = QObject::tr("Pandora FMS");
-        break;
-      case OpManager:
-        value = QObject::tr("ManageEngine OpManager");
         break;
       case Kubernetes:
         value = QObject::tr("Kubernetes");

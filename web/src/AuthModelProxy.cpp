@@ -31,57 +31,53 @@
 #include <QObject>
 #include <QDebug>
 
-AuthModelProxy::AuthModelProxy(const Wt::Auth::AuthService& baseAuth,
-                               Wt::Auth::AbstractUserDatabase& users,
-                               Wt::WObject* parent)
-  : Wt::Auth::AuthModel(baseAuth, users, parent),
-    m_loginFailed(this)
+AuthModelProxy::AuthModelProxy(DbSession* dbSessionRef)
+  : Wt::Auth::AuthModel(dbSessionRef->auth(), dbSessionRef->users()),
+    m_dbSessionRef(dbSessionRef)
 {
-
 }
 
 
 bool AuthModelProxy::login(Wt::Auth::Login& login)
 {
-  WebAuthSettings preferences;
+  auto username = valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8();
+  auto password = valueText(Wt::Auth::AuthModel::PasswordField).toUTF8();
 
-  // Check authentication mode
-  if (preferences.getAuthenticationMode() == WebBaseSettings::BuiltIn)
-    return Wt::Auth::AuthModel::login(login);
-
-  QString username = QString::fromStdString(valueText(Wt::Auth::FormBaseModel::LoginNameField).toUTF8());
-  QString password = QString::fromStdString(valueText(Wt::Auth::AuthModel::PasswordField).toUTF8());
-
-  if (username == "admin") {
-    return Wt::Auth::AuthModel::login(login);
+  auto user = m_dbSessionRef->findAuthUser(username, password);
+  if (! user.isValid()) {
+    login.login(user, Wt::Auth::LoginState::Disabled);
+    return false;
   }
 
-  // Get LDAP settings info
-  std::string ldapServerUri = preferences.getLdapServerUri();
-  std::string ldapIdField = preferences.getLdapIdField();
-  std::string ldapSearchBase = preferences.getLdapSearchBase();
-  std::string ldapBindUserDn =preferences.getLdapBindUserDn();
-  std::string ldapBindPassword =  preferences.getLdapBindUserPassword();
-  int ldapVersion = preferences.getLdapVersion();
+  WebAuthSettings config;
+  if (username == "admin" || config.getAuthenticationMode() == WebBaseSettings::BuiltIn) {
+    CORE_LOG("info", QObject::tr("Built-in authentication succeeded with user %1 ").arg(QString::fromStdString(username)).toStdString());
+    login.login(user, Wt::Auth::LoginState::Strong);
+    return true;
+  }
+
+  // handle LDAP auth
+  std::string ldapServerUri = config.getLdapServerUri();
+  std::string ldapIdField = config.getLdapIdField();
+  std::string ldapSearchBase = config.getLdapSearchBase();
+  std::string ldapBindUserDn =config.getLdapBindUserDn();
+  std::string ldapBindPassword =  config.getLdapBindUserPassword();
+  int ldapVersion = config.getLdapVersion();
 
   LdapHelper ldapHelper(ldapServerUri, ldapVersion);
   QString ldapFilter = QString("(&(%1=%2)(userPassword=%3))").arg(ldapIdField.c_str(),
-                                                                  username,
-                                                                  password);
+                                                                  QString::fromStdString(username),
+                                                                  QString::fromStdString(password));
   LdapUserMapT ldapUsers;
-  int result = ldapHelper.listUsers(ldapSearchBase,
-                                    ldapBindUserDn,
-                                    ldapBindPassword,
-                                    ldapFilter.toStdString().c_str(),
-                                    ldapUsers);
-  if (result != 1) {
-    std::string erroMsg  = Q_TR("LDAP authentication failed");
-    m_loginFailed.emit(erroMsg);
-    CORE_LOG("error", QString("%1: %2").arg(erroMsg.c_str(), username).toStdString());
-  } else {
-    CORE_LOG("info", Q_TR("LDAP authentication succeeded: ")+username.toStdString());
-    return Wt::Auth::AuthModel::login(login);
+  int count = ldapHelper.listUsers(ldapSearchBase, ldapBindUserDn, ldapBindPassword, ldapFilter.toStdString().c_str(), ldapUsers);
+  if (count == 1) {
+    login.login(user, Wt::Auth::LoginState::Strong);
+    CORE_LOG("info", QObject::tr("LDAP authentication succeeded with user %1 ").arg(QString::fromStdString(username)).toStdString());
+    return true;
   }
+  login.login(user, Wt::Auth::LoginState::Disabled);
+  m_loginFailed.emit("LDAP authentication failed");
+  CORE_LOG("error", QString("LDAP authentication failed with user %1").arg(QString::fromStdString(username)).toStdString());
   return false;
 }
 

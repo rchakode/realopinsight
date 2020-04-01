@@ -25,7 +25,7 @@
 #include "WebUtils.hpp"
 #include "WebEventConsole.hpp"
 #include "utilsCore.hpp"
-#include <Wt/WDateTime>
+#include <Wt/WDateTime.h>
 
 namespace {
   const qint32 ID_COLUMN = 5;
@@ -33,50 +33,51 @@ namespace {
 }
 
 WebMsgConsole::WebMsgConsole()
-  : WTableView(0)
+  : WTableView()
 {
   setSortingEnabled(true);
   setLayoutSizeAware(true);
   setColumnResizeEnabled(true);
   setSelectable(true);
-  setSelectionMode(Wt::SingleSelection);
-  setSelectionBehavior(Wt::SelectRows);
+  setSelectionMode(Wt::SelectionMode::Single);
+  setSelectionBehavior(Wt::SelectionBehavior::Rows);
   setHeaderHeight(26);
 
-  m_model = new Wt::WStandardItemModel(0, TABLE_COLUMN_COUNT);
+  auto model = std::make_shared<Wt::WStandardItemModel>(0, TABLE_COLUMN_COUNT);
+  m_modelRef = model.get();
   setModelHeaders();
-  setModel();
+
+  auto proxyModel = std::make_shared<SortingProxyModel>();
+  proxyModel->setSourceModel(model);
+  proxyModel->setDynamicSortFilter(true);
+  proxyModel->setFilterRole(Wt::ItemDataRole::User);
+  setModel(proxyModel);
 }
 
-WebMsgConsole::~WebMsgConsole()
+WebMsgConsole::~WebMsgConsole(){}
+
+
+void WebMsgConsole::clearAll(void)
 {
-  delete m_model;
+  m_modelRef->clear();
+  setModelHeaders();
 }
 
-void WebMsgConsole::setModel(void)
+void WebMsgConsole::setModelHeaders()
 {
-  SortingProxyModel* sproxy = new SortingProxyModel(this);
-  sproxy->setSourceModel(m_model);
-  sproxy->setDynamicSortFilter(true);
-  sproxy->setFilterRole(Wt::UserRole);
-  WTableView::setModel(sproxy);
-}
-
-void WebMsgConsole::setModelHeaders(void)
-{
-  m_model->insertColumns(0, TABLE_COLUMN_COUNT);
-  m_model->setHeaderData(0, Wt::Horizontal, Q_TR("Date & Hour"), Wt::DisplayRole);
-  m_model->setHeaderData(1, Wt::Horizontal, Q_TR("Severity"), Wt::DisplayRole);
-  m_model->setHeaderData(2, Wt::Horizontal, Q_TR("Component"), Wt::DisplayRole);
-  m_model->setHeaderData(3, Wt::Horizontal, Q_TR("Monitored item"), Wt::DisplayRole);
-  m_model->setHeaderData(4, Wt::Horizontal, Q_TR("Message"), Wt::DisplayRole);
-  m_model->setHeaderData(ID_COLUMN, Wt::Horizontal, Q_TR("Service ID"), Wt::UserRole);
+  m_modelRef->insertColumns(0, TABLE_COLUMN_COUNT);
+  m_modelRef->setHeaderData(0, Wt::Orientation::Horizontal, Q_TR("Date & Hour"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(1, Wt::Orientation::Horizontal, Q_TR("Severity"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(2, Wt::Orientation::Horizontal, Q_TR("Component"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(3, Wt::Orientation::Horizontal, Q_TR("Monitored item"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(4, Wt::Orientation::Horizontal, Q_TR("Message"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(ID_COLUMN, Wt::Orientation::Horizontal, Q_TR("Service ID"), Wt::ItemDataRole::User);
   hideColumn(ID_COLUMN);
 }
 
 void  WebMsgConsole::layoutSizeChanged(int width, int)
 {
-  Wt::WLength em = Wt::WLength(1, Wt::WLength::FontEx);
+  Wt::WLength em = Wt::WLength(1, Wt::LengthUnit::FontEx);
   setColumnWidth(0, 25 * em);
   setColumnWidth(1, 10 * em);
   setColumnWidth(2, 30 * em);
@@ -90,50 +91,54 @@ void WebMsgConsole::updateNodeMsg(const NodeT& _node)
 {
   int index = findServiceRow(_node.id.toStdString());
   if (index < 0) {
-    int row = m_model->rowCount();
-    m_model->setItem(row, 0, createDateTimeItem(_node.check.last_state_change, row));
-    m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(_node));
-    m_model->setItem(row, 2, createItem(_node.check.host, row));
-    m_model->setItem(row, 3, createItem(_node.name.toStdString(), row));
-    m_model->setItem(row, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), row));
-    m_model->setItem(row, 5, createItem(_node.id.toStdString(), row));
+    int row = m_modelRef->rowCount();
+    m_modelRef->setItem(row, 0, createDateItem(_node.check.last_state_change, row));
+    m_modelRef->setItem(row, 1, ngrt4n::createSeverityStandardItem(_node));
+    m_modelRef->setItem(row, 2, createItem(_node.check.host, row));
+    m_modelRef->setItem(row, 3, createItem(_node.name.toStdString(), row));
+    m_modelRef->setItem(row, 4, createItem(Wt::WString::fromUTF8(_node.actual_msg.toStdString()), row));
+    m_modelRef->setItem(row, 5, createItem(_node.id.toStdString(), row));
   } else {
-    m_model->item(index, 0)->setText(ngrt4n::humanTimeText(_node.check.last_state_change));
-    m_model->item(index, 2)->setText(_node.check.host);
-    m_model->item(index, 3)->setText(_node.name.toStdString()); //optional
-    m_model->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
+    m_modelRef->item(index, 0)->setText(ngrt4n::humanTimeText(_node.check.last_state_change));
+    m_modelRef->item(index, 2)->setText(_node.check.host);
+    m_modelRef->item(index, 3)->setText(_node.name.toStdString()); //optional
+    m_modelRef->item(index, 4)->setText(Wt::WString::fromUTF8(_node.actual_msg.toStdString()));
 
-    ngrt4n::updateSeverityItem(m_model->item(index, 1), _node.sev);
+    ngrt4n::updateSeverityItem(m_modelRef->item(index, 1), _node.sev);
   }
-  sortByColumn(1, Wt::DescendingOrder);
+  sortByColumn(1, Wt::SortOrder::Descending);
 }
 
 
-Wt::WStandardItem* WebMsgConsole::createItem(const Wt::WString& text, int row)
+std::unique_ptr<Wt::WStandardItem> WebMsgConsole::createItem(const Wt::WString& text, int row)
 {
-  Wt::WStandardItem* item = new Wt::WStandardItem(text);
-  if (row & 1) item->setStyleClass(ngrt4n::severityCssClass(-1));
-  return item;
+  auto item = std::make_unique<Wt::WStandardItem>(text);
+  if (row & 1) {
+    item->setStyleClass(ngrt4n::severityCssClass(-1));
+  }
+  return std::move(item);
 }
 
 
-Wt::WStandardItem* WebMsgConsole::createDateTimeItem(const std::string& _lastcheck, int row)
+std::unique_ptr<Wt::WStandardItem> WebMsgConsole::createDateItem(const std::string& _lastcheck, int row)
 {
-  Wt::WStandardItem * item = new Wt::WStandardItem();
+  auto item = std::make_unique<Wt::WStandardItem>();
   item->setText(ngrt4n::wHumanTimeText(_lastcheck));
-  item->setData(_lastcheck, Wt::UserRole);
-  if (row & 1) item->setStyleClass(ngrt4n::severityCssClass(-1));
-  return item;
+  item->setData(_lastcheck, Wt::ItemDataRole::User);
+  if (row & 1) {
+    item->setStyleClass(ngrt4n::severityCssClass(-1));
+  }
+  return std::move(item);
 }
 
 
 int WebMsgConsole::findServiceRow(const std::string& _id)
 {
   qint32 index = 0;
-  qint32 nbRows = m_model->rowCount();
+  qint32 nbRows = m_modelRef->rowCount();
   while(index < nbRows &&
-        m_model->item(index, ID_COLUMN) &&
-        m_model->item(index, ID_COLUMN)->text() != _id) { ++index;}
+        m_modelRef->item(index, ID_COLUMN) &&
+        m_modelRef->item(index, ID_COLUMN)->text() != _id) { ++index;}
 
   return (index >= nbRows)? -1 : index;
 }

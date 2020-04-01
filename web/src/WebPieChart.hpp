@@ -27,15 +27,14 @@
 
 #include "ChartBase.hpp"
 #include "WebUtils.hpp"
-#include <Wt/WStandardItemModel>
-#include <Wt/Chart/WPieChart>
-#include <Wt/WColor>
-#include <Wt/Chart/WChartPalette>
-#include <Wt/WScrollArea>
-#include <Wt/WText>
-#include <Wt/WTemplate>
-#include <Wt/WPen>
-#include  <Wt/WStandardItemModel>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/Chart/WPieChart.h>
+#include <Wt/WColor.h>
+#include <Wt/Chart/WChartPalette.h>
+#include <Wt/WText.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WPen.h>
+#include  <Wt/WStandardItemModel.h>
 
 
 class WebChartPalette : public Wt::Chart::WChartPalette
@@ -62,7 +61,7 @@ public:
   std::string defaultTooltipText(void);
 
 private:
-  Wt::WStandardItemModel* m_model;
+  Wt::WStandardItemModel* m_modelRef;
 
   void setupChartPalette(void);
   void setupChartStyle(void);

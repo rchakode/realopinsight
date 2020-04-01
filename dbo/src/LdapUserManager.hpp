@@ -30,11 +30,10 @@
 #include "LdapHelper.hpp"
 #include "dbo/src/DbObjects.hpp"
 #include "dbo/src/DbSession.hpp"
-#include <Wt/WTableView>
-#include <Wt/WContainerWidget>
-#include <Wt/WSignal>
 #include <QString>
-
+#include <Wt/WTableView.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WSignal.h>
 class LdapUserManager : public Wt::WTableView
 {
 public:
@@ -56,7 +55,7 @@ private:
 
   /** other members **/
   QString m_lastError;
-  Wt::WStandardItemModel* m_model;
+  std::shared_ptr<Wt::WStandardItemModel> m_model;
   DbSession* m_dbSession;
   LdapUserMapT m_users;
   std::string m_ldapUidField;

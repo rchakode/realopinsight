@@ -25,22 +25,22 @@
 #include "NotificationTableView.hpp"
 #include "WebUtils.hpp"
 
-namespace {
-  const int COLUMN_COUNT = 6;
+namespace
+{
+const int COLUMN_COUNT = 6;
 }
-NotificationTableView::NotificationTableView(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WTableView(parent),
-    m_dbSession(dbSession)
+NotificationTableView::NotificationTableView(DbSession *dbSession, Wt::WContainerWidget *parent)
+    : Wt::WTableView(),
+      m_model(std::make_shared<Wt::WStandardItemModel>(0, COLUMN_COUNT)),
+      m_dbSession(dbSession)
 {
   setSortingEnabled(true);
   setLayoutSizeAware(true);
   setColumnResizeEnabled(true);
   setSelectable(true);
-  setSelectionMode(Wt::SingleSelection);
-  setSelectionBehavior(Wt::SelectRows);
+  setSelectionMode(Wt::SelectionMode::Single);
+  setSelectionBehavior(Wt::SelectionBehavior::Rows);
   setHeaderHeight(26);
-
-  m_model = new Wt::WStandardItemModel(0, COLUMN_COUNT);
   setModel(m_model);
   setModelHeader();
   addEvent();
@@ -50,7 +50,6 @@ void NotificationTableView::addEvent()
 {
   m_model->itemChanged().connect(this, &NotificationTableView::handleAckStatusChanged);
 }
-
 
 void NotificationTableView::setModelHeader(void)
 {
@@ -64,26 +63,30 @@ void NotificationTableView::setModelHeader(void)
   m_model->setHeaderData(5, Q_TR("Last Updated by"));
 }
 
-
 int NotificationTableView::update(void)
 {
   setDisabled(true);
   NotificationMapT notifications;
 
   auto listViewNotifs = m_dbSession->listViewRelatedNotifications(notifications, m_dbSession->loggedUser().username);
-  if (listViewNotifs.first != ngrt4n::RcSuccess) {
+  if (listViewNotifs.first != ngrt4n::RcSuccess)
+  {
     setDisabled(false);
     return listViewNotifs.first;
   }
 
   m_model->clear();
   setModelHeader();
-  for (const auto& service : m_services) {
+  for (const auto &service : m_services)
+  {
     NotificationMapT::Iterator notificationIter = notifications.find(service.name.toStdString());
     bool found = (notificationIter != notifications.end());
-    if (notificationIter != notifications.end()) {
+    if (notificationIter != notifications.end())
+    {
       addServiceEntry(service, found, *notificationIter);
-    } else {
+    }
+    else
+    {
       addServiceEntry(service, found, NotificationT());
     }
   }
@@ -92,45 +95,50 @@ int NotificationTableView::update(void)
   return ngrt4n::RcSuccess;
 }
 
-
-
-void NotificationTableView::addServiceEntry(const NodeT& service,
+void NotificationTableView::addServiceEntry(const NodeT &service,
                                             bool hasNotification,
-                                            const NotificationT& notification)
+                                            const NotificationT &notification)
 {
   int row = m_model->rowCount();
   std::string serviceName = service.name.toStdString();
   m_model->setItem(row, 0, ngrt4n::createStandardItem(serviceName, serviceName));
   m_model->setItem(row, 1, ngrt4n::createSeverityStandardItem(service));
-  if (hasNotification) {
-    m_model->setItem(row, 2, ngrt4n::createStandardItem(Q_TR("Enabled"), serviceName) );
-    m_model->setItem(row, 3, ngrt4n::createStandardItem(ngrt4n::timet2String(notification.last_change).toUTF8(), serviceName) );
+  if (hasNotification)
+  {
+    m_model->setItem(row, 2, ngrt4n::createStandardItem(Q_TR("Enabled"), serviceName));
+    m_model->setItem(row, 3, ngrt4n::createStandardItem(ngrt4n::timet2String(notification.last_change).toUTF8(), serviceName));
     m_model->setItem(row, 4, ngrt4n::createCheckableStandardItem(serviceName, notification.ack_status == DboNotification::Acknowledged));
     m_model->setItem(row, 5, ngrt4n::createStandardItem(notification.ack_username, serviceName));
-  } else {
-    m_model->setItem(row, 2, ngrt4n::createStandardItem(Q_TR("Disabled"), serviceName) );
+  }
+  else
+  {
+    m_model->setItem(row, 2, ngrt4n::createStandardItem(Q_TR("Disabled"), serviceName));
     m_model->setItem(row, 3, ngrt4n::createStandardItem("", serviceName));
     m_model->setItem(row, 4, ngrt4n::createStandardItem("", serviceName));
     m_model->setItem(row, 5, ngrt4n::createStandardItem("", serviceName));
   }
 
   // Deal with row alternate
-  if (row & 1) {
-    for (int i:  {0, 2, 3, 4, 5})
+  if (row & 1)
+  {
+    for (int i : {0, 2, 3, 4, 5})
       m_model->item(row, i)->setStyleClass(ngrt4n::severityCssClass(-1));
   }
 }
 
-
-void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem* item)
+void NotificationTableView::handleAckStatusChanged(Wt::WStandardItem *item)
 {
-  if (item->isCheckable()) {
+  if (item->isCheckable())
+  {
     std::string viewName = ngrt4n::getItemData(item);
-    if (item->checkState() == Wt::Checked) {
+    if (item->checkState() == Wt::CheckState::Checked)
+    {
       m_dbSession->updateNotificationAckStatusForView(m_dbSession->loggedUser().username, viewName, DboNotification::Acknowledged);
       // FIXME: handle error?
-    } else {
-      m_dbSession->updateNotificationAckStatusForView(m_dbSession->loggedUser().username, viewName,  DboNotification::Open);
+    }
+    else
+    {
+      m_dbSession->updateNotificationAckStatusForView(m_dbSession->loggedUser().username, viewName, DboNotification::Open);
       // FIXME: handle error?
     }
   }

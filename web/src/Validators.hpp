@@ -1,9 +1,9 @@
 #ifndef VALIDATOR_HPP
 #define VALIDATOR_HPP
 #include "WebUtils.hpp"
-#include <Wt/WValidator>
-#include <Wt/WIntValidator>
-#include <Wt/WString>
+#include <Wt/WValidator.h>
+#include <Wt/WIntValidator.h>
+#include <Wt/WString.h>
 
 
 class UriValidator : public Wt::WValidator
@@ -19,9 +19,9 @@ public:
   virtual Wt::WValidator::Result validate(const Wt::WString& input) const
   {
     if (ngrt4n::isValidUri(QString::fromStdString(input.toUTF8()), m_schemeBase, m_nopath))
-      return Wt::WValidator::Result(Wt::WValidator::Valid);
+      return Wt::WValidator::Result(Wt::ValidationState::Valid);
 
-    return Wt::WValidator::Result(Wt::WValidator::Invalid, QObject::tr("Invalid %1 URI").arg(m_schemeBase).toStdString());
+    return Wt::WValidator::Result(Wt::ValidationState::Invalid, QObject::tr("Invalid %1 URI").arg(m_schemeBase).toStdString());
   }
 
 private:
@@ -41,16 +41,16 @@ public:
   virtual Wt::WValidator::Result validate(const Wt::WString& input) const
   {
     if (ngrt4n::isValidHostAddr(input.toUTF8().c_str()))
-      return Wt::WValidator::Result(Wt::WValidator::Valid);
-    return Wt::WValidator::Result(Wt::WValidator::Invalid, QObject::tr("Bad hostname/IP address").toStdString());
+      return Wt::WValidator::Result(Wt::ValidationState::Valid);
+    return Wt::WValidator::Result(Wt::ValidationState::Invalid, QObject::tr("Bad hostname/IP address").toStdString());
   }
 };
 
 class PortValidator: public Wt::WIntValidator
 {
 public:
-  PortValidator(Wt::WObject* parent = 0)
-    : Wt::WIntValidator(parent)
+  PortValidator()
+    : Wt::WIntValidator()
   {
     setRange(1, 65535);
   }
@@ -60,16 +60,14 @@ class FileExistValidator: public Wt::WValidator
 {
 public:
   FileExistValidator(Wt::WObject* parent = 0)
-    : Wt::WValidator(parent)
-  {
-  }
+    : Wt::WValidator(parent) { }
 
   virtual Wt::WValidator::Result validate(const Wt::WString& input) const
   {
     QFile file(input.toUTF8().c_str());
     if (file.exists())
-      return Wt::WValidator::Result(Wt::WValidator::Valid);
-    return Wt::WValidator::Result(Wt::WValidator::Invalid, QObject::tr("File not found").toStdString());
+      return Wt::WValidator::Result(Wt::ValidationState::Valid);
+    return Wt::WValidator::Result(Wt::ValidationState::Invalid, QObject::tr("File not found").toStdString());
   }
 };
 

@@ -23,11 +23,9 @@
  */
 #include "WebPieChart.hpp"
 #include "utilsCore.hpp"
-#include <Wt/WStandardItem>
+#include <Wt/WStandardItem.h>
 #include <QString>
-#include <QDebug>
-#include <Wt/WPainter>
-#include <Wt/WScrollBar>
+#include <Wt/WPainter.h>
 
 
 
@@ -44,7 +42,7 @@ WebPieChart::WebPieChart(int dataType)
 }
 
 WebPieChart::WebPieChart(void)
-  : WebPieChart(RawData) // delegating construction
+  : WebPieChart(RawData)
 {
 }
 
@@ -56,28 +54,29 @@ WebPieChart::~WebPieChart()
 
 void WebPieChart::setupChartPalette(void)
 {
-  WebChartPalette* palette = new WebChartPalette();
-  setPalette(palette); //take the ownership of the palette pointer
+  std::shared_ptr<WebChartPalette> palette = std::make_shared<WebChartPalette>();
+  setPalette(palette);
 }
 
 
 void WebPieChart::setupPieChartModel(void)
 {
-  m_model = new Wt::WStandardItemModel();
-  m_model->insertColumns(m_model->columnCount(), 2);
-  m_model->setHeaderData(0, Wt::WString("Severity"));
-  m_model->setHeaderData(1, Wt::WString("Count"));
-  m_model->insertRows(m_model->rowCount(), 5);
-  setModel(m_model); // take ownership of the pointer
+  auto model = std::make_unique<Wt::WStandardItemModel>();
+  m_modelRef = model.get();
+  model->insertColumns(m_modelRef->columnCount(), 2);
+  model->setHeaderData(0, Wt::WString("Severity"));
+  model->setHeaderData(1, Wt::WString("Count"));
+  model->insertRows(m_modelRef->rowCount(), 5);
+  setModel(std::move(model));
 }
 
 
 void WebPieChart::setupChartStyle(void)
 {
   resize(ngrt4n::CHART_WIDTH, ngrt4n::CHART_HEIGHT);  // WPaintedWidget must be given an explicit size.
-  setMargin(0, Wt::Top);
-  setPlotAreaPadding(0, Wt::All);
-  setDisplayLabels(Wt::Chart::NoLabels);
+  setMargin(0, Wt::Side::Top);
+  setPlotAreaPadding(0, Wt::AllSides);
+  setDisplayLabels(Wt::Chart::LabelOption::None);
   setPerspectiveEnabled(true, 0.2); // Enable a 3D and shadow effect.
   setShadowEnabled(true);
   setLabelsColumn(0);    // Set the column that holds the labels.
@@ -88,8 +87,8 @@ void WebPieChart::setupChartStyle(void)
 void WebPieChart::repaint()
 {
   for(auto it = std::begin(m_statsData); it != std::end(m_statsData); ++it) {
-    m_model->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
-    m_model->setData(it.key(), 1, it.value());
+    m_modelRef->setData(it.key(), 0, Severity(it.key()).toString().toStdString());
+    m_modelRef->setData(it.key(), 1, it.value());
   }
 
   if (m_dataType == SLAData) {
@@ -132,12 +131,12 @@ std::string WebPieChart::defaultTooltipText(void)
     totalText    = "/"+QString::number(m_dataCount);
   }
   QString tooltip =
-      QString("Normal: %1% - %2%9\n"
-              "Minor: %3%  - %4%9\n"
-              "Major: %5%  - %6%9\n"
-              "Critical: %7%  - %8%9\n").arg
+      QString("Normal: %1% (%2%9)\n"
+              "Minor: %3% (%4%9)\n"
+              "Major: %5% (%6%9)\n"
+              "Critical: %7% (%8%9)\n").arg
       (QString::number(m_severityRatio[ngrt4n::Normal],'f',0),
-       normalText,
+      normalText,
        QString::number(m_severityRatio[ngrt4n::Minor],'f',0),
        minorText,
        QString::number(m_severityRatio[ngrt4n::Major],'f',0),

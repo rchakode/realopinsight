@@ -26,114 +26,102 @@
 #include "WebNotificationSettings.hpp"
 #include "Validators.hpp"
 #include <QString>
-#include <Wt/WTemplate>
-#include <Wt/WContainerWidget>
-#include <Wt/WButtonGroup>
-#include <Wt/WLabel>
-#include <Wt/WLineEdit>
-#include <Wt/WPushButton>
-#include <Wt/WIntValidator>
-#include <Wt/WApplication>
+#include <Wt/WTemplate.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WButtonGroup.h>
+#include <Wt/WLabel.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WIntValidator.h>
+#include <Wt/WApplication.h>
 
 
 WebNotificationSettings::WebNotificationSettings(void)
   : WebBaseSettings(),
     Wt::WTemplate(Wt::WString::tr("notification-settings-form.tpl"))
 {
-  setMargin(0, Wt::All);
-  createFormWidgets();
-  bindFormWidgets();
-  addEvent();
+  setMargin(0, Wt::AllSides);
+
+  auto notifType = std::make_unique<Wt::WComboBox>();
+  m_notificationTypeFieldRef = notifType.get();
+  notifType->addItem(Q_TR("No notification"));
+  notifType->addItem(Q_TR("Email"));
+  notifType->changed().connect(this, &WebNotificationSettings::updateEmailFieldsEnabledState);
+  bindWidget("notification-type", std::move(notifType));
+
+  auto applyBtn = std::make_unique<Wt::WPushButton>(Q_TR("Save"));
+  m_applyBtnRef = applyBtn.get();
+  applyBtn->setStyleClass("btn btn-info");
+  applyBtn->clicked().connect(this, &WebNotificationSettings::saveChanges);
+  bindWidget("notification-settings-save-button", std::move(applyBtn));
+
+  auto smtpServer = std::make_unique<Wt::WLineEdit>();
+  m_smtpServerFieldRef = smtpServer.get();
+  smtpServer->setPlaceholderText(Q_TR("smtp.example.com"));
+  bindWidget("notification-mail-smtp-server", std::move(smtpServer));
+
+  auto smtpPort = std::make_unique<Wt::WLineEdit>();
+  m_smtpPortFieldRef = smtpPort.get();
+  smtpPort->setPlaceholderText(Q_TR("25"));
+  bindWidget("notification-mail-smtp-port", std::move(smtpPort));
+
+  auto smtpUseSsl = std::make_unique<Wt::WCheckBox>();
+  m_smtpUseSslFieldRef = smtpUseSsl.get();
+  bindWidget("notification-mail-smtp-use-ssl", std::move(smtpUseSsl));
+
+  auto smtpUser = std::make_unique<Wt::WLineEdit>();
+  m_smtpUserFieldRef = smtpUser.get();
+  m_smtpUserFieldRef->setPlaceholderText(Q_TR("opuser"));
+  bindWidget("notification-mail-smtp-username", std::move(smtpUser));
+
+  auto smtpPass = std::make_unique<Wt::WLineEdit>();
+  m_smtpPassFieldRef = smtpPass.get();
+  m_smtpPassFieldRef->setEchoMode(Wt::EchoMode::Password);
+  m_smtpPassFieldRef->setPlaceholderText(Q_TR("*******"));
+  bindWidget("notification-mail-smtp-password", std::move(smtpPass));
+
   updateContents();
 }
 
-
-WebNotificationSettings::~WebNotificationSettings(void)
-{
-  unbindFormWidgets();
-}
-
-
-void WebNotificationSettings::addEvent(void)
-{
-  m_notificationSettingsSaveBtn.clicked().connect(this, &WebNotificationSettings::saveChanges);
-  m_notificationTypeBox.changed().connect(this, &WebNotificationSettings::updateEmailFieldsEnabledState);
-}
-
-
-
-void WebNotificationSettings::bindFormWidgets(void)
-{
-  bindWidget("notification-type", &m_notificationTypeBox);
-  bindWidget("notification-settings-save-button", &m_notificationSettingsSaveBtn);
-  bindWidget("notification-mail-smtp-server", &m_smtpServerAddrField);
-  bindWidget("notification-mail-smtp-port", &m_smtpServerPortField);
-  bindWidget("notification-mail-smtp-use-ssl", &m_smtpUseSslField);
-  bindWidget("notification-mail-smtp-username", &m_smtpUsernameField);
-  bindWidget("notification-mail-smtp-password", &m_smtpPasswordField);
-}
-
-
-void WebNotificationSettings::unbindFormWidgets(void)
-{
-  takeWidget("notification-type");
-  takeWidget("notification-settings-save-button");
-  takeWidget("notification-mail-smtp-server");
-  takeWidget("notification-mail-smtp-port");
-  takeWidget("notification-mail-smtp-use-ssl");
-  takeWidget("notification-mail-smtp-username");
-  takeWidget("notification-mail-smtp-password");
-}
-
-
-void WebNotificationSettings::createFormWidgets(void)
-{
-  m_smtpServerAddrField.setEmptyText(Q_TR("smtp.example.com"));
-  m_smtpServerPortField.setEmptyText(Q_TR("25"));
-  m_smtpUsernameField.setEmptyText(Q_TR("opuser"));
-  m_smtpPasswordField.setEchoMode(Wt::WLineEdit::Password);
-  m_smtpPasswordField.setEmptyText(Q_TR("*******"));
-  m_notificationTypeBox.addItem(Q_TR("No notification"));
-  m_notificationTypeBox.addItem(Q_TR("Email"));
-  m_notificationSettingsSaveBtn.setText( Q_TR("Save") );
-  m_notificationSettingsSaveBtn.setStyleClass("btn btn-info");
-}
-
+WebNotificationSettings::~WebNotificationSettings(void) {}
 
 void WebNotificationSettings::saveChanges(void)
 {
-  m_settingFactory->setEntry(SettingFactory::NOTIF_TYPE, QString::number(m_notificationTypeBox.currentIndex()));
-  if (m_notificationTypeBox.currentIndex() == EmailNotification) {
-    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerAddrField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpServerPortField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_USERNAME, m_smtpUsernameField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD, m_smtpPasswordField.text().toUTF8().c_str());
-    m_settingFactory->setEntry(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL, QString::number(m_smtpUseSslField.checkState()));
-    Q_EMIT operationCompleted(ngrt4n::OperationSucceeded, Q_TR("Notification settings updated"));
+  SettingFactory settings;
+  settings.setKeyValue(SettingFactory::NOTIF_TYPE, QString::number(m_notificationTypeFieldRef->currentIndex()));
+  if (m_notificationTypeFieldRef->currentIndex() == EmailNotification) {
+    auto pass = m_smtpPassFieldRef->text().toUTF8();
+    auto passEncoded = SettingFactory::base64Encode(reinterpret_cast<const unsigned char *>(pass.c_str()), pass.size());
+    settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD, QString::fromStdString(passEncoded));
+    settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_USERNAME, m_smtpUserFieldRef->text().toUTF8().c_str());
+    settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_ADRR, m_smtpServerFieldRef->text().toUTF8().c_str());
+    settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpPortFieldRef->text().toUTF8().c_str());
+    settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL, QString::number(int(m_smtpUseSslFieldRef->checkState())));
   }
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings udpated"));
 }
 
 
 void WebNotificationSettings::updateEmailFieldsEnabledState(void)
 {
-  bool enable = m_notificationTypeBox.currentIndex() == EmailNotification;
-  m_smtpServerAddrField.setEnabled(enable);
-  m_smtpServerPortField.setEnabled(enable);
-  m_smtpUseSslField.setEnabled(enable);
-  m_smtpUsernameField.setEnabled(enable);
-  m_smtpPasswordField.setEnabled(enable);
+  bool enable = m_notificationTypeFieldRef->currentIndex() == EmailNotification;
+  m_smtpServerFieldRef->setEnabled(enable);
+  m_smtpPortFieldRef->setEnabled(enable);
+  m_smtpUseSslFieldRef->setEnabled(enable);
+  m_smtpUserFieldRef->setEnabled(enable);
+  m_smtpPassFieldRef->setEnabled(enable);
 }
 
 
 void WebNotificationSettings::updateFields(void)
 {
-  m_notificationTypeBox.setCurrentIndex( getNotificationType() );
-  m_smtpServerAddrField.setText( getSmtpServerAddr() );
-  m_smtpServerPortField.setText( getSmtpServerPortText() );
-  m_smtpUsernameField.setText( getSmtpUsername() );
-  m_smtpPasswordField.setEchoMode(Wt::WLineEdit::Password);
-  m_smtpPasswordField.setText( getSmtpPassword() );
-  m_smtpUseSslField.setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
+  m_notificationTypeFieldRef->setCurrentIndex( getNotificationType() );
+  m_smtpServerFieldRef->setText( getSmtpServerAddr() );
+  m_smtpPortFieldRef->setText( getSmtpServerPortText() );
+  m_smtpUserFieldRef->setText( getSmtpUsername() );
+  m_smtpPassFieldRef->setEchoMode(Wt::EchoMode::Password);
+  m_smtpPassFieldRef->setText( getSmtpPassword() );
+  m_smtpUseSslFieldRef->setCheckState( static_cast<Wt::CheckState>(getSmtpUseSsl()) );
   updateEmailFieldsEnabledState();
 }
 

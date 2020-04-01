@@ -27,7 +27,7 @@
 
 #include "Base.hpp"
 #include "utilsCore.hpp"
-#include "BaseSettings.hpp"
+#include "SettingFactory.hpp"
 #include "DbSession.hpp"
 #include <QDomNodeList>
 
@@ -41,10 +41,7 @@ class Parser : public QObject
     static const int ParsingModeExternalService = 2;
 
   public:
-    Parser(CoreDataT* _cdata,
-           int _parsingMode,
-           const BaseSettings* settings,
-           DbSession* dbSession);
+    Parser(CoreDataT* _cdata, int _parsingMode, DbSession* dbSession);
     virtual ~Parser();
     int processRenderingData(void);
     std::pair<int, QString> parse(const QString& viewFile);
@@ -63,7 +60,6 @@ class Parser : public QObject
     CoreDataT* m_cdata;
     QString m_lastErrorMsg;
     int m_parsingMode;
-    const BaseSettings* m_settings;
     DbSession* m_dbSession;
 
 

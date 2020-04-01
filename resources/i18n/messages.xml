@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <messages>
+
 <message id="copyright-info">
-<div class="footer">
-    ${footer}
-</div>
+<div>${footer}</div>
 </message>
 
 <message id="beta-message">
@@ -11,52 +10,51 @@
 </message>
 
 <message id="admin-home.tpl">
-  <div class="admin-page">
-    <!-- Menu pane -->
-    <div id="ngrt4n-side-pane" class="col-sm-4">
-       <div class="page-header">
-        <h1>${menu-get-started}</h1>
-       </div>
-      <div class="ngrt4n-content">
-            <div class="accordion">
-            <div class="accordion-group" id="viewMenuBlock">
-            <div class="accordion-heading">
-              <i class="fa fa-dashboard"></i> View Management
-            </div>
-            <div class="accordion-body collapse in">
+<div class="admin-page">
+  <!-- Menu pane -->
+  <div id="ngrt4n-side-pane" class="col-sm-4">
+    <div class="page-header">
+      <h2>${menu-get-started}</h2>
+    </div>
+    <div class="ngrt4n-content">
+      <div class="accordion">
+        <fieldset class="accordion-group" id="viewMenuBlock">
+          <div class="accordion-heading">
+            <i class="fa fa-dashboard"></i> View Management
+          </div>
+          <div class="accordion-body collapse in">
               <div class="accordion-inner">
-              <ul class="nav">
-              <li> ${menu-editor}</li>
-               <li> ${menu-import-service-file}</li>
-               <li> ${menu-preview}</li>
-               <li> ${menu-all-views}</li>
-              </ul>
+                <ul class="nav">
+                  <li> ${menu-editor}</li>
+                  <li> ${menu-preview}</li>
+                  <li> ${menu-all-views}</li>
+                </ul>
               </div>
-            </div>
-            </div>
+          </div>
+        </fieldset>
 
-            <div class="accordion-group" id="userMenuBlock">
-              <div class="accordion-heading">
-                <i class="fa fa-users"></i> User Management
-              </div>
-            <div class="accordion-body collapse in">
-                <div class="accordion-inner">
+        <fieldset class="accordion-group" id="userMenuSection">
+          <div class="accordion-heading">
+            <i class="fa fa-users"></i> User Management
+          </div>
+          <div class="accordion-body collapse in">
+            <div class="accordion-inner">
               <ul class="nav">
-               <li> ${menu-new-user}</li>
-               <li> ${menu-builin-users}</li>
-               <li> ${menu-ldap-users}</li>
+                <li> ${menu-new-user}</li>
+                <li> ${menu-builin-users}</li>
+                <li> ${menu-ldap-users}</li>
               </ul>
-              </div>
-             </div>
             </div>
-
-            <div class="accordion-group" id="viewMenuBlock">
-              <div class="accordion-heading">
-                 <i class="fa fa-cogs fa-fw pull-left"></i> Settings
-              </div>
-            <div class="accordion-body collapse in">
-              <div class="accordion-inner">
-               <ul class="nav">
+          </div>
+        </fieldset>
+  
+        <fieldset class="accordion-group" id="settingMenuSection">
+          <div class="accordion-heading">
+            <i class="fa fa-cogs fa-fw pull-left"></i> Settings
+          </div>
+          <div class="accordion-body collapse in">
+            <div class="accordion-inner">
+              <ul class="nav">
                 <li>${menu-monitoring-settings}</li>
                 <li id="menu-auth-settings">${menu-auth-settings}</li>
                 <li id="menu-notification-settings">${menu-notification-settings}</li>
@@ -64,99 +62,115 @@
                 <li id="menu-my-account"> ${menu-my-account}</li>
                 <li id="menu-change-password">${menu-change-password}</li>
               </ul>
-              </div>
             </div>
-            </div>
-        </div>
-
+          </div>
+        </fieldset>
       </div>
     </div>
-   <!-- Content Pane -->
-    <div id="ngrt4n-content-pane"  class="col-sm-8">
-    <div class="info-box">${info-box}</div>
-      <h3>${title}</h3>
-       <div class="ngrt4n-content">
-           ${contents}
-       </div>
-    </div>
   </div>
+
+  <!-- Content Pane -->
+  <div id="ngrt4n-content-pane"  class="col-sm-8">
+    <div class="info-box">${info-box}</div>
+      <h2>${title}</h2>
+      <div class="ngrt4n-content">
+        ${contents}
+      </div>
+    </div>
+</div>
 </message>
 
 
 
-
 <message id="getting-started.tpl">
-
-    <!-- Setting thumnail -->
-    <div class="col-sm-4">
-            <div class="thumbnail">
-              <h3>Set Monitoring Sources</h3>
-              <img src="/images/built-in/thumbnails/source-settings.png" alt="RealOpInsight Settings User Interface" />
-              <p>Define how RealOpInsight should connect to the backed monitoring systems to retrieve data needed to keep your operations views up-to-date.
-              </p>
-              <p><a href="http://docs.realopinsight.com/"
-              class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-            </div>
-    </div>
-
-  <!-- Describe thumnail -->
-  <div class="col-sm-4">
-       <div class="thumbnail">
-          <h3>Edit View Service Trees</h3>
-          <img src="/images/built-in/thumbnails/service-editor.png" alt="RealOpInsight Editor" />
-          <p>Use the Service Editor to easily design the views that underlie the operations of your business (dependencies mapping, status calculation and propagation rules).
-          </p>
-          <p><a href="http://docs.realopinsight.com/"
-          class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a>
-          </p>
-       </div>
-  </div>
-
-
-  <!-- Preview thumnail -->
-  <div class="col-sm-4">
-          <div class="thumbnail">
-            <h3>Preview to Validate Your Views</h3>
-            <img src="/images/built-in/thumbnails/application-dashboard.png" alt="RealOpInsight Dashboard Preview" />
-            <p>Use the Preview feature to load your designed views and ensure that they will work as expected (e.g. relationship mapping, status processing).
-            </p>
-            <p><a href="http://docs.realopinsight.com/"
-            class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
-          </div>
-  </div>
-
-
-  <div class="clearfix">&nbsp;</div>
-  <!-- Assign thumnail -->
-   <div class="col-sm-4">
-      <div class="thumbnail">
-         <h3>Assign and Let Operate</h3>
-         <img src="/images/built-in/thumbnails/manage-operations-views.png" alt="RealOpInsight View Access Control" />
-         <p>Once your views ready, use the Operations Views Manager to set for each operator, the views he can watch from his operations console.
-         </p>
-         <p><a href="http://docs.realopinsight.com/"
-         class="btn btn-info btn-sm" role="button" target="_blank">Learn more</a></p>
+  <div id="kube-features">
+    <div class="row gutters">
+      <div class="col col-4 item">
+        <figure>
+          <img alt="Configure data sources" src="/images/built-in/thumbnails/source-settings.png" />
+        </figure>
+        <h4>Configure Data Sources</h4>
+        <p>
+          Go to <b>Monitoring Sources</b> to define how to connect to the underlying monitoring systems to retrieve data needed for operations views.
+        </p>
       </div>
-   </div>
- </message>
 
- <message id="operator-home.tpl">
+      <div class="col col-4 item">
+        <figure>
+          <img alt="Create service tree views" src="/images/built-in/thumbnails/service-editor.png" />
+        </figure>
+        <h4>Create Service Operations View</h4>
+        <p>
+          Go to <b>Service Editor</b> to create the different service views that model your business operations (i.e. relationship mapping, status calculation and propagation).
+        </p>
+      </div>
+
+      <div class="col col-4 item">
+        <figure>
+          <img alt="Preview to validate views" src="/images/built-in/thumbnails/application-dashboard.png" />
+        </figure>
+        <h4>Preview and Validate Views</h4>
+        <p>
+           Go to <b>Preview</b> to previsualize views you created. This help ensure that they will be running as expected.
+        </p>
+      </div>
+
+      <div class="col col-4 item">
+        <figure>
+          <img alt="Assign to build operations views" src="/images/built-in/thumbnails/manage-operations-views.png" />
+        </figure>
+        <h4>Configure Operators Views</h4>
+        <p>
+          Once your views ready, go to <b>Operations View</b> to configure the service views each operator can watch on production.
+        </p>
+      </div>
+
+      <div class="col col-4 item">
+        <figure>
+          <img alt="Let operate" src="/images/built-in/thumbnails/operations-view.png" />
+        </figure>
+        <h3>Let's operate in production</h3>
+        <p>
+          Sign in <b>as operator</b> for daily operations. Get factual insights at a glance. Quickly assess the impact of each incident. Take right decisions.
+        </p>
+      </div>
+    </div>
+  </div>
+</message>
+
+ <message id="ops-home.tpl">
     <!-- Content Pane -->
     <div class="info-box col-sm-12">${info-box}</div>
     <div id="ngrt4n-content-pane" class="col-sm-8">
        <div class="ngrt4n-content">
-           <legend>&nbsp;Tactical Overview</legend>
-           ${thumbnails}
-           <legend>&nbsp;${bi-report-title}</legend>
-           ${bi-report-dashlet}
+          <div class="row">
+            <h1>&nbsp;Tactical Overview</h1>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              ${thumbnails}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <h1>&nbsp;${bi-report-title}</h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              ${bi-report-dashlet}
+            </div>
+          </div>
        </div>
     </div>
     <!-- Event Feeds Pane -->
     <div id="ngrt4n-side-pane" class="col-sm-4">
-    <div class="ngrt4n-content">
-    <legend>Open Events</legend>
-     ${event-feeds}
-    </div>
+      <div class="ngrt4n-content">
+        <h1>Open Events</h1>
+        <div>
+          ${event-feeds}
+        </div>
+      </div>
     </div>
 </message>
 
@@ -186,166 +200,178 @@
 <message id="Wt.Auth.field">
   <![CDATA[
     ${<if:{1}>}
-  <div class="col-sm-12 form-group">
-    <label for="${id:{1}}" class="control-label">
+  <div class="form-group row">
+    <label for="${id:{1}}" class="control-label col-sm-4">
         ${tr:Wt.Auth.{1}}
     </label>
-    <div class="controls">${{1}}</div>
+    <div class="controls col-sm-8">${{1}}</div>
   </div>
     ${</if:{1}>}
     ]]>
 </message>
 
 <message id="Wt.Auth.template.login">
-<div class="info-box">${info-box}</div>
-<div class="ngrt4n-gradient login-container">
- <legend><img src="/images/built-in/logo.png" /></legend>
-    <p>${tr:Wt.Auth.login-form-info}</p>
-      <div class="form-horizontal">
+<div class="info-box">
+  ${info-box}
+</div>
+<div id="main">
+  <div id="hero" class="primary">
+      <h2><img src="/images/built-in/logo.png" /></h2>
+      <p>${tr:Wt.Auth.login-form-info}</p>
+      <div class="form-group">
         ${<if:passwords>}
-        <div class="col-sm-12 form-group">
-          <label for="${id:user-name}" class="control-label">
-              ${user-name-label}
-          </label>
-          <div class="controls">
-              ${user-name}
-          </div>
+        <div class="form-group row">
+            <label for="${id:user-name}" class="control-label col-sm-4">
+                ${user-name-label}
+            </label>
+            <div class="controls col-sm-8">
+                ${user-name}
+            </div>
         </div>
         ${block:Wt.Auth.field password}
         ${</if:passwords>}
 
         ${<if:oauth>}
-        <div class="col-sm-12 form-group">
-          <div class="controls">
-            <p>Or login using:</p>
-              ${icons}
-          </div>
+        <div class="form-group row">
+            <div class="controls">
+                <p>Or login using:</p>
+                ${icons}
+            </div>
         </div>
         ${</if:oauth>}
-      <div class="clear"></div>
-      <div class="form-actions">
-        <span>${login class="btn-primary"}</span>
-        <span>${lost-password class="btn-link"} ${sep}
-          ${register class="btn-link"}</span>
+
+        <div class="clear" />
+
+        <div class="form-actions">
+          <div class="controls">
+            <span>${login class="btn-primary"}</span>
+            <span>${lost-password class="btn-link"} ${sep}
+            ${register class="btn-link"}</span>
+          </div>
+        </div>
       </div>
-      </div>
-      ${block:copyright-info}
   </div>
+</div>
+
+<div>
+    ${footer}
+</div>
 </message>
 
 <message id="Wt.Auth.template.logged-in">
   <div id="update-banner">${update-banner}</div>
-  <div class="logout-button ">${logout-item}</div>
-    ${main-ui}
+  <div>${main-ui}</div>
 </message>
 
 <message id="userForm-template">
-  <div class="form-horizontal">
-    ${<if:user-name>}
-    <div class="col-sm-12 form-group">
-        <label for="${id:user-name}" class="control-label">Login*</label>
-        <div class="controls">
-            ${user-name} <span class="help-inline">${user-name-info}</span>
-       </div>
-    </div>
-    ${</if:user-name>}
-
-    ${<if:current-password>}
-    <div class="col-sm-12 form-group">
-        <label for="${id:current-password}" class="control-label">Current password*</label>
-        <div class="controls">
-           ${current-password} <span class="help-inline">${current-password-info}</span>
+<div class="form-horizontal">
+    <fieldset>
+        ${<if:user-name>}
+        <div class="form-group row">
+            <label for="${id:user-name}" class="control-label col-sm-3">Login*</label>
+            <div class="controls col-sm-8">
+                ${user-name} <span class="help-inline">${user-name-info}</span>
+           </div>
         </div>
-    </div>
-    ${</if:current-password>}
+        ${</if:user-name>}
 
-    ${<if:password>}
-    <div class="col-sm-12 form-group">
-          <label for="${id:password}" class="control-label">Password*</label>
-          <div class="controls">
-              ${password}<span class="help-inline">${password-info}</span>
-          </div>
-    </div>
-    ${</if:password>}
-
-    ${<if:confirm-password>}
-    <div class="col-sm-12 form-group">
-          <label for="${id:confirm-password}" class="control-label">Verify password*</label>
-          <div class="controls">
-              ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
-          </div>
-    </div>
-    ${</if:confirm-password>}
-
-    ${<if:first-name>}
-    <div class="col-sm-12 form-group">
-        <label for="${id:first-name}" class="control-label">First name*</label>
-        <div class="controls">
-            ${first-name} <span class="help-inline">${first-name-info}</span>
-         </div>
-    </div>
-    ${</if:first-name>}
-
-    ${<if:last-name>}
-    <div class="col-sm-12 form-group">
-        <label for="${id:last-name}" class="control-label">Last name*</label>
-        <div class="controls">
-            ${last-name} <span class="help-inline">${last-name-info}</span>
+        ${<if:current-password>}
+        <div class="form-group row">
+            <label for="${id:current-password}" class="control-label col-sm-3">Current password*</label>
+            <div class="controls col-sm-8">
+               ${current-password} <span class="help-inline">${current-password-info}</span>
+            </div>
         </div>
-    </div>
-    ${</if:last-name>}
+        ${</if:current-password>}
 
-    ${<if:email>}
-    <div class="col-sm-12 form-group">
-        <label for="${id:email}" class="control-label">Email*</label>
-        <div class="controls">
-            ${email} <span class="help-inline">${email-info}</span>
+        ${<if:password>}
+        <div class="form-group row">
+              <label for="${id:password}" class="control-label col-sm-3">Password*</label>
+              <div class="controls col-sm-8">
+                  ${password}<span class="help-inline">${password-info}</span>
+              </div>
         </div>
-    </div>
-    ${</if:email>}
+        ${</if:password>}
 
-    ${<if:role>}
-    <div class="col-sm-12 form-group">
-          <label for="${id:role}" class="control-label">User Role*</label>
-          <div class="controls">
-              ${role} <span class="help-inline">${role-info}</span>
-          </div>
-    </div>
-    ${</if:role>}
+        ${<if:confirm-password>}
+        <div class="form-group row">
+              <label for="${id:confirm-password}" class="control-label col-sm-3">Verify password*</label>
+              <div class="controls col-sm-8">
+                  ${confirm-password} <span class="help-inline">${confirm-password-info}</span>
+              </div>
+        </div>
+        ${</if:confirm-password>}
 
-    ${<if:dashboard-mode>}
-    <div class="col-sm-12 form-group">
-          <label for="${id:dashboard-mode}" class="control-label">Dashboard Display Mode*</label>
-          <div class="controls">
-              ${dashboard-mode} <span class="help-inline">${dashboard-mode-info}</span>
-          </div>
-    </div>
-    ${</if:dashboard-mode>}
+        ${<if:first-name>}
+        <div class="form-group row">
+            <label for="${id:first-name}" class="control-label col-sm-3">First name*</label>
+            <div class="controls col-sm-8">
+                ${first-name} <span class="help-inline">${first-name-info}</span>
+             </div>
+        </div>
+        ${</if:first-name>}
 
-    ${<if:dashboard-tilesperrow>}
-    <div class="col-sm-12 form-group">
-          <label for="${id:dashboard-tilesperrow}" class="control-label">Dashboard Tiles Per Row*</label>
-          <div class="controls">
-              ${dashboard-tilesperrow} <span class="help-inline">${dashboard-tilesperrow-info}</span>
-          </div>
-    </div>
-    ${</if:dashboard-tilesperrow>}
+        ${<if:last-name>}
+        <div class="form-group row">
+            <label for="${id:last-name}" class="control-label col-sm-3">Last name*</label>
+            <div class="controls col-sm-8">
+                ${last-name} <span class="help-inline">${last-name-info}</span>
+            </div>
+        </div>
+        ${</if:last-name>}
 
-    ${<if:registration-date>}
-    <div class="col-sm-12 form-group">
-          <label for="${id:registration-date}" class="control-label">Registration*</label>
-          <div class="controls">
-              ${registration-date} <span class="help-inline">${registration-date-info}</span>
-          </div>
-    </div>
-    ${</if:registration-date>}
+        ${<if:email>}
+        <div class="form-group row">
+            <label for="${id:email}" class="control-label col-sm-3">Email*</label>
+            <div class="controls col-sm-8">
+                ${email} <span class="help-inline">${email-info}</span>
+            </div>
+        </div>
+        ${</if:email>}
 
-    <div class="form-actions">
-        <span>${submit-button}</span>
-        <span>${change-password-link}</span>
-        <span>${cancel-button}</span>
-    </div>
-  </div>
+        ${<if:role>}
+        <div class="form-group row">
+              <label for="${id:role}" class="control-label col-sm-3">User Role*</label>
+              <div class="controls col-sm-8">
+                  ${role} <span class="help-inline">${role-info}</span>
+              </div>
+        </div>
+        ${</if:role>}
+
+        ${<if:dashboard-mode>}
+        <div class="form-group row">
+              <label for="${id:dashboard-mode}" class="control-label col-sm-3">Dashboard Display Mode*</label>
+              <div class="controls col-sm-8">
+                  ${dashboard-mode} <span class="help-inline">${dashboard-mode-info}</span>
+              </div>
+        </div>
+        ${</if:dashboard-mode>}
+
+        ${<if:dashboard-tilesperrow>}
+        <div class="form-group row">
+              <label for="${id:dashboard-tilesperrow}" class="control-label col-sm-3">Dashboard Tiles Per Row*</label>
+              <div class="controls col-sm-8">
+                  ${dashboard-tilesperrow} <span class="help-inline">${dashboard-tilesperrow-info}</span>
+              </div>
+        </div>
+        ${</if:dashboard-tilesperrow>}
+
+        ${<if:registration-date>}
+        <div class="form-group row">
+              <label for="${id:registration-date}" class="control-label col-sm-3">Registration*</label>
+              <div class="controls col-sm-8">
+                  ${registration-date} <span class="help-inline">${registration-date-info}</span>
+              </div>
+        </div>
+        ${</if:registration-date>}
+
+        <div class="form-actions">
+            <span>${submit-button}</span>
+            <span>${change-password-link}</span>
+            <span>${cancel-button}</span>
+        </div>
+    </fieldset>
+</div>
 </message>
 
 <message id="error-msg-div-tpl">
@@ -365,17 +391,24 @@
     <div class="pull-left">${menu}</div>
     <div class="ngrt4n-content pull-right">${contents}</div>
   </div>
-  <div class="footer fixed-footer clearfix">
-       ${footer}
+  <div>
+    ${footer}
   </div>
 </message>
 
 
 <message id="copyright-footer.tpl">
-    Copyright &copy; ${release-year} RealOpInsight Labs
-    <br />Version ${version}
-    - <a href="http://docs.realopinsight.com/">Help</a>
-    - <a href="https://github.com/RealOpInsightLabs/realopinsight-ultimate/blob/master/LICENSE" target="_blank">Terms &amp; Conditions</a>
+<footer id="footer">
+  <nav>
+    <ul>
+      <li>RealOpInsight v${version}</li>
+      <li>&copy; ${release-year} Rodrigue Chakode and contributors</li>
+      <li><a href="http://realopinsight.com/docs/" target="_blank">Documentation</a></li>
+      <li><a href="https://github.com/rchakode/realopinsight/blob/master/LICENSE" target="_blank">Terms of Use</a></li>
+      <li><a href="https://github.com/rchakode/realopinsight/issues" target="_blank">Issues &amp; Support</a></li>
+    </ul>
+  </nav>
+</footer>
 </message>
 
 <message id="view-assignment-tpl">
@@ -385,17 +418,17 @@
     ${assigned-views}
   </div>
   <div class="col-sm-2">
-    ${button-assign}
-    ${button-revoke}
-    ${delete-view-button}
+    <ul class="list-unstyled">
+      <li>${button-assign}</li>
+      <li>${button-revoke}</li>
+      <li>${delete-view-button}</li>
+    </ul>
   </div>
   <div class="col-sm-3">
     ${non-assigned-views}
   </div>
 </div>
 </message>
-
-
 
 <message id="chart-legend-bar.tpl">
   <span class="badge severity-unknown">${unknown-count}</span>
@@ -417,49 +450,52 @@
 
     <div id="auth-section">
       <fieldset>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Authentication Mode&nbsp;</label>
-          <span>${authentication-mode}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">Authentication Mode&nbsp;</label>
+          <div class="controls col-sm-3">${authentication-mode}</div>
         </div>
       </fieldset>
       <fieldset id="ldap-auth-setting-section">
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Server URI&nbsp;</label>
-          <span>${ldap-server-uri}</span>
-          <span>${ldap-version}</span>
+
+        <div class="form-group row">
+          <label class="control-label col-sm-3">Server URI&nbsp;</label>
+          <div class="controls col-sm-3">${ldap-server-uri}</div>
+          <div class="controls col-sm-3">${ldap-version}</div>
         </div>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">&nbsp;</label>
-          <label class="control-label">Use Custom SSL Certificate&nbsp;</label>
-          <span>${ldap-ssl-use-custom-settings}</span>
+
+        <div class="form-group row">
+          <label class="control-label col-sm-3">&nbsp;</label>
+          <label class="control-label col-sm-3">Use Custom SSL Certificate&nbsp;</label>
+          <span class="controls col-sm-3">${ldap-ssl-use-custom-settings}</span>
         </div>
-        <!-- custom ssl settings -->
+
         <div id="ldap-custom-ssl-settings">
-           <div class="col-sm-12 form-group">
-             <label class="control-label">Certificate File&nbsp;</label>
-             <span>${ldap-ssl-cert-file}</span>
+           <div class="form-group row">
+             <label class="control-label col-sm-3">Certificate Path&nbsp;</label>
+             <span class="controls col-sm-6">${ldap-ssl-cert-file}</span>
            </div>
-           <div  class="col-sm-12 form-group">
-             <label class="control-label">CA File&nbsp;</label>
-             <span>${ldap-ssl-ca-file}</span>
+
+           <div  class="form-group row">
+             <label class="control-label col-sm-3">CA File&nbsp;</label>
+             <span class="controls col-sm-6">${ldap-ssl-ca-file}</span>
            </div>
         </div> <!-- id="ldap-custom-ssl-settings" -->
 
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Bind User DN&nbsp;</label>
-          <span>${ldap-bind-user-dn}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">Bind User DN&nbsp;</label>
+          <span class="controls col-sm-6">${ldap-bind-user-dn}</span>
         </div>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Bind User Password&nbsp;</label>
-          <span>${ldap-bind-user-password}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">Bind User Password&nbsp;</label>
+          <span class="controls col-sm-6">${ldap-bind-user-password}</span>
         </div>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">User Search Base&nbsp;</label>
-          <span>${ldap-user-search-base}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">User Search Base&nbsp;</label>
+          <span class="controls col-sm-6">${ldap-user-search-base}</span>
         </div>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">User ID Attribute&nbsp;</label>
-          <span>${ldap-uid-attribute}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">User ID Attribute&nbsp;</label>
+          <span class="controls col-sm-3">${ldap-uid-attribute}</span>
         </div>
       </fieldset> <!-- id="ldap-auth-setting-section" -->
     </div> <!-- id="auth-section" -->
@@ -479,48 +515,42 @@
 <div class="form-horizontal">
   <div id="monitoring-settings-section">
      <fieldset>
-       <div class="col-sm-12 form-group">
-         <label class="control-label">Source Id&nbsp;</label>
-         <span>${source-box}</span>
+
+       <div class="form-group row">
+         <label class="control-label col-sm-3">Source ID&nbsp;</label>
+         <div class="controls col-sm-6">${source-box}</div>
        </div>
-       <div class="col-sm-12 form-group">
-         <label class="control-label">Type&nbsp;</label>
-         <span>${monitor-type}</span>
+
+       <div class="form-group row">
+         <label class="control-label col-sm-3">Type&nbsp;</label>
+         <div class="controls col-sm-3">${monitor-type}</div>
        </div>
-       <div class="col-sm-12 form-group">
-        <label class="control-label">Update Interval (seconds)&nbsp;</label>
-        <span>${update-interval}</span>
+
+       <div class="form-group row">
+        <label class="control-label col-sm-3">Update Interval (seconds)&nbsp;</label>
+        <div class="controls col-sm-3">${update-interval}</div>
        </div>
      </fieldset>
 
 
     <fieldset id="livetstatus-settings">
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Livestatus Host&nbsp;</label>
-        <span>${livestatus-server}</span>
+      <div class="form-group row">
+        <label class="control-label col-sm-3">Livestatus Service&nbsp;</label>
+        <div class="controls col-sm-3">${livestatus-server}</div>
+        <div class="controls col-sm-3">${livestatus-port}</div>
       </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Livestatus Port&nbsp;</label>
-        <span>${livestatus-port}</span>
-      </div>
-    </fieldset>  <!-- id="livetstatus-section" -->
+    </fieldset>
 
      <fieldset id="source-api-settings">
-       <div class="col-sm-12 form-group">
-         <label class="control-label">Monitor API Base URL&nbsp;</label>
-         <span>${monitor-url}</span>
+       <div class="form-group row">
+         <label class="control-label col-sm-3">Monitor API Base URL&nbsp;</label>
+         <div class="controls col-sm-6">${monitor-url}</div>
+         <div class="controls col-sm-3">${dont-verify-ssl-certificate}</div>
        </div>
-       <div class="col-sm-12 form-group">
-         <label class="control-label">Don't verify SSL certificate&nbsp;</label>
-         <span>${dont-verify-ssl-certificate}</span>
-       </div>
-       <div class="col-sm-12 form-group">
-         <label class="control-label">Auth String&nbsp;</label>
-         <span>${monitor-auth-string}</span>
-       </div>
-       <div class="col-sm-12 form-group">
-         <label class="control-label">Show auth string in clear&nbsp;</label>
-         <span>${show-in-clear}</span>
+       <div class="form-group row">
+         <label class="control-label col-sm-3">Auth String&nbsp;</label>
+         <div class="controls col-sm-6">${monitor-auth-string}</div>
+         <div class="controls col-sm-3">${show-in-clear}</div>
        </div>
      </fieldset>
 
@@ -539,26 +569,25 @@
 
 
 <message id="about-tpl">
-<div>
-    <p class="pull-left">
-     <img src="/images/built-in/logo.png" />
-    </p>
-    <p class="pull-right">
-       Version: ${corelib-version}<br />
-       Codename: ${codename}<br />
-       Release ID: ${release-id} <br />
-       Bug report: <a href="mailto:${bug-report-email}">${bug-report-email}</a>
-    </p>
- </div>
- <div class="clearfix"></div>
- <div>
-   <h3>Copyrights</h3>
-   <p>
-   Copyrights &copy; 2010-${release-year} RealOpInsight Labs. All rights reserved. <br />
-   <a href="http://legal.realopinsight.com/" target="_blank">Terms of Use</a>
-   </p>
+<div id="hero" class="primary">
+  <h2><img src="/images/built-in/logo.png" /></h2>
+  <p class="pull-left">
+     Version: ${version}<br />
+     Codename: ${codename}<br />
+     Build Timestamp : ${release-date}
+  </p>
 </div>
- <div style="float: right;">${close-button}</div>
+
+<div class="clearfix" />
+
+<div style="float: right;">
+  ${close-button}
+</div>
+
+<div>
+  ${footer}
+</div>
+
 </message>
 
 <message id="notification.block.tpl">
@@ -579,9 +608,9 @@
 
 
 <message id="editor-fields-form.tpl">
-  <form class="form-horizontal">
+<form class="form-horizontal">
   <fieldset>
-    <div class="pull-right">
+    <div class="form-group pull-right">
       <span id="save-current-view">${save-current-view}</span>
       <span id="new-service-view">${new-service-view}</span>
       <span id="open-service-view">${open-service-view}</span>
@@ -589,42 +618,40 @@
       <span id="import-zabbix-it-service">${import-zabbix-it-service}</span>
       <span id="import-nabios-bpi">${import-nabios-bpi}</span>
     </div>
-    </fieldset>
+  </fieldset>
 
-    <fieldset>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Name&nbsp;</label>
-        <span>${name-field}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Type&nbsp;</label>
-        <span>${type-field}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Severity Calculation Rule&nbsp;</label>
-        <span>${calc-rule-field}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Severity Propagation Rule&nbsp;</label>
-        <span>${prop-rule-field}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Icon&nbsp;</label>
-        <span>${icon-field}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Description&nbsp;</label>
-        <span>${description-field}</span>
-      </div>
-      <div class="col-sm-12 form-group">
-        <label class="control-label">Monitored Item&nbsp;</label>
-        <span>${monitoring-item-field}</span>
-      </div>
-    </fieldset>
-  </form>
+  <fieldset>
+    <div class="form-group row">
+        <label class="control-label col-sm-3">Name&nbsp;</label>
+        <span class="controls col-sm-8">${name-field}</span>
+    </div>
+    <div class="form-group row">
+      <label class="control-label col-sm-3">Type&nbsp;</label>
+      <span class="controls col-sm-8">${type-field}</span>
+    </div>
+    <div class="form-group row">
+      <label class="control-label col-sm-3">Severity Calculation Rule&nbsp;</label>
+      <span class="controls col-sm-8">${calc-rule-field}</span>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-3">Severity Propagation Rule&nbsp;</label>
+        <span class="controls col-sm-8">${prop-rule-field}</span>
+    </div>
+    <div class="form-group row">
+      <label class="control-label col-sm-3">Icon&nbsp;</label>
+      <span class="controls col-sm-8">${icon-field}</span>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-3">Description&nbsp;</label>
+        <span class="controls col-sm-8">${description-field}</span>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-3">Monitored Item&nbsp;</label>
+        <span class="controls col-sm-8">${monitoring-item-field}</span>
+    </div>
+  </fieldset>
+</form>
 </message>
-
-
 
 
 <message id="notification-settings-form.tpl">
@@ -632,29 +659,29 @@
 
     <div id="notification-section">
       <fieldset>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Notification type&nbsp;</label>
-          <span>${notification-type}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">Notification type&nbsp;</label>
+          <span class="controls col-sm-3">${notification-type}</span>
          </div>
           <!-- mail notification settings -->
           <div id="mail-notification-settings">
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Server&nbsp;</label>
-               <span>${notification-mail-smtp-server}</span>
+             <div class="form-group row">
+               <label class="control-label col-sm-3">SMTP Server&nbsp;</label>
+               <span class="controls col-sm-5">${notification-mail-smtp-server}</span>
              </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Port&nbsp;</label>
-               <span>${notification-mail-smtp-port}</span>
+             <div class="form-group row">
+               <label class="control-label col-sm-3">SMTP Port&nbsp;</label>
+               <span class="controls col-sm-3">${notification-mail-smtp-port}</span>
                <span>Enable SSL</span>
-               <span>${notification-mail-smtp-use-ssl}</span>
+               <span class="controls col-sm-3">${notification-mail-smtp-use-ssl}</span>
              </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Username&nbsp;</label>
-               <span>${notification-mail-smtp-username}</span>
+             <div class="form-group row">
+               <label class="control-label col-sm-3">SMTP Username&nbsp;</label>
+               <span class="controls col-sm-5">${notification-mail-smtp-username}</span>
              </div>
-             <div class="col-sm-12 form-group">
-               <label class="control-label">SMTP Password&nbsp;</label>
-               <span>${notification-mail-smtp-password}</span>
+             <div class="form-group row">
+               <label class="control-label col-sm-3">SMTP Password&nbsp;</label>
+               <span class="controls col-sm-5">${notification-mail-smtp-password}</span>
              </div>
           </div> <!-- id="mail-notification-settings" -->
       </fieldset>
@@ -674,37 +701,37 @@
 
     <div id="database-section">
       <fieldset>
-        <div class="col-sm-12 form-group">
-          <label class="control-label">Database Type&nbsp;</label>
-          <span>${database-type}</span>
+        <div class="form-group row">
+          <label class="control-label col-sm-3">Database Type&nbsp;</label>
+          <span class="controls col-sm-5">${database-type}</span>
          </div>
 
-         <div class="col-sm-12 form-group">
-           <label class="control-label">Database Name&nbsp;</label>
-           <span>${database-name}</span>
-           <span>Empty database (if checked, will be initialized)</span>
-           <span>${database-empty-state}</span>
+         <div class="form-group row">
+         <label class="control-label col-sm-3">&nbsp;</label>
+           <span class="control-label col-sm-3">Empty database (i.e. initialization is required)</span>
+           <span class="controls col-sm-1">${database-empty-state}</span>
          </div>
 
-         <div class="col-sm-12 form-group">
-           <label class="control-label">Server Address&nbsp;</label>
-           <span>${database-server-addr}</span>
+         <div class="form-group row">
+           <label class="control-label col-sm-3">Database Name&nbsp;</label>
+           <span class="controls col-sm-5">${database-name}</span>
          </div>
 
-
-         <div class="col-sm-12 form-group">
-           <label class="control-label">Server Port&nbsp;</label>
-           <span>${database-server-port}</span>
+         <div class="form-group row">
+           <label class="control-label col-sm-3">Server Address&nbsp;</label>
+           <span class="controls col-sm-3">${database-server-addr}</span>
+           <label class="control-label col-sm-1">Port&nbsp;</label>
+           <span class="controls col-sm-1">${database-server-port}</span>
          </div>
 
-         <div class="col-sm-12 form-group">
-           <label class="control-label">Username&nbsp;</label>
-           <span>${database-user}</span>
+         <div class="form-group row">
+           <label class="control-label col-sm-3">Username&nbsp;</label>
+           <span class="controls col-sm-5">${database-user}</span>
          </div>
 
-         <div class="col-sm-12 form-group">
-           <label class="control-label">Password&nbsp;</label>
-           <span>${database-password}</span>
+         <div class="form-group row">
+           <label class="control-label col-sm-3">Password&nbsp;</label>
+           <span class="controls col-sm-5">${database-password}</span>
          </div>
       </fieldset>
     </div>
@@ -716,7 +743,5 @@
 
   </div>
 </message>
-
-
 
 </messages>

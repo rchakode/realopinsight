@@ -38,14 +38,12 @@ public:
   static const QString GLOBAL_DB_STATE_KEY;
   static const QString GLOBAL_GRAPH_LAYOUT;
   static const QString GLOBAL_UPDATE_INTERVAL_KEY;
-
   static const QString DB_TYPE;
   static const QString DB_SERVER_ADDR;
   static const QString DB_SERVER_PORT;
   static const QString DB_NAME;
   static const QString DB_USER;
   static const QString DB_PASSWORD;
-
   static const QString AUTH_MODE_KEY;
   static const QString AUTH_LDAP_SERVER_URI;
   static const QString AUTH_LDAP_BIND_USER_DN;
@@ -56,38 +54,41 @@ public:
   static const QString AUTH_LDAP_SSL_USE_CERT;
   static const QString AUTH_LDAP_SSL_CERT_FILE;
   static const QString AUTH_LDAP_SSL_CA_FILE;
-
   static const QString NOTIF_TYPE;
   static const QString NOTIF_MAIL_SMTP_SERVER_ADRR;
   static const QString NOTIF_MAIL_SMTP_SERVER_PORT;
   static const QString NOTIF_MAIL_SMTP_USE_SSL;
   static const QString NOTIF_MAIL_SMTP_USERNAME;
   static const QString NOTIF_MAIL_SMTP_PASSWORD;
-
   static const QString DASHBOARD_THUMBNAILS_PER_ROW;
 
-  SettingFactory();
-
-  SettingFactory(const QString& path);
-
+  SettingFactory(void);
   virtual ~SettingFactory(void);
 
-  void init(void);
-
-  void setKeyValue(const QString & key, const QString & value);
-
-  QString keyValue(const QString & key) {return QSettings::value(key).toString();}
-
-  qint32 updateInterval() const;
-
-  void setEntry(const QString& key, const QString& value);
-
-  QString entry(const QString& key) const {return QSettings::value(key).toString();}
-
   static QString language(void);
-
+  static QString coreAppDir(void);
+  static QString coreDataDir(void);
+  static QString coreLogDir(void);
+  static QString coreConfigPath(void);
+  static std::string webConfigPath(void);
+  void setKeyValue(const QString & key, const QString & value);
+  QString keyValue(const QString & key) {
+    return QSettings::value(key).toString();
+  }
+  qint32 updateInterval() const;
+  QString entry(const QString& key) const {
+    return QSettings::value(key).toString();
+  }
   int getGraphLayout(void) const;
 
+  static inline bool isBase64(unsigned char c) {
+    return (isalnum(c) || (c == '+') || (c == '/'));
+  }
+  static std::string base64Encode(unsigned char const* bytesToEncode, unsigned int inLen);
+  static std::string base64Decode(std::string const& encoded_string);
+
+private:
+  QString m_configPath;
 };
 
 

@@ -27,37 +27,42 @@
 
 
 #include "Base.hpp"
-#include "utilsCore.hpp"
-#include <Wt/WTreeView>
-#include <Wt/WStandardItemModel>
-#include <Wt/WStandardItem>
-#include <Wt/WModelIndex>
-#include <Wt/WPopupMenu>
+#include "WebUtils.hpp"
+#include <Wt/WTreeView.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WStandardItem.h>
+#include <Wt/WModelIndex.h>
+#include <Wt/WPopupMenu.h>
 
 class WebTree : public Wt::WTreeView
 {
   public:
-    WebTree(void);
+    WebTree(CoreDataT* cdata);
     virtual ~WebTree();
-    void setCdata(CoreDataT* cdata) {m_cdata = cdata;}
-    void updateItemDecoration(const NodeT& _node, const QString& _tip);
+    void updateItemDecoration(const NodeT& nodeInfo, const QString& tooltip);
     void build(void);
-    void renewModel(void);
     void activateEditionFeatures(void);
-    void addTreeItem(const NodeT& _node, bool _bindToParent, bool _selectItemAfterProcessing);
-    QString findNodeIdFromTreeItem(const Wt::WModelIndex& _index) const;
+    void newNodeItem(const NodeT& nodeInfo, const QString& parentId, bool selectNewNode);
+    QString findNodeIdFromTreeItem(const Wt::WModelIndex& index) const;
     void expandNodeById(const QString& nodeId);
     void selectNodeById(const QString& nodeId);
     void updateItemLabel(const QString& nodeId, const std::string& label);
 
   private:
-    Wt::WStandardItemModel* m_model;
     CoreDataT* m_cdata;
-    QMap<QString,  Wt::WStandardItem*> m_treeItems;
+    std::map<QString, Wt::WStandardItem*> m_items;
+    std::shared_ptr<Wt::WStandardItemModel> m_model;
 
     void activateDashboardFeatures(void);
-    Wt::WStandardItem* findItemByNodeId(const QString& _nodeId);
+    Wt::WStandardItem* findItemByNodeId(const QString& nodeId);
     void bindChildToParent(const QString& childId, const QString& parentId);
+
+    static std::string childMgntTip(void) {
+      return Q_TR("Clik on a node; Shift+C to add a child; Shift+D to delete");
+    }
+    static std::string newEditionTip(void) {
+      return Q_TR("Click on this area; Shift+N to start a new edition");
+    }
 };
 
 #endif /* WEBTREE_HPP */

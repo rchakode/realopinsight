@@ -26,18 +26,18 @@
 #define WEBPOSTGRESQLSETTINGS_HPP
 
 #include "WebBaseSettings.hpp"
-#include <Wt/WDialog>
-#include <Wt/WRadioButton>
-#include <Wt/WLineEdit>
-#include <Wt/WComboBox>
-#include <Wt/WPushButton>
-#include <Wt/WSpinBox>
-#include <Wt/WCheckBox>
-#include <Wt/WObject>
-#include <Wt/WStringListModel>
-#include <Wt/WLengthValidator>
-#include <Wt/WTemplate>
 #include <memory>
+#include <Wt/WDialog.h>
+#include <Wt/WRadioButton.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WSpinBox.h>
+#include <Wt/WCheckBox.h>
+#include <Wt/WObject.h>
+#include <Wt/WStringListModel.h>
+#include <Wt/WLengthValidator.h>
+#include <Wt/WTemplate.h>
 
 
 class WebDatabaseSettings : public WebBaseSettings, public Wt::WTemplate
@@ -58,20 +58,15 @@ protected:
 
 private:
   Wt::Signal<int, std::string> m_operationCompleted;
-  Wt::WComboBox m_dbTypeBox;
-  Wt::WLineEdit m_dbServerAddrField;
-  Wt::WLineEdit m_dbServerPortField;
-  Wt::WLineEdit m_dbNameField;
-  Wt::WCheckBox m_dbEmptyState;
-  Wt::WLineEdit m_dbUserField;
-  Wt::WLineEdit m_dbPasswordField;
-  Wt::WPushButton m_saveSettingsBtn;
+  Wt::WComboBox* m_dbTypeBoxRef;
+  Wt::WLineEdit* m_dbServerFieldRef;
+  Wt::WLineEdit* m_dbPortFieldRef;
+  Wt::WLineEdit* m_dbNameFieldRef;
+  Wt::WCheckBox* m_dbEmptyStateRef;
+  Wt::WLineEdit* m_dbUserFieldRef;
+  Wt::WLineEdit* m_dbPassFieldRef;
+  Wt::WPushButton* m_applyBtnRef;
 
-  void createFormWidgets(void);
-
-  void addEvent(void);
-  void bindFormWidgets(void);
-  void unbindFormWidgets(void);
   void applySettings(void);
   void updateFieldEnabledState(void);
 };

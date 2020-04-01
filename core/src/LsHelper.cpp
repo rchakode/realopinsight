@@ -27,13 +27,11 @@
 #include "utilsCore.hpp"
 #include "utilsCore.hpp"
 #include "RawSocket.hpp"
-#include "JsonHelper.hpp"
 #include <iostream>
 #include <QDir>
-#include <QScriptValueIterator>
 
-LsHelper::LsHelper(const QString& host, uint16_t port)
-  : m_socketHandler(new RawSocket(host, port))
+LsHelper::LsHelper(const QString &host, uint16_t port)
+    : m_socketHandler(new RawSocket(host, port))
 {
 }
 
@@ -44,7 +42,8 @@ LsHelper::~LsHelper()
 
 int LsHelper::setupSocket(void)
 {
-  if (m_socketHandler->setupSocket()) {
+  if (m_socketHandler->setupSocket())
+  {
     return ngrt4n::RcRpcError;
   }
   return ngrt4n::RcSuccess;
@@ -53,35 +52,36 @@ int LsHelper::setupSocket(void)
 QByteArray LsHelper::prepareRequestData(ReqTypeT requestType)
 {
   QString request = "";
-  switch(requestType) {
-    case LsHelper::Host:
-      request = "GET hosts\n"
-                "Columns: name state last_state_change check_command plugin_output groups\n"
-                "OutputFormat: json\n";
-      break;
-    case LsHelper::Service:
-      request = "GET services\n"
-                "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
-                "OutputFormat: json\n";
-      break;
-    default:
-      break;
+  switch (requestType)
+  {
+  case LsHelper::Host:
+    request = "GET hosts\n"
+              "Columns: name state last_state_change check_command plugin_output groups\n"
+              "OutputFormat: json\n";
+    break;
+  case LsHelper::Service:
+    request = "GET services\n"
+              "Columns: host_name service_description state last_state_change check_command plugin_output host_groups\n"
+              "OutputFormat: json\n";
+    break;
+  default:
+    break;
   }
   return ngrt4n::toByteArray(request.append("\n"));
 }
 
-int LsHelper::loadChecks(const QString& hostgroupFilter, ChecksT& checks)
+int LsHelper::loadChecks(const QString &hostgroupFilter, ChecksT &checks)
 {
   m_hostOrGroupFilter = hostgroupFilter.toStdString();
   checks.clear();
-  if (makeRequest(prepareRequestData(LsHelper::Host), checks) != 0) {
+  if (makeRequest(prepareRequestData(LsHelper::Host), checks) != 0)
+  {
     return ngrt4n::RcRpcError;
   }
   return makeRequest(prepareRequestData(LsHelper::Service), checks);
 }
 
-
-int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
+int LsHelper::makeRequest(const QByteArray &data, ChecksT &checks)
 {
   if (m_socketHandler->makeRequest(data) != 0) {
     return ngrt4n::RcRpcError;
@@ -90,60 +90,53 @@ int LsHelper::makeRequest(const QByteArray& data, ChecksT& checks)
   return ngrt4n::RcSuccess;
 }
 
-
-void LsHelper::parseResult(ChecksT& checks)
+void LsHelper::parseResult(ChecksT &checks)
 {
-  JsonHelper json(m_socketHandler->lastResult());
-
-  QScriptValueIterator entryIter(json.data());
-  while (entryIter.hasNext()) {
-    entryIter.next();
-    if (entryIter.flags() & QScriptValue::SkipInEnumeration) {
-      continue;
-    }
-    QScriptValueIterator fieldIter(entryIter.value());
-
+  QJsonParseError parserError;
+  QJsonDocument dataDecoded = QJsonDocument::fromJson(m_socketHandler->lastResult().toUtf8(), &parserError);
+  if (parserError.error != QJsonParseError::NoError) {
+    return;
+  }
+  auto checkItems = dataDecoded.array();
+  for (const auto &checkItem : checkItems) {
     QStringList fields;
-    fields.clear();
-    while (fieldIter.hasNext()) {
-      fieldIter.next();
-      if (fieldIter.flags() & QScriptValue::SkipInEnumeration) continue;
-      fields.push_back(fieldIter.value().toString());
+    auto fieldItems = checkItem.toArray();
+    for (const auto &fieldItem : fieldItems) {
+      fields.push_back(fieldItem.toString());
     }
 
     CheckT check;
-    switch( fields.size() ) {
-      case 6: // host
-        check.host = fields[0].toStdString();
-        check.status = fields[1].toInt();
-        check.last_state_change = fields[2].toStdString();
-        check.check_command = fields[3].toStdString();
-        check.alarm_msg = fields[4].toStdString();
-        check.host_groups = fields[5].toStdString();
-        check.id = check.host;
-        break;
-
-      case 7: // service
-        check.host = fields[0].toStdString();
-        check.id = ID_PATTERN.arg(check.host.c_str(), fields[1]).toLower().toStdString();
-        check.status = fields[2].toInt();
-        check.last_state_change = fields[3].toStdString();
-        check.check_command = fields[4].toStdString();
-        check.alarm_msg = fields[5].toStdString();
-        check.host_groups = fields[6].toStdString();
-        break;
-
-      default:
-        qDebug() << "Livestatus parser: unexpected status entry =>" << entryIter.value().toString();
-        continue;
-        break;
+    switch (fields.size())
+    {
+    case 6: // host
+      check.host = fields[0].toStdString();
+      check.status = fields[1].toInt();
+      check.last_state_change = fields[2].toStdString();
+      check.check_command = fields[3].toStdString();
+      check.alarm_msg = fields[4].toStdString();
+      check.host_groups = fields[5].toStdString();
+      check.id = check.host;
+      break;
+    case 7: // service
+      check.host = fields[0].toStdString();
+      check.id = ID_PATTERN.arg(check.host.c_str(), fields[1]).toLower().toStdString();
+      check.status = fields[2].toInt();
+      check.last_state_change = fields[3].toStdString();
+      check.check_command = fields[4].toStdString();
+      check.alarm_msg = fields[5].toStdString();
+      check.host_groups = fields[6].toStdString();
+      break;
+    default:
+      qDebug() << "Livestatus parser: unexpected status entry =>" << checkItem.toString();
+      continue;
+      break;
     }
 
     if (m_hostOrGroupFilter.empty() ||
-        (! m_hostOrGroupFilter.empty() && m_hostOrGroupFilter == check.host ) ||
-        (! m_hostOrGroupFilter.empty() && m_hostOrGroupFilter == check.host_groups )) {
+        (!m_hostOrGroupFilter.empty() && m_hostOrGroupFilter == check.host) ||
+        (!m_hostOrGroupFilter.empty() && m_hostOrGroupFilter == check.host_groups))
+    {
       checks.insert(check.id, check);
     }
-
   }
 }

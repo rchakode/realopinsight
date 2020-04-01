@@ -26,7 +26,7 @@
 
 #include "BaseSettings.hpp"
 #include "dbo/src/DbSession.hpp"
-#include <Wt/WCheckBox>
+#include <Wt/WCheckBox.h>
 
 
 const std::string LDAP_VERSION2_LABEL = "LDAPv2";
@@ -52,28 +52,55 @@ public:
   std::string getDbName(void) const;
   std::string getDbUser(void) const;
   std::string getDbPassword(void) const;
-  std::string getDbConnectionString(void) const;
-
-  std::string getLdapServerUri(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SERVER_URI).toStdString();}
-  std::string getLdapBindUserDn(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_BIND_USER_DN).toStdString();}
-  std::string getLdapSearchBase(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SEARCH_BASE).toStdString();}
-  std::string getLdapBindUserPassword(void) const { return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_BIND_USER_PASSWORD).toStdString();}
+  std::string getDbConnectionName(void) const;
+  std::string getDbConnectionNameDebug(void) const;
   std::string getLdapIdField(void) const;
   int getLdapVersion(void) const;
-  bool getLdapSslUseMyCert(void) const {return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SSL_USE_CERT).toInt() == Wt::Checked;}
-  std::string getLdapSslCertFile(void) const {return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SSL_CERT_FILE).toStdString();}
-  std::string getLdapSslCaFile(void) const {return m_settingFactory->keyValue(SettingFactory::AUTH_LDAP_SSL_CA_FILE).toStdString();}
-
+  bool getLdapSslUseMyCert(void) const;
   int getAuthenticationMode(void) const;
-  static std::string authTypeString(int authSystem) {return (authSystem == LDAP) ? "LDAP" : "Built-in";}
-  int getNotificationType(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_TYPE).toInt();}
 
-  std::string getSmtpServerAddr(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();}
-  std::string getSmtpServerPortText(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();}
-  int getSmtpServerPort(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT).toInt();}
-  std::string getSmtpUsername(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_USERNAME).toStdString();}
-  std::string getSmtpPassword(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD).toStdString();}
-  int getSmtpUseSsl(void) const { return m_settingFactory->keyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL).toInt();}
+  std::string getLdapServerUri(void) const {
+    return SettingFactory().keyValue(SettingFactory::AUTH_LDAP_SERVER_URI).toStdString();
+  }
+  std::string getLdapBindUserDn(void) const {
+    return SettingFactory().keyValue(SettingFactory::AUTH_LDAP_BIND_USER_DN).toStdString();
+  }
+  std::string getLdapSearchBase(void) const {
+    return SettingFactory().keyValue(SettingFactory::AUTH_LDAP_SEARCH_BASE).toStdString();
+  }
+  std::string getLdapBindUserPassword(void) const {
+    return SettingFactory::base64Decode(SettingFactory().keyValue(SettingFactory::AUTH_LDAP_BIND_USER_PASSWORD).toStdString());
+  }
+  std::string getLdapSslCertFile(void) const {
+    return SettingFactory().keyValue(SettingFactory::AUTH_LDAP_SSL_CERT_FILE).toStdString();
+  }
+  std::string getLdapSslCaFile(void) const {
+    return SettingFactory().keyValue(SettingFactory::AUTH_LDAP_SSL_CA_FILE).toStdString();
+  }
+  static std::string authTypeString(int authSystem) {
+    return (authSystem == LDAP) ? "LDAP" : "Built-in";
+  }
+  int getNotificationType(void) const {
+    return SettingFactory().keyValue(SettingFactory::NOTIF_TYPE).toInt();
+  }
+  std::string getSmtpServerAddr(void) const {
+    return SettingFactory().keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_ADRR).toStdString();
+  }
+  std::string getSmtpServerPortText(void) const {
+    return SettingFactory().keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT).toStdString();
+  }
+  int getSmtpServerPort(void) const {
+    return SettingFactory().keyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT).toInt();
+  }
+  std::string getSmtpUsername(void) const {
+    return SettingFactory().keyValue(SettingFactory::NOTIF_MAIL_SMTP_USERNAME).toStdString();
+  }
+  std::string getSmtpPassword(void) const {
+    return SettingFactory::base64Decode(SettingFactory().keyValue(SettingFactory::NOTIF_MAIL_SMTP_PASSWORD).toStdString());
+  }
+  int getSmtpUseSsl(void) const {
+    return SettingFactory().keyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL).toInt();
+  }
 
 protected :
   virtual void fillInFormGivenSourceId(int sid) {}

@@ -25,13 +25,9 @@
 
 #include "DashboardBase.hpp"
 #include "utilsCore.hpp"
-#include "JsonHelper.hpp"
 #include "LsHelper.hpp"
-#include "PandoraHelper.hpp"
-#include "OpManagerHelper.hpp"
 #include "StatusAggregator.hpp"
 #include "K8sHelper.hpp"
-#include <QScriptValueIterator>
 #include <QNetworkCookieJar>
 #include <sstream>
 #include <QObject>
@@ -86,13 +82,9 @@ DashboardBase::~DashboardBase()
 {
 }
 
-std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, const QString& viewFile)
+std::pair<int, QString> DashboardBase::initialize(const QString& vfile)
 {
-  if (! p_settings) {
-    return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("no initialized settings"));
-  }
-
-  if (viewFile.isEmpty()) {
+  if (vfile.isEmpty()) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("empty description file"));
   }
 
@@ -100,12 +92,8 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("initialize: db session not initialized"));
   }
 
-  Parser parser{&m_cdata,
-        Parser::ParsingModeDashboard,
-        p_settings,
-        m_dbSession};
-
-  auto parseOut = parser.parse(viewFile);
+  Parser parser{&m_cdata, Parser::ParsingModeDashboard, m_dbSession};
+  auto parseOut = parser.parse(vfile);
   if (parseOut.first != ngrt4n::RcSuccess) {
     return std::make_pair(parseOut.first, parseOut.second);
   }
@@ -119,8 +107,6 @@ std::pair<int, QString> DashboardBase::initialize(BaseSettings* p_settings, cons
   if (rc != ngrt4n::RcSuccess) {
     return std::make_pair(rc, parser.lastErrorMsg());
   }
-  buildTree();
-  buildMap();
 
   return std::make_pair(ngrt4n::RcSuccess, "");
 }
@@ -344,10 +330,10 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
     node->check.check_command = "-";
     node->check.last_state_change = std::to_string(toDate);
 
-    auto externalServiceName = node->child_nodes.toStdString();
-    int rc = p_dbSession->listQosData(qosMap, externalServiceName, fromDate, toDate);
+    auto listOfExternalViews = node->child_nodes.toStdString();
+    int rc = p_dbSession->listQosData(qosMap, listOfExternalViews, fromDate, toDate);
     if (rc > 0) {
-      node->sev = qosMap[externalServiceName].back().status;
+      node->sev = qosMap[listOfExternalViews].back().status;
       node->actual_msg = QObject::tr("external service - %1").arg(node->child_nodes);
     } else {
       node->sev = ngrt4n::Unknown;

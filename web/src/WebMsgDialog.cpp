@@ -24,39 +24,40 @@
 
 #include "WebMsgDialog.hpp"
 #include "WebUtils.hpp"
-#include <Wt/WPushButton>
+#include <Wt/WPushButton.h>
 
-WebMsgDialog::WebMsgDialog(DbSession* dbSession, Wt::WContainerWidget* parent)
-  : Wt::WDialog(Q_TR("Manage Notifications"), parent),
-    m_operationCompleted(this)
+WebMsgDialog::WebMsgDialog(DbSession* dbSession)
+  : Wt::WDialog(Q_TR("Manage Notifications"))
 {
-  m_notificationTableView = new NotificationTableView(dbSession, this->contents());
-
-  m_infoBox = new Wt::WText("", this->footer());
-
-  Wt::WPushButton* closeButton = new Wt::WPushButton(Q_TR("Close"), this->footer());
-  closeButton->clicked().connect(this, &Wt::WDialog::accept);
-
   setStyleClass("Wt-dialog");
   titleBar()->setStyleClass("titlebar");
+
+  auto notifTable = std::make_unique<NotificationTableView>(dbSession);
+  m_notifTableRef = notifTable.get();
+  contents()->addWidget(std::move(notifTable));
+
+  auto infoBox = std::make_unique<Wt::WText>();
+  m_infoBoxRef = infoBox.get();
+  footer()->addWidget(std::move(infoBox));
+
+  auto closeBtn = std::make_unique<Wt::WPushButton>(Q_TR("Close"));
+  closeBtn->clicked().connect(this, &Wt::WDialog::accept);
+  this->footer()->addWidget(std::move(closeBtn));
 }
 
 
-WebMsgDialog::~WebMsgDialog()
-{
-  delete m_notificationTableView;
-}
+WebMsgDialog::~WebMsgDialog() {}
 
 
 void WebMsgDialog::show(void)
 {
-  if (m_notificationTableView->update() != 0) {
-    m_infoBox->setHidden(false);
-    m_infoBox->setText(m_notificationTableView->lastError());
-    m_infoBox->setStyleClass("text-danger");
+  if (m_notifTableRef->update() != 0) {
+    m_infoBoxRef->setHidden(false);
+    m_infoBoxRef->setText(m_notifTableRef->lastError());
+    m_infoBoxRef->setStyleClass("text-danger");
   } else {
-    m_infoBox->setHidden(true);
-    m_infoBox->setStyleClass("text-muted");
+    m_infoBoxRef->setHidden(true);
+    m_infoBoxRef->setStyleClass("text-muted");
   }
   Wt::WDialog::show();
 }

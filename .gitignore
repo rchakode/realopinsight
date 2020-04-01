@@ -1,0 +1,7 @@
+.vscode/c_cpp_properties.json
+.qmake.stash
+.vscode/settings.json
+Makefile
+log
+realopinsight.pro.user
+generated

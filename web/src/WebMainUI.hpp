@@ -30,7 +30,7 @@
 #include "dbo/src/UserManagement.hpp"
 #include "dbo/src/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
-#include "WebBiDashlet.hpp"
+#include "WebQoSPanel.hpp"
 #include "WebUtils.hpp"
 #include "WebMsgDialog.hpp"
 #include "WebNotificationSettings.hpp"
@@ -38,21 +38,20 @@
 #include "WebDataSourceSettings.hpp"
 #include "WebDatabaseSettings.hpp"
 #include "WebCsvReportResource.hpp"
-#include "WebInputSelector.hpp"
+#include "WebInputField.hpp"
 #include "WebEditor.hpp"
-#include <Wt/WComboBox>
-#include <Wt/WTimer>
-#include <Wt/WApplication>
-#include <Wt/WTabWidget>
-#include <Wt/WContainerWidget>
-#include <Wt/WSignal>
-#include <Wt/WProgressBar>
-#include <Wt/WDialog>
-#include <Wt/WNavigationBar>
-#include <Wt/WFileUpload>
+#include <Wt/WComboBox.h>
+#include <Wt/WTimer.h>
+#include <Wt/WApplication.h>
+#include <Wt/WTabWidget.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WSignal.h>
+#include <Wt/WProgressBar.h>
+#include <Wt/WDialog.h>
+#include <Wt/WNavigationBar.h>
 
 class AuthManager;
-class ViewAclManagement;
+class ViewAccessControl;
 class WebMainUI;
 
 
@@ -83,110 +82,95 @@ class WebMainUI : public QObject, public Wt::WContainerWidget
 public:
   WebMainUI(AuthManager* authManager);
   virtual ~WebMainUI();
-  void showUserHome(void);
-  void enable(void) {m_mainWidget.enable();}
-  void disbale(void) {m_mainWidget.disable();}
-  void startTimer(void);
+  void enable(void) {
+    m_mainWidgetRef->enable();
+  }
+  void disbale(void) {
+    m_mainWidgetRef->disable();
+  }
   void handleRefresh(void);
-  Wt::Signal<void>& terminateSession(void) {return sessionTerminated;}
-  virtual void 	refresh () {handleRefresh();}
-  DbSession* dbSession(void) {return m_dbSession;}
+  Wt::Signal<>& signoutTriggered(void) {
+    return m_signoutTriggered;
+  }
+  virtual void 	refresh () {
+    handleRefresh();
+  }
+  DbSession* dbSession(void) {
+    return m_dbSession;
+  }
 
 public Q_SLOTS:
-  void resetTimer(qint32 interval);
-  void setDashboardAsFrontStackedWidget(WebDashboard* dashboard);
-  void swicthFrontStackedWidgetTo(Wt::WWidget* widget);
-  void resetViewSelectionBox(void) { m_selectViewBox->setCurrentIndex(0); m_showOnlyProblemMsgsField->setHidden(true);}
+  void showAppBoard(WebDashboard* appBoard);
+  void switchFeaturePanel(Wt::WWidget* item);
   void showMessage(int status, const std::string& msg);
   void showProgressMessage(const std::string& msg) {showMessage(ngrt4n::OperationInProgress, msg); }
   void handleDashboardSelected(std::string viewName);
   void handleReportPeriodChanged(long start, long end);
-  void handleShowExecutiveView(void);
   void handleShowSettingsView(void);
-  void handleNewViewSelected(void);
-
-
+  void handleBoardSelectionChanged(void);
+  void handleSignout(void) {
+    signoutTriggered().emit();
+  }
+  void removeGlobalWidget() {
+    wApp->domRoot()->removeWidget(&m_previewInput);
+  }
 
 private:
-  enum FileDialogAction
-  {
-    IMPORT = 0,
-    OPEN = 1
-  };
-  /** Signals */
-  Wt::Signal<void> sessionTerminated;
-  typedef QMap<std::string, Wt::WTemplate*> ThumbnailMapT;
-
+  Wt::Signal<> m_signoutTriggered;
 
   /** Private members **/
   WebBaseSettings m_settings;
   Wt::WTimer m_globalTimer;
-  Wt::WText m_infoBox;
+  Wt::WText* m_infoBoxRef;
   QMap<int,Wt::WAnchor*> m_menuLinks;
-  QString m_rootDir;
-  QString m_configDir;
-  Wt::WContainerWidget m_mainWidget;
-  Wt::WTemplate m_settingsMainPageTpl;
-  Wt::WTemplate m_operatorHomeTpl;
-  Wt::WTemplate m_adminHomePageTpl;
-  Wt::WTemplate* m_breadcrumbsBar;
+  Wt::WContainerWidget* m_mainWidgetRef;
+  Wt::WTemplate* m_settingsPageRef;
+  Wt::WTemplate* m_opsPageRef;
+  Wt::WTemplate* m_adminHomePageRef;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
   std::map<int, Wt::WText*> m_notificationBoxes;
-  DbUserManager* m_dbUserManager;
-  LdapUserManager* m_ldapUserManager;
-  UserFormView* m_userAccountForm;
-  UserFormView* m_changePasswordPanel;
-  ViewAclManagement* m_viewAccessPermissionForm;
-  Wt::WDialog* m_aboutDialog;
-  WebDashboard* m_currentDashboard;
-  Wt::WComboBox* m_selectViewBox;
-  Wt::WCheckBox* m_showOnlyProblemMsgsField;
+  std::unique_ptr<DbUserManager> m_dbUserManager;
+  LdapUserManager* m_ldapUserManagerRef;
+  UserFormView* m_accountPageRef;
+  UserFormView* m_changePasswdPanelRef;
+  ViewAccessControl* m_aclPageRef;
+  std::shared_ptr<Wt::WDialog> m_aboutDialog;
+  WebDashboard* m_currentAppBoard;
+  Wt::WComboBox* m_boardSelectorRef;
+  Wt::WCheckBox* m_showOnlyProblemsSelectorRef;
 
-  WebDataSourceSettings m_dataSourceSettings;
-  WebNotificationSettings m_notificationSettingsForm;
-  WebAuthSettings m_authSettingsForm;
-  WebDatabaseSettings m_databaseSettingsForm;
-  WebEditor m_webEditor;
+  WebDataSourceSettings* m_sourceConfigRef;
+  WebNotificationSettings* m_notifPageRef;
+  WebAuthSettings* m_authPageRef;
+  WebDatabaseSettings* m_dbPageRef;
+  WebEditor* m_webEditorRef;
 
-  Wt::WNavigationBar m_navbar;
-  Wt::WStackedWidget m_mainStackedContents;
-  Wt::WStackedWidget m_adminStackedContents;
-  Wt::WStackedWidget m_dashboardStackedContents;
+  Wt::WNavigationBar* m_navbarRef;
+  Wt::WStackedWidget* m_mainStackRef;
+  Wt::WStackedWidget* m_adminStackRef;
+  Wt::WStackedWidget* m_opsStackRef;
 
-  QMap<QString, WebDashboard*> m_dashboardMap;
-  Wt::WText m_adminPanelTitle;
-  InputSelector m_previewSelectorDialog;
+  QMap<QString, WebDashboard*> m_appBoards;
+  Wt::WText* m_adminPageTitleRef;
+  WebInputField m_previewInput;
 
-  /** For file upload **/
-  Wt::WFileUpload* m_fileUploader;
-  Wt::WPushButton m_uploadSubmitButton;
-  Wt::WPushButton m_uploadCancelButton;
-  Wt::WText m_uploadFormTitle;
-  Wt::WDialog m_uploadForm;
-
-  /** Executive View widgets **/
-  Wt::WGridLayout* m_thumbsLayout;
   WebMsgDialog* m_notificationManager;
-  Wt::WWidget* m_notificationSection;
-  Wt::WVBoxLayout* m_eventFeedLayout;
-  Wt::WContainerWidget m_eventFeedsContainer;
-  Wt::WContainerWidget m_thumbsContainer;
-  ThumbnailMapT m_thumbsWidgets;
-  WebBiDashlet m_biDashlet;
+  Wt::WVBoxLayout* m_eventFeedLayoutRef;
+  QMap<std::string, Wt::WTemplate*>  m_thumbs;
+  WebQosPanel* m_qosPanelRef;
 
 
   /** callbacks */
   void handleAuthSystemChanged(int authSystem);
   void handleLdapUsersMenu(void);
-  void handleBuiltInUsersMenu(void);
-  void handleNewUserMenu(void);
+  void handleManageBuiltinUsers(void);
+  void handleNewUser(void);
   void handleViewAclMenu(void);
   void handleDeleteView(const std::string& viewName);
   void handleUserEnableStatusChanged(int status, std::string data);
   void handleShowNotificationManager(void) { m_notificationManager->show(); }
-  void handleShowOnlyProblemsMsgs(void);
-  void handleImportDescriptionFile(void);
+  void handleShowOnlyProblems(void);
   void handleLaunchEditor(void);
   void handlePreviewFile(const std::string& path, const std::string& option);
   void handleDataSourceSettings(void);
@@ -200,47 +184,24 @@ private:
   void handleErrcode(int errcode);
   void handleUserUpdatedCompleted(int errcode);
   void handleShowAdminHome(void);
-  void handleUploadSubmitButton(void);
-  void handleUploadCancelButton(void);
-  void handleUploadFileTooLarge(void);
-  void handleShowUploadForm(void);
+  void handleHideInfoBox(Wt::WMouseEvent);
 
   /** other member functions */
   void scaleMap(double factor);
-  void addEvents(void);
   void selectItem4Preview(void);
-  void initOperatorDashboard(void);
   void setInternalPath(const std::string& path);
   void startDashbaordUpdate(void);
-  void hideAdminSettingsMenu(void);
-  void showConditionalUiWidgets(const DbViewsT& views);
-  void setupSettingsPage(void);
-  void configureDialogWidget(void);
-  void setupMainUI(void);
-  void setupInfoBox(void);
-  void setupProfileMenus(void);
+  void disableAdminFeatures(void);
   void setupMenus(void);
-  void setupUploadForm(void);
-  void setupNavivationBar(void);
-  void setupMainStackedContent(void);
-  void unbindWidgets(void);
-  void bindExecutiveViewWidgets(void);
-  void unbindExecutiveViewWidgets(void);
-  void unbindDashboardWidgets(void);
-  void unbindStackedWidgets(void);
   void saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path);
-  void clearThumbnailTemplate(Wt::WTemplate* tpl);
   bool createDirectory(const std::string& path, bool cleanContent);
-  void resetFileUploader(void);
+  Wt::WTemplate* buildOpsPage(void);
   std::pair<WebDashboard*, QString> loadView(const std::string& path);
-  Wt::WTemplate* createBreadCrumbsBarTpl(void);
-  WebMsgDialog* createNotificationManager(void);
-  UserFormView* createAccountPanel(void);
-  UserFormView* createPasswordPanel(void);
-  Wt::WDialog* createAboutDialog(void);
-  Wt::WAnchor* createLogoLink(void);
-  Wt::WWidget* createNotificationSection(void);
-  Wt::WTemplate* createThumbnailWidget(Wt::WLabel* titleWidget, Wt::WLabel* problemWidget, Wt::WImage* imageWidget);
+  std::unique_ptr<Wt::WWidget> createDisplayOptionsToolbar(void);
+  std::shared_ptr<Wt::WDialog> createAboutDialog(void);
+  std::unique_ptr<Wt::WAnchor> createLogoLink(void);
+  std::unique_ptr<Wt::WWidget> createNotificationToolbar(void);
+  std::unique_ptr<Wt::WTemplate> createThumb(std::string title, std::string msg, std::string imgURL, std::string imgLink);
 };
 
 #endif // MAINWEBWINDOW_HPP
