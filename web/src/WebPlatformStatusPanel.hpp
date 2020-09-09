@@ -25,10 +25,10 @@
 #ifndef WEBBIDASHLET_HPP
 #define WEBBIDASHLET_HPP
 
-#include "WebQoSAnalytics.hpp"
-#include "WebQoSRaw.hpp"
+#include "WebPlatformStatusAnalytics.hpp"
+#include "WebPlatformStatusRaw.hpp"
 #include "WebPieChart.hpp"
-#include "WebQoSDateFilter.hpp"
+#include "WebPlatformStatusDateFilter.hpp"
 #include "WebCsvReportResource.hpp"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WHBoxLayout.h>
@@ -36,14 +36,14 @@
 
 
 
-class WebQosPanel : public QObject, public Wt::WContainerWidget
+class WebPlatformStatusPanel : public QObject, public Wt::WContainerWidget
 {
   Q_OBJECT
 
 public:
-  WebQosPanel(const DbViewsT& listOfViews);
-  ~WebQosPanel();
-  void updateByView (const std::string& vame, const QosDataListMapT& qosData);
+  WebPlatformStatusPanel(const DbViewsT& listOfViews);
+  ~WebPlatformStatusPanel();
+  void updateByView (const std::string& vame, const PlatformStatusListMapT& qosData);
   long startTime(void) {return m_dateFilterRef->epochStartTime();}
   long endTime(void) {return m_dateFilterRef->epochEndTime();}
   Wt::Signal<long, long>& reportPeriodChanged() { return m_reportPeriodChanged; }
@@ -52,10 +52,10 @@ public:
 private:
   Wt::Signal<long, long> m_reportPeriodChanged;
   Wt::WGridLayout* m_layoutRef;
-  WebQoSDateFilter* m_dateFilterRef;
+  WebPlatformStatusDateFilter* m_dateFilterRef;
   QMap<std::string, Wt::WText*> m_slaReportTitlesRef;
   QMap<std::string, WebPieChart*> m_slaReportsRef;
-  QMap<std::string, WebQoSRaw*> m_problemReportsRef;
+  QMap<std::string, WebPlatformStatusRaw*> m_problemReportsRef;
   QMap<std::string, WebCsvExportIcon*> m_csvLinksRef;
   QMap<std::string, std::string> m_viewDashboardAliasNames;
 };

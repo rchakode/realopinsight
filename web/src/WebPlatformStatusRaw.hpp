@@ -1,8 +1,8 @@
 /*
- * ReportCollector.cpp
+ * WebRawBiChart.hpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
-# Last Update: 06-10-2014                                                  #
+# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
+# Creation: 17-07-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,28 +22,23 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "QosCollector.hpp"
-#include "ctime"
+#ifndef WEBBIRAWCHART_HPP
+#define WEBBIRAWCHART_HPP
 
-QosCollector::QosCollector(void)
-  : DashboardBase(nullptr)
+#include "dbo/src/DbObjects.hpp"
+#include <Wt/Chart/WCartesianChart.h>
+
+class WebPlatformStatusRaw : public Wt::Chart::WCartesianChart
 {
-}
+public:
+  WebPlatformStatusRaw(const std::string& vame);
+  void setViewName(const std::string& vname) {m_viewName = vname;}
+  std::string viewName() const {return m_viewName;}
+  void updateData(const PlatformStatusList& data);
 
+private:
+  std::string m_viewName;
+  void setChartTitle(void);
+};
 
-void QosCollector::updateChart(void)
-{
-  CheckStatusCountT statsData;
-  int statCount = extractStatsData(statsData);
-  m_chartBase.updateStatsData(statsData, statCount);
-
-  NodeT rootSrv = rootNode();
-  m_qosInfo.timestamp = time(nullptr);
-  m_qosInfo.view_name = rootSrv.name.toStdString();
-  m_qosInfo.status    = rootSrv.sev;
-  m_qosInfo.normal    = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Normal));
-  m_qosInfo.minor     = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Minor));
-  m_qosInfo.major     = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Major));
-  m_qosInfo.critical  = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Critical));
-  m_qosInfo.unknown   = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Unknown));
-}
+#endif // WEBBIRAWCHART_HPP

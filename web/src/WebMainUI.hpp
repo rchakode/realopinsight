@@ -30,7 +30,7 @@
 #include "dbo/src/UserManagement.hpp"
 #include "dbo/src/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
-#include "WebQoSPanel.hpp"
+#include "WebPlatformStatusPanel.hpp"
 #include "WebUtils.hpp"
 #include "WebMsgDialog.hpp"
 #include "WebNotificationSettings.hpp"
@@ -158,7 +158,7 @@ private:
   WebMsgDialog* m_notificationManager;
   Wt::WVBoxLayout* m_eventFeedLayoutRef;
   QMap<std::string, Wt::WTemplate*>  m_thumbs;
-  WebQosPanel* m_qosPanelRef;
+  WebPlatformStatusPanel* m_qosPanelRef;
 
 
   /** callbacks */

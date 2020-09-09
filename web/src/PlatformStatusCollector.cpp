@@ -1,8 +1,8 @@
 /*
- * WebBiDateFilter.hpp
+ * ReportCollector.cpp
 # ------------------------------------------------------------------------ #
-# Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 26-07-2015                                                     #
+# Copyright (c) 2010-2014 Rodrigue Chakode (rodrigue.chakode@gmail.com)    #
+# Last Update: 06-10-2014                                                  #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,40 +22,28 @@
 #--------------------------------------------------------------------------#
  */
 
+#include "PlatformStatusCollector.hpp"
+#include "ctime"
 
-
-#ifndef WEBBIDATEFILTER_HPP
-#define WEBBIDATEFILTER_HPP
-
-#include <QObject>
-#include <Wt/WLabel.h>
-#include <Wt/WDatePicker.h>
-#include <Wt/WHBoxLayout.h>
-#include <Wt/WAnchor.h>
-
-class WebQoSDateFilter : public QObject, public  Wt::WContainerWidget
+PlatformStatusCollector::PlatformStatusCollector(void)
+  : DashboardBase(nullptr)
 {
-  Q_OBJECT
-
-public:
-  WebQoSDateFilter(void);
-  ~WebQoSDateFilter();
-  long epochStartTime(void){
-    return Wt::WDateTime(m_startDatePickerRef->date()).toTime_t();
-  }
-  long epochEndTime(void) {
-    return Wt::WDateTime(m_endDatePickerRef->date()).toTime_t() + 86399;
-  }
-  Wt::Signal<long, long>& reportPeriodChanged() {
-    return m_reportPeriodChanged;
-  }
-
-private:
-  Wt::Signal<long, long> m_reportPeriodChanged;
-  Wt::WDatePicker* m_startDatePickerRef;
-  Wt::WDatePicker* m_endDatePickerRef;
-  void setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime);
-};
+}
 
 
-#endif // WEBBIDATEFILTER_HPP
+void PlatformStatusCollector::updateChart(void)
+{
+  CheckStatusCountT statsData;
+  int statCount = extractStatsData(statsData);
+  m_chartBase.updateStatsData(statsData, statCount);
+
+  NodeT rootSrv = rootNode();
+  m_info.timestamp = time(nullptr);
+  m_info.view_name = rootSrv.name.toStdString();
+  m_info.status    = rootSrv.sev;
+  m_info.normal    = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Normal));
+  m_info.minor     = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Minor));
+  m_info.major     = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Major));
+  m_info.critical  = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Critical));
+  m_info.unknown   = static_cast<float>(m_chartBase.statusRatio(ngrt4n::Unknown));
+}

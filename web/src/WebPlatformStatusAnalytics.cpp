@@ -23,12 +23,12 @@
  */
 
 
-#include "WebQoSAnalytics.hpp"
+#include "WebPlatformStatusAnalytics.hpp"
 #include "WebUtils.hpp"
 #include <Wt/WRectArea.h>
 
 
-WebQoSAnalytics::WebQoSAnalytics(const std::list<QosDataT>& data)
+WebQoSAnalytics::WebQoSAnalytics(const std::list<PlatformStatusT>& data)
   : m_normalDuration(0),
     m_minorDuration(0),
     m_majorDuration(0),
@@ -38,9 +38,9 @@ WebQoSAnalytics::WebQoSAnalytics(const std::list<QosDataT>& data)
   processData(data);
 }
 
-void WebQoSAnalytics::processData(const QosDataList& data)
+void WebQoSAnalytics::processData(const PlatformStatusList& data)
 {
-  QosDataList::const_iterator iterData = data.begin();
+  PlatformStatusList::const_iterator iterData = data.begin();
   m_plottingData.clear();
   m_normalDuration   = 0;
   m_minorDuration    = 0;

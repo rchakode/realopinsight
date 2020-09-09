@@ -22,20 +22,20 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebQoSPanel.hpp"
-#include "WebQoSRaw.hpp"
+#include "WebPlatformStatusPanel.hpp"
+#include "WebPlatformStatusRaw.hpp"
 #include <ctime>
 #include <regex>
 
 
-WebQosPanel::WebQosPanel(const DbViewsT& listOfViews)
+WebPlatformStatusPanel::WebPlatformStatusPanel(const DbViewsT& listOfViews)
   : m_layoutRef(nullptr),
     m_dateFilterRef(nullptr)
 {
   auto layout = std::make_unique<Wt::WGridLayout>();
   m_layoutRef = layout.get();
 
-  auto dateFilter = std::make_unique<WebQoSDateFilter>();
+  auto dateFilter = std::make_unique<WebPlatformStatusDateFilter>();
   m_dateFilterRef = dateFilter.get();
   m_dateFilterRef->reportPeriodChanged().connect(std::bind([=]{m_reportPeriodChanged.emit(this->startTime(), this->endTime());}));
   layout->addWidget(std::move(dateFilter), 0, 0, 1, 2, Wt::AlignmentFlag::Center);
@@ -57,7 +57,7 @@ WebQosPanel::WebQosPanel(const DbViewsT& listOfViews)
     auto csvExportIcon = std::make_unique<WebCsvExportIcon>();
     m_csvLinksRef.insert(dname, csvExportIcon.get());
 
-    auto  problemReport = std::make_unique<WebQoSRaw>(dname);
+    auto  problemReport = std::make_unique<WebPlatformStatusRaw>(dname);
     m_problemReportsRef.insert(dname, problemReport.get());
 
     auto slaReport = std::make_unique<WebPieChart>(ChartBase::SLAData);
@@ -76,14 +76,14 @@ WebQosPanel::WebQosPanel(const DbViewsT& listOfViews)
 }
 
 
-WebQosPanel::~WebQosPanel() {}
+WebPlatformStatusPanel::~WebPlatformStatusPanel() {}
 
 
 
-void WebQosPanel::updateByView(const std::string& vname, const QosDataListMapT& qosData)
+void WebPlatformStatusPanel::updateByView(const std::string& vname, const PlatformStatusListMapT& qosData)
 {
   auto viewDashboardAliasName = m_viewDashboardAliasNames[vname];
-  QosDataListMapT::ConstIterator iterQosDataSet = qosData.find(viewDashboardAliasName);
+  PlatformStatusListMapT::ConstIterator iterQosDataSet = qosData.find(viewDashboardAliasName);
   if (iterQosDataSet ==  qosData.end()) {
     return;
   }
@@ -97,7 +97,7 @@ void WebQosPanel::updateByView(const std::string& vname, const QosDataListMapT& 
   }
 
   // update IT problem chart when applicable
-  QMap<std::string, WebQoSRaw*>::iterator iterProblemTrendsChart = m_problemReportsRef.find(vname);
+  QMap<std::string, WebPlatformStatusRaw*>::iterator iterProblemTrendsChart = m_problemReportsRef.find(vname);
   if (iterProblemTrendsChart != m_problemReportsRef.end()) {
     (*iterProblemTrendsChart)->updateData(*iterQosDataSet);
   }

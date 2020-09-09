@@ -23,7 +23,7 @@ void WebCsvExportResource::setExportFileName(void)
 }
 
 
-void WebCsvExportResource::updateData(const std::string& viewName, const QosDataList& qosData)
+void WebCsvExportResource::updateData(const std::string& viewName, const PlatformStatusList& qosData)
 {
   m_qosData.clear();
   std::copy(qosData.begin(), qosData.end(), std::back_inserter(m_qosData));
@@ -52,7 +52,7 @@ WebCsvExportIcon::WebCsvExportIcon(void)
 }
 
 
-void WebCsvExportIcon::updateData(const std::string& viewName, const QosDataList& qosData)
+void WebCsvExportIcon::updateData(const std::string& viewName, const PlatformStatusList& qosData)
 {
   m_csvResource->updateData(viewName, qosData);
 }

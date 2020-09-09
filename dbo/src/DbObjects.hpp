@@ -40,8 +40,8 @@ namespace dbo = Wt::Dbo;
 class DboView;
 class DboUser;
 class DboLoginSession;
-struct QosDataT;
-class DboQosData;
+struct PlatformStatusT;
+class DboPlatformStatus;
 class DboNotification;
 class DboSource;
 struct NotificationT;
@@ -78,7 +78,7 @@ public:
   std::string path;
   int service_count;
   dbo::collection< dbo::ptr<DboUser> > users;
-  dbo::collection< dbo::ptr<DboQosData> > qosdatas;
+  dbo::collection< dbo::ptr<DboPlatformStatus> > platformStatusCollection;
   dbo::collection< dbo::ptr<DboNotification> > notifications;
 
   template<class Action>
@@ -87,7 +87,7 @@ public:
     dbo::field(a, path, "path");
     dbo::field(a, service_count, "service_count");
     dbo::hasMany(a, users,dbo::ManyToMany, "user_view", std::string(), dbo::OnDeleteCascade);
-    dbo::hasMany(a, qosdatas, dbo::ManyToOne, "view");
+    dbo::hasMany(a, platformStatusCollection, dbo::ManyToOne, "view");
     dbo::hasMany(a, notifications, dbo::ManyToOne, "view");
   }
 };
@@ -201,8 +201,8 @@ public:
   }
 };
 
-/** holds QoS data without wt::dbo specific info */
-struct QosDataT {
+/** holds platform status data without wt::dbo specific info */
+struct PlatformStatusT {
   long timestamp;
   int status;
   float normal;
@@ -212,7 +212,7 @@ struct QosDataT {
   float unknown;
   std::string view_name;
 
-  QosDataT() : status(ngrt4n::Unknown) {}
+  PlatformStatusT() : status(ngrt4n::Unknown) {}
 
   std::string toString(void) const {
     return QString("%1,%2,%3,%4,%5,%6,%7,%8")
@@ -228,8 +228,8 @@ struct QosDataT {
 };
 
 
-/** holds QoS data like wt::dbo class */
-class DboQosData {
+/** holds platform status like wt::dbo class */
+class DboPlatformStatus {
 public:
   long timestamp;
   int status;
@@ -240,7 +240,7 @@ public:
   float unknown;
   dbo::ptr<DboView> view;
 
-  void setData(const QosDataT& data)
+  void setData(const PlatformStatusT& data)
   {
     timestamp = data.timestamp;
     status = data.status;
@@ -251,9 +251,9 @@ public:
     unknown = data.unknown;
   }
 
-  QosDataT data(void) const
+  PlatformStatusT data(void) const
   {
-    QosDataT d;
+    PlatformStatusT d;
     d.timestamp = timestamp;
     d.status = status;
     d.normal = normal;
@@ -404,12 +404,12 @@ typedef std::set<std::string> UserViewsT;
 typedef std::list<DboUser> DbUsersT;
 typedef std::list<DboView> DbViewsT;
 typedef std::list<DboLoginSession> LoginSessionListT;
-typedef std::list<QosDataT> QosDataList;
-typedef QMap<std::string, QosDataList > QosDataListMapT;
+typedef std::list<PlatformStatusT> PlatformStatusList;
+typedef QMap<std::string, PlatformStatusList > PlatformStatusListMapT;
 typedef QMap<std::string, NotificationT> NotificationMapT;
 typedef dbo::collection< dbo::ptr<DboUser> > DboUserCollectionT;
 typedef dbo::collection< dbo::ptr<DboView> > DboViewCollectionT;
-typedef dbo::collection< dbo::ptr<DboQosData> > DboQosDataCollectionT;
+typedef dbo::collection< dbo::ptr<DboPlatformStatus> > DboPlatformStatusCollectionT;
 typedef dbo::collection< dbo::ptr<DboNotification> > DboNotificationCollectionT;
 typedef dbo::collection< dbo::ptr<DboLoginSession> > DboLoginSessionCollectionT;
 typedef dbo::collection< dbo::ptr<DboSource> > DboSourceCollectionT;

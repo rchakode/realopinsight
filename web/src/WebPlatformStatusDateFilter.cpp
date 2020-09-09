@@ -24,13 +24,13 @@
 
 
 
-#include "WebQoSDateFilter.hpp"
+#include "WebPlatformStatusDateFilter.hpp"
 #include "WebUtils.hpp"
 
 
 #define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
 
-WebQoSDateFilter::WebQoSDateFilter(void)
+WebPlatformStatusDateFilter::WebPlatformStatusDateFilter(void)
   : m_startDatePickerRef(nullptr),
     m_endDatePickerRef(nullptr)
 {
@@ -57,12 +57,12 @@ WebQoSDateFilter::WebQoSDateFilter(void)
 }
 
 
-WebQoSDateFilter::~WebQoSDateFilter()
+WebPlatformStatusDateFilter::~WebPlatformStatusDateFilter()
 {
 }
 
 
-void WebQoSDateFilter::setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime)
+void WebPlatformStatusDateFilter::setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime)
 {
   if (datePicker) {
     Wt::WDateTime dt;

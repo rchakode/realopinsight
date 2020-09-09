@@ -36,15 +36,14 @@ class Notificator : public QObject
   Q_OBJECT
 
 public:
-  Notificator(DbSession* dbSession);
-  void sendEmailNotification(const NodeT& node, int lastState, const QosDataT& qosData, const QStringList& recipients);
-  void handleNotification(const NodeT& node, const QosDataT& qosData);
+  Notificator(void);
+  void sendEmailNotification(const NodeT& node, int lastState, const PlatformStatusT& pfStatus, const QStringList& recipients);
+  void handleNotification(const NodeT& node, const PlatformStatusT& pfStatus);
 
 
 private:
   std::unique_ptr<MailSender> m_mailSender;
   WebBaseSettings m_preferences;
-  DbSession* m_dbSession;
   QEventLoop m_eventSynchonizer;
 };
 #endif // NOTIFICATOR_H

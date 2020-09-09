@@ -89,7 +89,7 @@ void DbSession::setupDbMapping(void)
   mapClass<DboView>("view");
   mapClass<AuthInfo>("auth_info");
   mapClass<DboLoginSession>("login_session");
-  mapClass<DboQosData>("qosdata");
+  mapClass<DboPlatformStatus>("qosdata");
   mapClass<DboNotification>("notification");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
   mapClass<AuthInfo::AuthTokenType>("auth_token");
@@ -635,23 +635,23 @@ int DbSession::checkUserCookie(const DboLoginSession &session)
   return rc;
 }
 
-int DbSession::addQosData(const QosDataT &qosData)
+int DbSession::addPlatformStatus(const PlatformStatusT &platformStatus)
 {
-  REPORTD_LOG("info", QObject::tr("Adding QoS entry: %1").arg(qosData.toString().c_str()));
+  REPORTD_LOG("info", QObject::tr("Adding platform status entry: %1").arg(platformStatus.toString().c_str()));
 
   int retValue = ngrt4n::RcGenericFailure;
   dbo::Transaction transaction(*this);
   try
   {
-    auto dboQosData = std::make_unique<DboQosData>();
-    dboQosData->setData(qosData);
-    dboQosData->view = find<DboView>().where("name=?").bind(qosData.view_name);
-    if (dboQosData->view.get() != nullptr) {
-      dbo::ptr<DboQosData> dboEntry = add(std::move(dboQosData));
+    auto pfsInfo = std::make_unique<DboPlatformStatus>();
+    pfsInfo->setData(platformStatus);
+    pfsInfo->view = find<DboView>().where("name=?").bind(platformStatus.view_name);
+    if (pfsInfo->view.get() != nullptr) {
+      dbo::ptr<DboPlatformStatus> dboEntry = add(std::move(pfsInfo));
       retValue = ngrt4n::RcSuccess;
     } else {
       retValue = ngrt4n::RcDbError;
-      REPORTD_LOG("error", QObject::tr("%1: Cannot find view: %2").arg(Q_FUNC_INFO, qosData.view_name.c_str()).toStdString());
+      REPORTD_LOG("error", QObject::tr("%1: Cannot find view: %2").arg(Q_FUNC_INFO, platformStatus.view_name.c_str()).toStdString());
     }
   }
   catch (const dbo::Exception &ex) {
@@ -662,25 +662,25 @@ int DbSession::addQosData(const QosDataT &qosData)
 }
 
 std::pair<int, QString>
-DbSession::addQosDataList(const QosDataList &qosDataList)
+DbSession::addPlatformStatusList(const PlatformStatusList &platformStatusList)
 {
   std::pair<int, QString> out{ngrt4n::RcDbError, ""};
 
   dbo::Transaction transaction(*this);
   try
   {
-    for (const auto &qosData : qosDataList) {
-      auto dboQosData = std::make_unique<DboQosData>();
-      dboQosData->setData(qosData);
-      dboQosData->view = find<DboView>().where("name=?").bind(qosData.view_name);
-      dbo::ptr<DboQosData> dboEntry = add(std::move(dboQosData));
-      out.second.append(QString("QoS entry added: %1").arg(dboEntry->toString().c_str()));
+    for (const auto &pfsItem : platformStatusList) {
+      auto dboPFS = std::make_unique<DboPlatformStatus>();
+      dboPFS->setData(pfsItem);
+      dboPFS->view = find<DboView>().where("name=?").bind(pfsItem.view_name);
+      dbo::ptr<DboPlatformStatus> dboEntry = add(std::move(dboPFS));
+      out.second.append(QString("Platform status entry added: %1").arg(dboEntry->toString().c_str()));
     }
     out.first = 0;
   }
   catch (const dbo::Exception &ex)
   {
-    out.second = "Failed to add QoS entries to database.";
+    out.second = "Failed to add platform status entries to database.";
     CORE_LOG("error", QObject::tr("%1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
@@ -688,21 +688,21 @@ DbSession::addQosDataList(const QosDataList &qosDataList)
   return out;
 }
 
-int DbSession::listQosData(QosDataListMapT &qosDataMap, const std::string &view, long fromDate, long toDate)
+int DbSession::listPlatformStatus(PlatformStatusListMapT &platformStatusMap, const std::string &view, long fromDate, long toDate)
 {
   int count = 0;
   dbo::Transaction transaction(*this);
   try
   {
-    DboQosDataCollectionT dbEntries;
+    DboPlatformStatusCollectionT dbEntries;
     if (view.empty() || view == "ALL") {
-      dbEntries = find<DboQosData>()
+      dbEntries = find<DboPlatformStatus>()
           .where("timestamp >= ? AND timestamp <= ?")
           .orderBy("timestamp")
           .bind(fromDate)
           .bind(toDate);
     } else {
-      dbEntries = find<DboQosData>()
+      dbEntries = find<DboPlatformStatus>()
           .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
           .orderBy("timestamp")
           .bind(view)
@@ -710,10 +710,10 @@ int DbSession::listQosData(QosDataListMapT &qosDataMap, const std::string &view,
           .bind(toDate);
     }
 
-    qosDataMap.clear();
+    platformStatusMap.clear();
     for (auto &entry : dbEntries) {
       auto viewDashboardAliasName = entry->data().view_name;
-      qosDataMap[viewDashboardAliasName].push_back(entry->data());
+      platformStatusMap[viewDashboardAliasName].push_back(entry->data());
       ++count;
     }
   }
@@ -726,31 +726,31 @@ int DbSession::listQosData(QosDataListMapT &qosDataMap, const std::string &view,
   return count;
 }
 
-int DbSession::getLastQosData(QosDataT &qosData, const std::string &view)
+int DbSession::getLastPlatformStatus(PlatformStatusT &platfotmStatus, const std::string &view)
 {
   int count = -1;
   dbo::Transaction transaction(*this);
   try
   {
-    DboQosDataCollectionT queryResults;
+    DboPlatformStatusCollectionT queryResults;
     if (view.empty()) {
-      queryResults = find<DboQosData>()
+      queryResults = find<DboPlatformStatus>()
           .orderBy("timestamp DESC")
           .limit(1);
     } else {
-      queryResults = find<DboQosData>()
+      queryResults = find<DboPlatformStatus>()
           .orderBy("timestamp DESC")
           .limit(1);
     }
 
     if (queryResults.size() == 1) {
       count = 0;
-      qosData = queryResults.begin()->modify()->data();
+      platfotmStatus = queryResults.begin()->modify()->data();
     }
   }
   catch (const dbo::Exception &ex)
   {
-    CORE_LOG("error", QObject::tr("Failed to fetch last QoS entry at %1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
+    CORE_LOG("error", QObject::tr("Failed to fetch last platform status entry at %1: %2").arg(Q_FUNC_INFO, ex.what()).toStdString());
   }
   transaction.commit();
   return count;

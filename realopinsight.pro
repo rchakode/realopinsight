@@ -107,7 +107,6 @@ HEADERS += \
     web/src/Validators.hpp \
     web/src/LdapHelper.hpp\
     web/src/AuthModelProxy.hpp \
-    web/src/QosCollector.hpp \
     web/src/Notificator.hpp \
     web/src/WebCsvReportResource.hpp \
     web/src/WebMsgDialog.hpp \
@@ -123,12 +122,13 @@ HEADERS += \
     web/src/utils/wtwithqt/WQApplication.h \
     web/src/WebTree.hpp \
     web/src/WebApplication.hpp \
-    web/src/WebQoSDateFilter.hpp \
-    web/src/WebQoSAnalytics.hpp \
-    web/src/WebQoSRaw.hpp \
-    web/src/WebQoSPanel.hpp \
     web/src/WebInputField.hpp \
-    web/src/WebInputList.hpp
+    web/src/WebInputList.hpp \
+    web/src/WebPlatformStatusAnalytics.hpp \
+    web/src/WebPlatformStatusDateFilter.hpp \
+    web/src/WebPlatformStatusPanel.hpp \
+    web/src/WebPlatformStatusRaw.hpp \
+    web/src/PlatformStatusCollector.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -154,7 +154,6 @@ SOURCES +=  core/src/Base.cpp \
     web/src/utils/smtpclient/qxtsmtp.cpp \
     web/src/utils/smtpclient/MailSender.cpp \
     web/src/utils/Logger.cpp \
-    web/src/QosCollector.cpp \
     web/src/WebDashboard.cpp \
     web/src/WebMap.cpp \
     web/src/WebTree.cpp \
@@ -177,12 +176,13 @@ SOURCES +=  core/src/Base.cpp \
     core/src/K8sHelper.cpp \
     dbo/src/ViewAccessControl.cpp \
     web/src/WebApplication.cpp \
-    web/src/WebQoSPanel.cpp \
-    web/src/WebQoSDateFilter.cpp \
-    web/src/WebQoSAnalytics.cpp \
-    web/src/WebQoSRaw.cpp \
     web/src/WebInputField.cpp \
-    web/src/WebInputList.cpp
+    web/src/WebInputList.cpp \
+    web/src/WebPlatformStatusAnalytics.cpp \
+    web/src/WebPlatformStatusDateFilter.cpp \
+    web/src/WebPlatformStatusPanel.cpp \
+    web/src/WebRaw.cpp \
+    web/src/PlatformStatusCollector.cpp
 
 
 LIBS += -L"$(WT_ROOT)/lib" \
@@ -200,9 +200,11 @@ LIBS += -L"$(WT_ROOT)/lib" \
         -lboost_date_time \
         -lldap
 
+
 reportd {
   SOURCES += web/src/realopinsight-reportd.cpp
   TARGET = realopinsight-reportd
+  LIBS += -lprometheus-cpp-core -lprometheus-cpp-push -lprometheus-cpp-pull
 }
 
 server {

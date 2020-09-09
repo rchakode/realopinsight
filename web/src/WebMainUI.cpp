@@ -334,7 +334,7 @@ Wt::WTemplate* WebMainUI::buildOpsPage(void)
 
   if (m_dbSession->isCompleteUserDashboard()) {
     opsPageRef->bindString("bi-report-title", Q_TR("Reports"));
-    auto qosPanel = std::make_unique<WebQosPanel>(listOfUserViews);
+    auto qosPanel = std::make_unique<WebPlatformStatusPanel>(listOfUserViews);
     m_qosPanelRef = qosPanel.get();
     m_qosPanelRef->reportPeriodChanged().connect(this, &WebMainUI::handleReportPeriodChanged);
     opsPageRef->bindWidget("bi-report-dashlet", std::move(qosPanel));
@@ -493,8 +493,8 @@ void WebMainUI::handleRefresh(void)
       (*thumb)->setStyleClass(ditem->thumbCss());
       (*thumb)->setToolTip(ditem->tooltip());
       if (! m_dbSession->isLoggedAdmin() && m_qosPanelRef) {
-        QosDataListMapT qosData;
-        m_dbSession->listQosData(qosData, vname,  m_qosPanelRef->startTime(), m_qosPanelRef->endTime());
+        PlatformStatusListMapT qosData;
+        m_dbSession->listPlatformStatus(qosData, vname,  m_qosPanelRef->startTime(), m_qosPanelRef->endTime());
         m_qosPanelRef->updateByView(vname, qosData);
       }
     }
@@ -597,8 +597,8 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 
 void WebMainUI::handleReportPeriodChanged(long start, long end)
 {
-  QosDataListMapT qosData;
-  m_dbSession->listQosData(qosData, "ALL", start, end);
+  PlatformStatusListMapT qosData;
+  m_dbSession->listPlatformStatus(qosData, "ALL", start, end);
   for (const auto& vname : qosData.keys()) {
     m_qosPanelRef->updateByView(vname, qosData);
   }

@@ -1,5 +1,5 @@
 /*
- * WebBiSlaChart.hpp
+ * WebBiDateFilter.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
 # Creation: 26-07-2015                                                     #
@@ -22,39 +22,40 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBBISLACHART_HPP
-#define WEBBISLACHART_HPP
 
-#include "dbo/src/DbObjects.hpp"
 
-class WebQoSAnalytics
+#ifndef WEBBIDATEFILTER_HPP
+#define WEBBIDATEFILTER_HPP
+
+#include <QObject>
+#include <Wt/WLabel.h>
+#include <Wt/WDatePicker.h>
+#include <Wt/WHBoxLayout.h>
+#include <Wt/WAnchor.h>
+
+class WebPlatformStatusDateFilter : public QObject, public  Wt::WContainerWidget
 {
+  Q_OBJECT
+
 public:
-  WebQoSAnalytics(const QosDataList& data);
-
-  double normalDuration(void) const {return m_normalDuration;}
-  double minorDuration(void) const {return m_minorDuration;}
-  double majorDuration(void) const {return m_majorDuration;}
-  double criticalDuration(void) const {return m_criticalDuration;}
-  double unknownDuration(void) const {return m_unknownDuration;}
-  double totalDuration(void) const {return m_totalDuration;}
-
+  WebPlatformStatusDateFilter(void);
+  ~WebPlatformStatusDateFilter();
+  long epochStartTime(void){
+    return Wt::WDateTime(m_startDatePickerRef->date()).toTime_t();
+  }
+  long epochEndTime(void) {
+    return Wt::WDateTime(m_endDatePickerRef->date()).toTime_t() + 86399;
+  }
+  Wt::Signal<long, long>& reportPeriodChanged() {
+    return m_reportPeriodChanged;
+  }
 
 private:
-  struct TimeStatusT {
-    long timestamp;
-    int status;
-  };
-  typedef QList<TimeStatusT> TimeStatusesT;
-  TimeStatusesT m_plottingData;
-  long m_normalDuration;
-  long m_minorDuration;
-  long m_majorDuration;
-  long m_criticalDuration;
-  long m_unknownDuration;
-  long m_totalDuration;
-
-  void processData(const QosDataList& data);
+  Wt::Signal<long, long> m_reportPeriodChanged;
+  Wt::WDatePicker* m_startDatePickerRef;
+  Wt::WDatePicker* m_endDatePickerRef;
+  void setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime);
 };
 
-#endif // WEBBISLACHART_HPP
+
+#endif // WEBBIDATEFILTER_HPP

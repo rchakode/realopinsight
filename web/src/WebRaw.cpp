@@ -22,12 +22,12 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "WebQoSRaw.hpp"
+#include "WebPlatformStatusRaw.hpp"
 #include <Wt/WStandardItemModel.h>
 #include <Wt/WFont.h>
 
 
-WebQoSRaw::WebQoSRaw(const std::string& vame)
+WebPlatformStatusRaw::WebPlatformStatusRaw(const std::string& vame)
   : Wt::Chart::WCartesianChart(),
     m_viewName(vame)
 {
@@ -41,12 +41,12 @@ WebQoSRaw::WebQoSRaw(const std::string& vame)
 }
 
 
-void WebQoSRaw::setChartTitle(void)
+void WebPlatformStatusRaw::setChartTitle(void)
 {
   setTitle(Q_TR("Trend of IT problems (%)"));
 }
 
-void WebQoSRaw::updateData(const QosDataList& data)
+void WebPlatformStatusRaw::updateData(const PlatformStatusList& data)
 {
   auto model = std::make_unique<Wt::WStandardItemModel>(static_cast<int>(data.size()), 9);
   model->setHeaderData(0, Q_TR("Date/time"));

@@ -41,8 +41,7 @@ namespace {
 }
 
 
-Notificator::Notificator(DbSession* dbSession)
-  : m_dbSession(dbSession)
+Notificator::Notificator(void)
 {
   m_mailSender.reset(new MailSender(QString::fromStdString(m_preferences.getSmtpServerAddr()),
                                     m_preferences.getSmtpServerPort(),
@@ -52,10 +51,9 @@ Notificator::Notificator(DbSession* dbSession)
 }
 
 
-void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const QosDataT& qosData, const QStringList& recipients)
+void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const PlatformStatusT& pfStatus, const QStringList& recipients)
 {
   if (m_preferences.getNotificationType() != WebBaseSettings::EmailNotification) {
-    // do nothing and exit
     return;
   }
 
@@ -75,7 +73,7 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
 
   QString emailContent = EMAIL_NOTIFICATION_CONTENT_TEMPLATE.arg(
         emailSubject,
-        ngrt4n::timet2String(qosData.timestamp).toUTF8().c_str(),
+        ngrt4n::timet2String(pfStatus.timestamp).toUTF8().c_str(),
         statusHtmlColor,
         statusString,
         lastStatusHtmlColor,
@@ -92,17 +90,18 @@ void Notificator::sendEmailNotification(const NodeT& node, int lastStatus, const
   REPORTD_LOG(logLevel, QObject::tr("[Notificator] %1").arg(m_mailSender->lastError()));
 }
 
-void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
+void Notificator::handleNotification(const NodeT& node, const PlatformStatusT& qosData)
 {
   std::string viewName = node.name.toStdString();
   QStringList recipients;
-  if (m_dbSession->listAssignedUsersEmails(recipients, viewName) <= 0) {
+  DbSession dbSession;
+  if (dbSession.listAssignedUsersEmails(recipients, viewName) <= 0) {
     REPORTD_LOG("info", QString("No notification recipients for view %1").arg(viewName.c_str()));
     return;
   }
 
   NotificationT lastNotifData;
-  m_dbSession->getLastNotificationInfo(lastNotifData, viewName);
+  dbSession.getLastNotificationInfo(lastNotifData, viewName);
   bool updateRequired = false;
   switch (node.sev) {
     case  ngrt4n::Normal:
@@ -121,8 +120,8 @@ void Notificator::handleNotification(const NodeT& node, const QosDataT& qosData)
   
  if (updateRequired) {
    sendEmailNotification(node, lastNotifData.view_status, qosData, recipients);
-   m_dbSession->updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
-   m_dbSession->addNotification(viewName, node.sev);
+   dbSession.updateNotificationAckStatusForUser("admin", viewName, DboNotification::Closed);
+   dbSession.addNotification(viewName, node.sev);
  }
 }
 

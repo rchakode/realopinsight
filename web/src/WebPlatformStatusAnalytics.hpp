@@ -1,8 +1,8 @@
 /*
- * WebRawBiChart.hpp
+ * WebBiSlaChart.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 17-07-2015                                                     #
+# Creation: 26-07-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,23 +22,39 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBBIRAWCHART_HPP
-#define WEBBIRAWCHART_HPP
+#ifndef WEBBISLACHART_HPP
+#define WEBBISLACHART_HPP
 
 #include "dbo/src/DbObjects.hpp"
-#include <Wt/Chart/WCartesianChart.h>
 
-class WebQoSRaw : public Wt::Chart::WCartesianChart
+class WebQoSAnalytics
 {
 public:
-  WebQoSRaw(const std::string& vame);
-  void setViewName(const std::string& vname) {m_viewName = vname;}
-  std::string viewName() const {return m_viewName;}
-  void updateData(const QosDataList& data);
+  WebQoSAnalytics(const PlatformStatusList& data);
+
+  double normalDuration(void) const {return m_normalDuration;}
+  double minorDuration(void) const {return m_minorDuration;}
+  double majorDuration(void) const {return m_majorDuration;}
+  double criticalDuration(void) const {return m_criticalDuration;}
+  double unknownDuration(void) const {return m_unknownDuration;}
+  double totalDuration(void) const {return m_totalDuration;}
+
 
 private:
-  std::string m_viewName;
-  void setChartTitle(void);
+  struct TimeStatusT {
+    long timestamp;
+    int status;
+  };
+  typedef QList<TimeStatusT> TimeStatusesT;
+  TimeStatusesT m_plottingData;
+  long m_normalDuration;
+  long m_minorDuration;
+  long m_majorDuration;
+  long m_criticalDuration;
+  long m_unknownDuration;
+  long m_totalDuration;
+
+  void processData(const PlatformStatusList& data);
 };
 
-#endif // WEBBIRAWCHART_HPP
+#endif // WEBBISLACHART_HPP

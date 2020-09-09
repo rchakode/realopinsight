@@ -29,11 +29,11 @@
 #include "dbo/src/DbSession.hpp"
 #include "ChartBase.hpp"
 
-class QosCollector : public DashboardBase
+class PlatformStatusCollector : public DashboardBase
 {
 public:
-  QosCollector(void);
-  QosDataT qosInfo(void) const {return m_qosInfo;}
+  PlatformStatusCollector(void);
+  PlatformStatusT info(void) const {return m_info;}
 
 protected:
   virtual void updateChart(void);
@@ -46,7 +46,7 @@ protected:
 
 private:
   ChartBase m_chartBase;
-  QosDataT m_qosInfo;
+  PlatformStatusT m_info;
 };
 
 #endif // REPORTCOLLECTOR_HPP

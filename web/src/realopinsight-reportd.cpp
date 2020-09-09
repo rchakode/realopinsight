@@ -22,9 +22,8 @@
 #--------------------------------------------------------------------------#
  */
 
-#include "dbo/src/DbSession.hpp"
 #include "WebBaseSettings.hpp"
-#include "QosCollector.hpp"
+#include "PlatformStatusCollector.hpp"
 #include "WebUtils.hpp"
 #include "WebApplication.hpp"
 #include "Notificator.hpp"
@@ -37,7 +36,9 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <regex>
-
+#include <prometheus/gauge.h>
+#include <prometheus/exposer.h>
+#include <prometheus/registry.h>
 
 void wait_for_interval(int interval)
 {
@@ -49,15 +50,26 @@ void runCollector(int period)
 {
   ngrt4n::initReportdLogger();
 
-  WebBaseSettings settings;
-  DbSession dbSession;
-  Notificator notificator(&dbSession);
+  prometheus::Exposer promExposer{"127.0.0.1:4584"};
+
+  auto registry = std::make_shared<prometheus::Registry>();
+  auto& promMetrics = prometheus::BuildGauge()
+      .Name("realopinsight_probes_status_percent")
+      .Help("Status of monitored platforms and related components")
+      .Register(*registry);
+  promExposer.RegisterCollectable(registry);
+
+
   while(1) {
-    QosDataList qosDataList;
+    DbSession dbSession;
+    WebBaseSettings settings;
+    Notificator notificator;
+    PlatformStatusList platformStatusList;
     NodeListT rootNodes;
-    qosDataList.clear();
-    rootNodes.clear();
     DbViewsT vlist;
+
+    platformStatusList.clear();
+    rootNodes.clear();
     try {
       vlist = dbSession.listViews();
     } catch(const std::exception& ex) {
@@ -65,12 +77,25 @@ void runCollector(int period)
     }
 
     for (const auto& view: vlist) {
-      QosCollector collector;
+      PlatformStatusCollector collector;
       collector.setDbSession(&dbSession);
+
+      auto& promStatusOverall = promMetrics.Add({{"scope", view.name}, {"status", "summary"}});
+      auto& promStatusCritical = promMetrics.Add({{"scope", view.name}, {"status", "critical"}});
+      auto& promStatusUnknown = promMetrics.Add({{"scope", view.name}, {"status", "unknown"}});
+      auto& promStatusMajor = promMetrics.Add({{"scope", view.name}, {"status", "major"}});
+      auto& promStatusMinor = promMetrics.Add({{"scope", view.name}, {"status", "minor"}});
+      auto& promStatusNormal = promMetrics.Add({{"scope", view.name}, {"status", "normal"}});
 
       auto initilizeOut = collector.initialize(view.path.c_str());
       if (initilizeOut.first != ngrt4n::RcSuccess) {
         REPORTD_LOG("error", QObject::tr("%1: %2").arg(view.name.c_str(), initilizeOut.second).toStdString());
+        promStatusOverall.Set(ngrt4n::Unknown);
+        promStatusCritical.Set(-1);
+        promStatusUnknown.Set(-1);
+        promStatusMajor.Set(-1);
+        promStatusMinor.Set(-1);
+        promStatusNormal.Set(-1);
         continue;
       }
 
@@ -78,18 +103,31 @@ void runCollector(int period)
       auto updateOut = collector.updateAllNodesStatus();
       if (updateOut.first != ngrt4n::RcSuccess) {
         REPORTD_LOG("error", updateOut.second.toStdString());
+        promStatusOverall.Set(ngrt4n::Unknown);
+        promStatusCritical.Set(-1);
+        promStatusUnknown.Set(-1);
+        promStatusMajor.Set(-1);
+        promStatusMinor.Set(-1);
+        promStatusNormal.Set(-1);
         continue;
       }
 
-      QosDataT qosData = collector.qosInfo();
-      if (qosData.view_name != view.name && std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
-        qosData.view_name = view.name;
+      PlatformStatusT platformStatus = collector.info();
+      if (platformStatus.view_name != view.name && std::regex_match(view.name, std::regex("Source[0-9]:.+"))) {
+        platformStatus.view_name = view.name;
       }
-      qosData.timestamp = time(nullptr); // now
-      qosDataList.push_back(qosData);
-      rootNodes[qosData.view_name.c_str()] = collector.rootNode();
+      platformStatus.timestamp = time(nullptr); // now
+      platformStatusList.push_back(platformStatus);
+      rootNodes[platformStatus.view_name.c_str()] = collector.rootNode();
+      promStatusOverall.Set(platformStatus.status);
+      promStatusCritical.Set(platformStatus.critical);
+      promStatusUnknown.Set(platformStatus.unknown);
+      promStatusMajor.Set(platformStatus.major);
+      promStatusMinor.Set(platformStatus.minor);
+      promStatusNormal.Set(platformStatus.normal);
+
       try {
-        dbSession.addQosData(qosData);
+        dbSession.addPlatformStatus(platformStatus);
       } catch(const std::exception& ex) {
         REPORTD_LOG("error", std::string(ex.what()));
       }
@@ -97,8 +135,8 @@ void runCollector(int period)
 
     // handle notifications if applicable
     if (settings.getNotificationType() != WebBaseSettings::NoNotification) {
-      for (const auto& qosEntry : qosDataList) {
-        notificator.handleNotification(rootNodes[qosEntry.view_name.c_str()], qosEntry);
+      for (const auto& pfs : platformStatusList) {
+        notificator.handleNotification(rootNodes[pfs.view_name.c_str()], pfs);
       }
     }
     wait_for_interval(period);

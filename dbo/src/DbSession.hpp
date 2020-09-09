@@ -120,10 +120,10 @@ public:
   std::pair<int, QString> revokeView(const std::string& userId, const std::string& vname);
   int listAssignedUsersEmails(QStringList& emails, const std::string& vname);
 
-  int addQosData(const QosDataT& qosData);
-  std::pair<int, QString> addQosDataList(const QosDataList& qosDataList);
-  int listQosData(QosDataListMapT& qosDataMap, const std::string& view, long fromDate = 0, long toDate = LONG_MAX);
-  int getLastQosData(QosDataT& qosData, const std::string& view);
+  int addPlatformStatus(const PlatformStatusT& platformStatus);
+  std::pair<int, QString>  addPlatformStatusList(const PlatformStatusList& platformStatusList);
+  int listPlatformStatus(PlatformStatusListMapT& platformStatusMap, const std::string& view, long fromDate = 0, long toDate = LONG_MAX);
+  int getLastPlatformStatus(PlatformStatusT& platformStatus, const std::string& view);
 
   DbViewsT listViews(void);
   DbViewsT listViewListByAssignedUser(const std::string& uname);
