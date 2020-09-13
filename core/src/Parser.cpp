@@ -160,25 +160,24 @@ std::pair<int, QString> Parser::loadDynamicViewByGroup(QDomNodeList& inXmlDomNod
 
   outCData.sources.insert(sourceId);
 
-  auto findSourceOut = m_dbSession->findSourceById(sourceId);
-  if (! findSourceOut.first) {
+  auto sourceFound = m_dbSession->findSourceById(sourceId);
+  if (! sourceFound.first) {
     return std::make_pair(ngrt4n::RcGenericFailure, QObject::tr("failed loading source settings on %1").arg(sourceId));
   }
 
-  if (findSourceOut.second.mon_type == MonitorT::Kubernetes) {
-    auto loqdK8sNs = K8sHelper(findSourceOut.second.mon_url, findSourceOut.second.verify_ssl_peer)
+  if (sourceFound.second.mon_type == MonitorT::Kubernetes) {
+    auto k8sNsFound = K8sHelper(sourceFound.second.mon_url, sourceFound.second.verify_ssl_peer, sourceFound.second.auth)
                      .loadNamespaceView(monitoredGroup, outCData);
-    if (loqdK8sNs.second != ngrt4n::RcSuccess) {
-      auto m_lastErrorMsg = QObject::tr("%1: %2").arg(findSourceOut.second.id, loqdK8sNs.first);
-      return std::make_pair(loqdK8sNs.second, m_lastErrorMsg);
+    if (k8sNsFound.second != ngrt4n::RcSuccess) {
+      auto m_lastErrorMsg = QObject::tr("%1: %2").arg(sourceFound.second.id, k8sNsFound.first);
+      return std::make_pair(k8sNsFound.second, m_lastErrorMsg);
     }
-
   } else {
-    auto loadViewByGroupOut = ngrt4n::loadDynamicViewByGroup(findSourceOut.second, monitoredGroup, outCData);
-    if (loadViewByGroupOut.first == ngrt4n::RcSuccess) {
+    auto viewLoaded = ngrt4n::loadDynamicViewByGroup(sourceFound.second, monitoredGroup, outCData);
+    if (viewLoaded.first == ngrt4n::RcSuccess) {
       ngrt4n::fixupDependencies(outCData);
     }
-    return loadViewByGroupOut;
+    return viewLoaded;
   }
 
   return std::make_pair(ngrt4n::RcSuccess, "");

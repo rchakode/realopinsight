@@ -125,7 +125,7 @@ bool WebDataSourceSettings::validateSourceSettingsFields(void)
     return false;
   }
 
-  SourceT sinfo = extractSourceSettingsGivenIndex( m_sourceSelectionFieldRef->currentIndex() );
+  SourceT sinfo = getSourceInfoByIndex( m_sourceSelectionFieldRef->currentIndex() );
   bool isValidMonitorUrl = (m_monitorUrlFieldRef->validate() == Wt::ValidationState::Valid || sinfo.mon_type == MonitorT::Nagios);
   if (! isValidMonitorUrl) {
     m_operationCompleted.emit(ngrt4n::OperationFailed, Q_TR("Please fix field(s) in red"));
@@ -153,10 +153,10 @@ void WebDataSourceSettings::applySourceChanges(int index)
     return;
   }
 
-  SourceT sinfo = extractSourceSettingsGivenIndex(index);
+  SourceT sinfo = getSourceInfoByIndex(index);
   QHash<QString, bool> monitoredGroups;
   if (sinfo.mon_type == MonitorT::Kubernetes) {
-    K8sHelper k8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer);
+    K8sHelper k8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer, sinfo.auth);
     auto outListNamespaces = k8sHelper.listNamespaces();
     if (outListNamespaces.second != ngrt4n::RcSuccess) {
       m_operationCompleted.emit(ngrt4n::OperationFailed, QObject::tr("failed connecting to source (%1)").arg(outListNamespaces.first.at(0)).toStdString());
@@ -414,9 +414,6 @@ void WebDataSourceSettings::updateComponentsVisibiliy(int monitorTypeCurrentInde
     wApp->doJavaScript("$('#livetstatus-settings').hide();");
     wApp->doJavaScript("$('#source-api-settings').show();");
   }
-
-  const auto K8sSourceSelected = ! monitorType.contains("Kubernetes");
-  m_authStringFieldRef->setEnabled(K8sSourceSelected);
 }
 
 
@@ -430,7 +427,7 @@ void WebDataSourceSettings::handleShowAuthStringChanged(void)
 }
 
 
-SourceT WebDataSourceSettings::extractSourceSettingsGivenIndex(int sourceIndex)
+SourceT WebDataSourceSettings::getSourceInfoByIndex(int sourceIndex)
 {
   SourceT sinfo;
 

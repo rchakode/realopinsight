@@ -87,7 +87,7 @@ private:
   void updateComponentsVisibiliy(int monitorTypeCurrentIndex);
   void handleShowAuthStringChanged(void);
   void saveSourceInDatabase(const SourceT& sinfo);
-  SourceT extractSourceSettingsGivenIndex(int sourceIndex);
+  SourceT getSourceInfoByIndex(int sourceIndex);
 };
 
 #endif // WEBDATASOURCESETTINGS_HPP

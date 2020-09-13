@@ -157,9 +157,9 @@ void DashboardBase::runDynamicViewByGroupUpdate(const SourceT& sinfo)
 {
   if (sinfo.mon_type == MonitorT::Kubernetes) {
     CoreDataT newCData;
-    auto loadNsViewOut = K8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer).loadNamespaceView(rootNode().name, newCData);
-    if (loadNsViewOut.second != ngrt4n::RcSuccess) {
-      updateDashboardOnError(sinfo, loadNsViewOut.first);
+    auto viewLoaded = K8sHelper(sinfo.mon_url, sinfo.verify_ssl_peer, sinfo.auth).loadNamespaceView(rootNode().name, newCData);
+    if (viewLoaded.second != ngrt4n::RcSuccess) {
+      updateDashboardOnError(sinfo, viewLoaded.first);
       return ;
     }
 

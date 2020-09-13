@@ -1,17 +1,16 @@
 #include <QString>
-#include <QtTest>
-#include "MkLsHelper.hpp"
+#include "LsHelper.hpp"
 
-CheckListCstIterT check;
-MkLsHelper mkhelper("ubs-1", 50000);
+ChecksT check;
+LsHelper mkhelper("ubs-1", 50000);
 
-class MkLsHelperTest : public QObject
+class LsHelperTest : public QObject
 {
   Q_OBJECT
   
 public:
-  MkLsHelperTest();
-  ~MkLsHelperTest();
+  LsHelperTest();
+  ~LsHelperTest();
   
 private Q_SLOTS:
   void testCase1();
@@ -21,50 +20,50 @@ private Q_SLOTS:
   void testLoadHostData();
 };
 
-MkLsHelperTest::MkLsHelperTest()
+LsHelperTest::LsHelperTest()
 {
 }
 
-MkLsHelperTest::~MkLsHelperTest()
+LsHelperTest::~LsHelperTest()
 {
 }
 
-void MkLsHelperTest::testCase1()
+void LsHelperTest::testCase1()
 {
   QVERIFY(true == mkhelper.connectToService());
   mkhelper.clearData();
-  QVERIFY(true == mkhelper.requestData("localhost", MkLsHelper::Host));
-  QVERIFY(true == mkhelper.recvData(MkLsHelper::Host));
+  QVERIFY(true == mkhelper.requestData("localhost", LsHelper::Host));
+  QVERIFY(true == mkhelper.recvData(LsHelper::Host));
   QVERIFY(true == mkhelper.findCheck("localhost", check));
   QVERIFY(false == mkhelper.findCheck("localhost/PING", check));
 
   mkhelper.disconnectFromService();
 }
 
-void MkLsHelperTest::testBadRecvingDataType()
+void LsHelperTest::testBadRecvingDataType()
 {
   QVERIFY(true == mkhelper.connectToService());
   mkhelper.clearData();
-  QVERIFY(true == mkhelper.requestData("localhost", MkLsHelper::Service));
-  QVERIFY(false == mkhelper.recvData(MkLsHelper::Host));
+  QVERIFY(true == mkhelper.requestData("localhost", LsHelper::Service));
+  QVERIFY(false == mkhelper.recvData(LsHelper::Host));
   QVERIFY(false == mkhelper.findCheck("localhost", check));
 
   mkhelper.disconnectFromService();
 }
 
-void MkLsHelperTest::testCaseService()
+void LsHelperTest::testCaseService()
 {
   QVERIFY(true == mkhelper.connectToService());
   mkhelper.clearData();
-  QVERIFY(true == mkhelper.requestData("localhost", MkLsHelper::Service));
-  QVERIFY(true == mkhelper.recvData(MkLsHelper::Service));
+  QVERIFY(true == mkhelper.requestData("localhost", LsHelper::Service));
+  QVERIFY(true == mkhelper.recvData(LsHelper::Service));
   QVERIFY(true == mkhelper.findCheck("localhost/Load", check));
 
   mkhelper.disconnectFromService();
 }
 
 
-void MkLsHelperTest::testLoadHostData()
+void LsHelperTest::testLoadHostData()
 {
   mkhelper.setHost("ubs-1");
   mkhelper.setPort(50000);
@@ -77,7 +76,7 @@ void MkLsHelperTest::testLoadHostData()
 }
 
 
-void MkLsHelperTest::testBadHostBadPort()
+void LsHelperTest::testBadHostBadPort()
 {
   mkhelper.setHost("localhost");
   mkhelper.setPort(50000);
@@ -91,7 +90,7 @@ void MkLsHelperTest::testBadHostBadPort()
   mkhelper.disconnectFromService();
 }
 
-QTEST_MAIN(MkLsHelperTest)
-//QTEST_APPLESS_MAIN(MkLsHelperTest)
+QTEST_MAIN(LsHelperTest)
+//QTEST_APPLESS_MAIN(LsHelperTest)
 
-#include "tst_mklshelpertest.moc"
+#include "tst_LsHelpertest.moc"

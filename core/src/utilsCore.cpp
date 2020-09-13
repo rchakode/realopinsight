@@ -350,7 +350,7 @@ std::pair<int, QString> ngrt4n::loadDataItems(const SourceT &sinfo, const QStrin
   // Kubernetes
   if (sinfo.mon_type == MonitorT::Kubernetes)
   {
-    K8sHelper k8s(sinfo.mon_url, sinfo.verify_ssl_peer);
+    K8sHelper k8s(sinfo.mon_url, sinfo.verify_ssl_peer, sinfo.auth);
     return std::make_pair(ngrt4n::RcGenericFailure, "TODO import k8s data points");
   }
 

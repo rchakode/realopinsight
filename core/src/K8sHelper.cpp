@@ -32,8 +32,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-K8sHelper::K8sHelper(const QString& apiUrl, bool verifySslPeer)
-  : m_verifySslPeer(verifySslPeer)
+K8sHelper::K8sHelper(const QString& apiUrl, bool verifySslPeer, QString authToken)
+  : m_verifySslPeer(verifySslPeer),
+    m_userAuthToken(authToken)
 {
   m_hostname = QString::fromStdString(boost::asio::ip::host_name());
   if (apiUrl.endsWith("/")) {
@@ -109,9 +110,12 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(void)
 
   if (m_apiURL.host() != "127.0.0.1" && m_apiURL.host() != "localhost") {
     req.setRawHeader("Host", m_hostname.toUtf8());
-    auto authString = getAuthString();
-    if (! authString.isEmpty()) {
-      req.setRawHeader("Authorization", authString.toUtf8());
+    auto authToken = m_userAuthToken;
+    if (authToken.isEmpty()) {
+      authToken = getAuthTokenFromEnv();
+    }
+    if (! authToken.isEmpty()) {
+      req.setRawHeader("Authorization", QString("Bearer %1").arg(authToken).toUtf8());
     }
   }
 
@@ -149,9 +153,12 @@ std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const QString& 
 
   if (m_apiURL.host() != "127.0.0.1" && m_apiURL.host() != "localhost") {
     req.setRawHeader("Host", m_hostname.toUtf8());
-    auto authString = getAuthString();
-    if (! authString.isEmpty()) {
-      req.setRawHeader("Authorization", authString.toUtf8());
+    auto authToken = m_userAuthToken;
+    if (authToken.isEmpty()) {
+      authToken = getAuthTokenFromEnv();
+    }
+    if (! authToken.isEmpty()) {
+      req.setRawHeader("Authorization", QString("Bearer %1").arg(authToken).toUtf8());
     }
   }
 
@@ -516,7 +523,7 @@ int K8sHelper::convertToPodPhaseStatusEnum(const QString& podPhaseStatusText)
 }
 
 
-QString K8sHelper::getAuthString()
+QString K8sHelper::getAuthTokenFromEnv()
 {
   QString tokenFile = QString::fromLocal8Bit(qgetenv("REALOPINSIGHT_K8S_SA_TOKEN"));
   if (tokenFile.isEmpty()) {
@@ -525,7 +532,7 @@ QString K8sHelper::getAuthString()
   std::ifstream ifs(tokenFile.toStdString());
   std::string token(std::string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>())));
   if (! token.empty()) {
-    return QString("Bearer %2").arg(token.c_str());
+    return QString::fromStdString(token);
   }
   return "";
 }

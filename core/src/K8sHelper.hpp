@@ -36,7 +36,7 @@ class K8sHelper : public QNetworkAccessManager
   Q_OBJECT
 
 public:
-  K8sHelper(const QString& apiUrl, bool verifySslPeer);
+  K8sHelper(const QString& apiUrl, bool verifySslPeer, QString authToken);
   std::pair<QString, int> loadNamespaceView(const QString& in_namespace, CoreDataT& out_cdata);
   std::pair<QStringList, int> listNamespaces();
   std::pair<QByteArray, int> requestNamespacedItemsData(const QString& in_namespace, const QString& in_itemType);
@@ -62,11 +62,12 @@ private:
   QUrl m_apiURL;
   QString m_hostname;
   bool m_verifySslPeer;
+  QString m_userAuthToken;
   QEventLoop m_eventLoop;
   void setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption);
   QSet<QString> findMatchingService(const QMap<QString, QMap<QString, QString>>& allServicesSelectors, const QMap<QString, QVariant>& podLabels);
   int convertToPodPhaseStatusEnum(const QString& podPhaseStatusText);
-  QString getAuthString();
+  QString getAuthTokenFromEnv();
 };
 
 #endif // K8SHELPER_H
