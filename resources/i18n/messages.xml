@@ -101,7 +101,7 @@
         </figure>
         <h4>Create Service Operations View</h4>
         <p>
-          Go to <b>Service Editor</b> to create the different service views that model your business operations (i.e. relationship mapping, status calculation and propagation).
+          Use the built-in <b>Editor</b> to model your business operations using relationship mapping and status aggregation/propagation rules.
         </p>
       </div>
 
