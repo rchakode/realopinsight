@@ -43,11 +43,12 @@
 #include <Wt/WHBoxLayout.h>
 #include <Wt/WEvent.h>
 
-#define RESIZE_PANES \
+#define RESIZE_PANELS \
   "var top = $(\"#ngrt4n-content-pane\").offset().top;" \
   "var windowHeight = $(window).height() - 40;" \
   "$(\"#ngrt4n-content-pane\").height(windowHeight - top);" \
   "$(\"#ngrt4n-side-pane\").height(windowHeight - top);"
+
 
 
 WebMainUI::WebMainUI(AuthManager* authManager)
@@ -276,7 +277,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_boardSelectorRef->setCurrentIndex(0);
     m_showOnlyProblemsSelectorRef->setHidden(true);
   }
-  doJavaScript(RESIZE_PANES);
+  doJavaScript(RESIZE_PANELS);
 }
 
 WebMainUI::~WebMainUI()

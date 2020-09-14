@@ -42,6 +42,13 @@ namespace {
   const double THUMBNAIL_WIDTH = 120;
   const double THUMBNAIL_HEIGHT = 60;
   const double ICON_SIZE = 40.0;
+  const double COLOR_BORDER_SIZE_X = 30.0;
+  const double COLOR_BORDER_SIZE_Y = 10.0;
+  const double COLOR_BORDER_DOUBLE_SIZE_X = 2 * COLOR_BORDER_SIZE_X;
+  const double COLOR_BORDER_DOUBLE_SIZE_Y = 2 * COLOR_BORDER_SIZE_Y;
+  const int MAX_LABEL_LENGTH = 20;
+  const int MAP_MARGIN = 100;
+  const int MAP_PEN_WIDTH = 5;
 }
 
 WebMap::WebMap(CoreDataT* cdata)
@@ -101,7 +108,7 @@ void WebMap::paintEvent(Wt::WPaintDevice* _pdevice)
 void WebMap::drawMap(void)
 {
   Wt::WPaintedWidget::update(); //this calls paintEvent
-  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX, m_cdata->map_height * m_scaleY);
+  Wt::WPaintedWidget::resize(m_cdata->map_width * m_scaleX + MAP_MARGIN, m_cdata->map_height * m_scaleY + MAP_MARGIN);
   updateThumb();
 }
 
@@ -109,11 +116,6 @@ void WebMap::drawMap(void)
 void WebMap::drawNode(const NodeT& node, bool drawIcon)
 {
   if (node.visibility & ngrt4n::Visible) {
-
-    const double COLOR_BORDER_SIZE = 5.0;
-    const double COLOR_BORDER_DOUBLE_SIZE = 2 * COLOR_BORDER_SIZE;
-    const int MAX_LABEL_LENGTH = 20;
-
     double base_x = node.pos_x + m_cdata->min_x;
     double base_y = node.pos_y + m_cdata->min_y;
     Wt::WPointF iconPos(base_x - 20,  base_y - 24);
@@ -123,23 +125,27 @@ void WebMap::drawNode(const NodeT& node, bool drawIcon)
 
     m_painter->save();
 
+    Wt::WFont font;
+    font.setSize(font.sizeLength() / std::max(m_scaleX, m_scaleY));
+    m_painter->setFont(font);
+
     m_painter->setPen(Wt::WPen(Wt::WColor(255, 255, 255, 0)));
     m_painter->setBrush(Wt::WBrush(ngrt4n::severityWColor(node.sev)));
 
-    m_painter->drawRect(iconPos.x() - COLOR_BORDER_SIZE,
-                        iconPos.y() - COLOR_BORDER_SIZE,
-                        ICON_SIZE + COLOR_BORDER_DOUBLE_SIZE,
-                        ICON_SIZE + COLOR_BORDER_DOUBLE_SIZE);
+    m_painter->drawRect(iconPos.x() - COLOR_BORDER_SIZE_X,
+                        iconPos.y() - COLOR_BORDER_SIZE_Y,
+                        ICON_SIZE + COLOR_BORDER_DOUBLE_SIZE_X,
+                        ICON_SIZE + COLOR_BORDER_DOUBLE_SIZE_Y);
 
     if (drawIcon) {
       m_painter->drawImage(iconPos, GImage(ngrt4n::NodeIcons[node.icon], static_cast<int>(ICON_SIZE), static_cast<int>(ICON_SIZE)));
-    } else { /* thumbnail: do nothing*/ }
+    }
 
     if( node.type == NodeType::BusinessService) {
       if (node.visibility & ngrt4n::Expanded) {
-        m_painter->drawImage(expIconPos,GImage(ngrt4n::NodeIcons[ngrt4n::MINUS], 19, 18));
+        m_painter->drawImage(expIconPos, GImage(ngrt4n::NodeIcons[ngrt4n::MINUS], 19, 18));
       } else {
-        m_painter->drawImage(expIconPos,GImage(ngrt4n::NodeIcons[ngrt4n::PLUS], 19, 18));
+        m_painter->drawImage(expIconPos, GImage(ngrt4n::NodeIcons[ngrt4n::PLUS], 19, 18));
       }
       createExpIconLink(node, expIconPos);
     }
@@ -160,8 +166,9 @@ void WebMap::drawEdge(const QString& parentId, const QString& childId)
   {
     if (parent->visibility & ngrt4n::Expanded) {
       m_painter->save();
-      Wt::WPen pen(ngrt4n::severityWColor(child->sev_prop));
-      m_painter->setPen(pen);
+      Wt::WPen wpen(ngrt4n::severityWColor(child->sev_prop));
+      wpen.setWidth(MAP_PEN_WIDTH);
+      m_painter->setPen(wpen);
 
       Wt::WPointF edgeP1(parent->pos_x + m_cdata->min_x, parent->pos_y + 24 + m_cdata->min_y);
       Wt::WPointF edgeP2(child->pos_x + m_cdata->min_x, child->pos_y - 24 + m_cdata->min_y);
