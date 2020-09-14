@@ -941,7 +941,7 @@ void WebMainUI::showAppBoard(WebDashboard* appBoard)
 {
   if (appBoard) {
     switchFeaturePanel(appBoard);
-    appBoard->doJavascriptAutoResize();
+    // appBoard->doJavascriptAutoResize();
     m_boardSelectorRef->setCurrentIndex(m_boardSelectorRef->findText(appBoard->rootNode().name.toStdString()));
     m_showOnlyProblemsSelectorRef->setHidden(false);
     m_currentAppBoard = appBoard;

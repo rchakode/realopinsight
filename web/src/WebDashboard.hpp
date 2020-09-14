@@ -43,33 +43,6 @@
 #include <Wt/WLabel.h>
 #include <Wt/WApplication.h>
 
-/**
-  This fonction take as parameter the height of the navigation window
-  Important : the size of stacked container corresponds to the size of the windows
-  minus the size of the navbar (40)
-  */
-#define JS_AUTO_RESIZING_SCRIPT(windowHeight) \
-  windowHeight \
-  "var maxHeight = windowHeight - 50;" \
-  "$('#stackcontentarea').height(maxHeight);" \
-  "var heightGridRow1 = maxHeight*0.60 - 15;" \
-  "var heightGridRow2 = maxHeight - heightGridRow1 - 15;" \
-  "$('#wrapper').height(windowHeight);" \
-  "$('#maincontainer').height(maxHeight);" \
-  "$('#"+wApp->root()->id()+"').height(windowHeight);" \
-  "$('#"+m_treeContainerId+"').height(heightGridRow1);" \
-  "$('#"+m_mapContainerId+"').height(heightGridRow1);" \
-  "$('#"+m_chartContainerId+"').height(heightGridRow2);" \
-  "$('#"+m_eventContainerId+"').height(heightGridRow2);"
-
-#define JS_AUTO_RESIZING_FUNCTION \
-  "function(self, windowWidth, windowHeight) {" \
-  JS_AUTO_RESIZING_SCRIPT("windowHeight=windowHeight;") \
-  "var mapHeight = $('#"+m_mapContainerId+"').height();" \
-  "var mapWidth = $('#"+m_mapContainerId+"').width();" \
-  "Wt.emit("+m_mapRef->id()+", 'containerSizeChanged', mapWidth, mapHeight, windowWidth, windowHeight);" \
-  "}"
-
 
 class WebDashboard : public DashboardBase, public Wt::WContainerWidget
 {
@@ -105,9 +78,6 @@ public:
   std::string tooltip(void) {
     return m_chartRef->toStdString();
   }
-  void doJavascriptAutoResize(void) {
-    doJavaScript(JS_AUTO_RESIZING_SCRIPT("windowHeight=$(window).height();"));
-  }
   void refreshMsgConsoleOnProblemStates(void);
   std::unique_ptr<Wt::WVBoxLayout> eventItemsContainerLayout(void) {
     return std::move(m_eventItemsContainerLayout);
@@ -136,7 +106,6 @@ private:
   std::string m_thumbMsg;
   std::unique_ptr<Wt::WVBoxLayout> m_eventItemsContainerLayout;
   QHash<QString, Wt::WWidget*> m_eventItems;
-  Wt::WGridLayout* m_mainLayoutRef;
 
   std::string m_treeContainerId;
   std::string m_mapContainerId;

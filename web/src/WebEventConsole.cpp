@@ -68,9 +68,9 @@ void WebMsgConsole::setModelHeaders()
   m_modelRef->insertColumns(0, TABLE_COLUMN_COUNT);
   m_modelRef->setHeaderData(0, Wt::Orientation::Horizontal, Q_TR("Date & Hour"), Wt::ItemDataRole::Display);
   m_modelRef->setHeaderData(1, Wt::Orientation::Horizontal, Q_TR("Severity"), Wt::ItemDataRole::Display);
-  m_modelRef->setHeaderData(2, Wt::Orientation::Horizontal, Q_TR("Component"), Wt::ItemDataRole::Display);
-  m_modelRef->setHeaderData(3, Wt::Orientation::Horizontal, Q_TR("Monitored item"), Wt::ItemDataRole::Display);
-  m_modelRef->setHeaderData(4, Wt::Orientation::Horizontal, Q_TR("Message"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(2, Wt::Orientation::Horizontal, Q_TR("Application Component"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(3, Wt::Orientation::Horizontal, Q_TR("Probe Item"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(4, Wt::Orientation::Horizontal, Q_TR("Details"), Wt::ItemDataRole::Display);
   m_modelRef->setHeaderData(ID_COLUMN, Wt::Orientation::Horizontal, Q_TR("Service ID"), Wt::ItemDataRole::User);
   hideColumn(ID_COLUMN);
 }

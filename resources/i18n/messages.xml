@@ -182,6 +182,27 @@
   </div>
 </message>
 
+<message id="dashboard-item.tpl">
+  <div class="col-sm-12">
+    <div class="dashboard-left-pane col-sm-3">
+      <div class="dashboard-tree">
+        ${dashboard-tree}
+      </div>
+      <div class="dashboard-piechart">
+        ${dashboard-piechart}
+      </div>
+    </div>
+    <div class="dashboard-right-pane col-sm-9">
+      <div class="dashboard-map">
+        ${dashboard-map}
+      </div>
+      <div class="dashboard-msg-console">
+        ${dashboard-msg-console}
+      </div>
+    </div>
+  </div>
+</message>
+
 <message id="event-feed.tpl">
   <div class="media">
     <a class="pull-left" href="#">

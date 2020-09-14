@@ -47,7 +47,7 @@ namespace {
   const double COLOR_BORDER_DOUBLE_SIZE_X = 2 * COLOR_BORDER_SIZE_X;
   const double COLOR_BORDER_DOUBLE_SIZE_Y = 2 * COLOR_BORDER_SIZE_Y;
   const int MAX_LABEL_LENGTH = 20;
-  const int MAP_MARGIN = 100;
+  const int MAP_MARGIN = 50;
   const int MAP_PEN_WIDTH = 5;
 }
 
@@ -202,10 +202,16 @@ void WebMap::updateNode(const NodeT&, const QString&)
 
 void WebMap::scaleMap(double factor)
 {
-  m_scaleX *= factor;
-  m_scaleY *= factor;
+  setScaleFactor(factor, factor);
   Wt::WPaintedWidget::update();
   Wt::WPaintedWidget::resize(factor * width(), factor * height());
+}
+
+
+void WebMap::setScaleFactor(double factorX, double factorY)
+{
+  m_scaleX *= factorX;
+  m_scaleY *= factorY;
 }
 
 void WebMap::handleContainedSizeChanged(double mapWidth, double mapHeight, double winWidth, double winHeight)

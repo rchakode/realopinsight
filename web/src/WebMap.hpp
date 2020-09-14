@@ -45,6 +45,7 @@ public:
   void drawMap(void);
   void updateNode(const NodeT& _node, const QString& _toolTip);
   void scaleMap(double factor);
+  void setScaleFactor(double factorX, double factorY);
   void updateThumb(void);
   Wt::JSignal<double, double, double, double>& containerSizeChanged(void) {
     return m_containerSizeChanged;

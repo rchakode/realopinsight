@@ -1,5 +1,5 @@
 body, html {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "EB+Garamond", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
   font-size: 15px;
   line-height: 1.42857143;
   color: #222222;
@@ -115,7 +115,6 @@ body, html {
   background: #F1F1F1;
   background: -webkit-linear-gradient(-45deg,#9DC6DD 0px, #F1F1F1 50%, #FFBB69 75%, #F1F1F1 55%, #9DC6DD);
 }
-
 
 #ngrt4n-content-pane {
   overflow: auto;
@@ -271,10 +270,6 @@ legend {
 }
 
 
-.bi-chart {
-  /* background-color: #f8f8ff; */
-}
-
 .btn {
  min-width: 18ch;
 }
@@ -293,7 +288,6 @@ legend {
   border-color: #ffa500;
 }
 
-
 /* green button */
 .btn-normal {
   color: #fff !important;
@@ -301,14 +295,12 @@ legend {
   border-color: #4b7;
 }
 
-
 /* yellow button */
 .btn-minor {
   color: #fff !important;
   background-color: #fa4 !important;
   border-color: #fa4;
 }
-
 
 /* grey */
 .btn-unknown {
@@ -338,16 +330,69 @@ legend {
 }
 
 .form-horizontal fieldset {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 0 2em;
-    margin-bottom: 0;
-    margin-top: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0 2em;
+  margin-bottom: 0;
+  margin-top: 1rem;
 }
 
 
 .accordion fieldset {
-border: 1px solid rgba(0, 0, 0, 0.1);
-padding: 0 1em;
-margin-bottom: 1rem;
-margin-top: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0 1em;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.dashboard-left-pane {
+  resize: horizontal;
+  max-width: 25%;
+  overflow: none;
+  min-height: 100vh;
+  border-right: 1px solid #d1d1d1;
+}
+
+.dashboard-right-pane {
+  resize: horizontal;
+  max-width: 75%;
+  overflow: none;
+}
+
+.dashboard-map, .dashboard-tree {
+  resize: both;
+  min-height: 50vh;
+  max-height: 65vh;
+  overflow: auto;
+  background-color: #f8f8ff;
+}
+
+.dashboard-map {
+  min-width: 600px;
+  max-width: 100%;
+}
+
+.dashboard-tree, .dashboard-piechart  {
+  min-width: 300px;
+  max-width: 100%;
+}
+
+.dashboard-msg-console, .dashboard-piechart {
+  min-height: 25vh;
+  max-height: 35vh;
+  overflow: auto;
+  overflow-x: hidden;
+  resize: none;
+}
+
+.dashboard-piechart, .dashboard-msg-console  {
+  border-top: 1px solid #d1d1d1;
+}
+
+.dashboard-left-pane, .dashboard-right-pane {
+  border-right: 1px solid #d1d1d1;
+}
+
+.Wt-treeview {
+  background: #f8f8ff;
+  border: none;
 }

@@ -38,55 +38,19 @@
 #include <Wt/WImage.h>
 #include <Wt/WTemplate.h>
 
+const double MAP_DEFAULT_HEIGHT = 600.0;
 
 
 WebDashboard::WebDashboard(DbSession* dbSession)
   : DashboardBase(dbSession)
 {
   m_eventItemsContainerLayout = std::make_unique<Wt::WVBoxLayout>();
-  auto mainLayout = std::make_unique<Wt::WGridLayout>();
-  m_mainLayoutRef = mainLayout.get();
-  mainLayout->setColumnResizable(0);
-  mainLayout->setColumnResizable(1);
-  mainLayout->setRowResizable(0);
-  mainLayout->setRowResizable(1);
-
-  auto tree = std::make_unique<WebTree>(&m_cdata);
-  m_treeRef = tree.get();
-  auto treeContainer = std::make_unique<Wt::WContainerWidget>();
-  m_treeContainerId = treeContainer->id();
-  treeContainer->setOverflow(Wt::Overflow::Auto);
-  treeContainer->addWidget(std::move(tree));
-  mainLayout->addWidget(std::move(treeContainer), 0, 0);
-
-  auto map = std::make_unique<WebMap>(&m_cdata);
-  m_mapRef = map.get();
-  map->containerSizeChanged().connect(this, & WebDashboard::hanleRenderingAreaSizeChanged);
-  auto mapContainer = std::make_unique<Wt::WContainerWidget>();
-  m_mapContainerId = mapContainer->id();
-  mapContainer->setOverflow(Wt::Overflow::Auto);
-  mapContainer->addWidget(std::move(map));
-  mainLayout->addWidget(std::move(mapContainer), 0, 1);
-
-  auto chart = std::make_unique<WebPieChart>();
-  m_chartRef = chart.get();
-  auto chartContainer = std::make_unique<Wt::WContainerWidget>();
-  m_chartContainerId = chartContainer->id();
-  chartContainer->setOverflow(Wt::Overflow::Auto);
-  chartContainer->addWidget(std::move(chart));
-  mainLayout->addWidget(std::move(chartContainer), 1, 0);
-
-  auto eventConsole = std::make_unique<WebMsgConsole>();
-  m_eventConsoleRef = eventConsole.get();
-  auto eventContainer = std::make_unique<Wt::WContainerWidget>();
-  m_eventContainerId = m_eventConsoleRef->id();
-  eventContainer->setOverflow(Wt::Overflow::Auto);
-  eventContainer->addWidget(std::move(eventConsole));
-  mainLayout->addWidget(std::move(eventContainer), 1, 1);
-
-  setJavaScriptMember("wtResize", JS_AUTO_RESIZING_FUNCTION);
-  doJavascriptAutoResize();
-  setLayout(std::move(mainLayout));
+  auto dashboardTpl = std::make_unique<Wt::WTemplate>(Wt::WString::tr("dashboard-item.tpl"));
+  m_treeRef = dashboardTpl->bindNew<WebTree>("dashboard-tree", &m_cdata);
+  m_mapRef = dashboardTpl->bindNew<WebMap>("dashboard-map", &m_cdata);
+  m_chartRef = dashboardTpl->bindNew<WebPieChart>("dashboard-piechart");
+  m_eventConsoleRef = dashboardTpl->bindNew<WebMsgConsole>("dashboard-msg-console");
+  addWidget(std::move(dashboardTpl));
 }
 
 WebDashboard::~WebDashboard(){ }
@@ -136,6 +100,8 @@ void WebDashboard::updateChart(void)
 
 void WebDashboard::buildMap(void)
 {
+  auto scaleFactor = std::min(1.0, MAP_DEFAULT_HEIGHT / m_cdata.map_height);
+  m_mapRef->setScaleFactor(scaleFactor, scaleFactor);
   m_mapRef->drawMap();
 }
 
