@@ -64,7 +64,6 @@ WebApp::WebApp(const Wt::WEnvironment& env)
   useStyleSheet("/resources/css/kube/master.css");
   useStyleSheet("/resources/css/kube/highlight.css");
   useStyleSheet("/resources/css/kube/master.css");
-  useStyleSheet("/resources/css/kube/custom.css");
   useStyleSheet("/resources/css/realopinsight.css");
   requireJQuery("/resources/js/jquery-3.4.1.min.js");
   messageResourceBundle().use(docRoot()+"/resources/i18n/messages");

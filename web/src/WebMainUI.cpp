@@ -155,7 +155,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_adminHomePageRef = adminHomePage.get();
     m_adminStackRef->addWidget(std::move(adminHomePage));
 
-    auto linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Go to Home").toStdString());
+    auto linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr(" >> Home << ").toStdString());
     linkPtr->clicked().connect(this, &WebMainUI::handleShowAdminHome);
     m_menuLinks.insert(MenuWelcome, linkPtr.get());
     m_settingsPageRef->bindWidget("menu-get-started", std::move(linkPtr));
@@ -744,7 +744,7 @@ void WebMainUI::handleUserUpdatedCompleted(int errcode)
 void WebMainUI::handleShowAdminHome(void)
 {
   m_adminStackRef->setCurrentWidget(m_adminHomePageRef);
-  m_adminPageTitleRef->setText(Q_TR("Getting Started in 3 Simple Steps !"));
+  m_adminPageTitleRef->setText("");
 }
 
 

@@ -41,7 +41,6 @@ WebMsgConsole::WebMsgConsole()
   setSelectable(true);
   setSelectionMode(Wt::SelectionMode::Single);
   setSelectionBehavior(Wt::SelectionBehavior::Rows);
-  setHeaderHeight(26);
 
   auto model = std::make_shared<Wt::WStandardItemModel>(0, TABLE_COLUMN_COUNT);
   m_modelRef = model.get();
@@ -65,11 +64,11 @@ void WebMsgConsole::clearAll(void)
 
 void WebMsgConsole::setModelHeaders()
 {
-  m_modelRef->insertColumns(0, TABLE_COLUMN_COUNT);
+  // m_modelRef->insertColumns(0, TABLE_COLUMN_COUNT);
   m_modelRef->setHeaderData(0, Wt::Orientation::Horizontal, Q_TR("Date & Hour"), Wt::ItemDataRole::Display);
   m_modelRef->setHeaderData(1, Wt::Orientation::Horizontal, Q_TR("Severity"), Wt::ItemDataRole::Display);
-  m_modelRef->setHeaderData(2, Wt::Orientation::Horizontal, Q_TR("Application Component"), Wt::ItemDataRole::Display);
-  m_modelRef->setHeaderData(3, Wt::Orientation::Horizontal, Q_TR("Probe Item"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(2, Wt::Orientation::Horizontal, Q_TR("Component"), Wt::ItemDataRole::Display);
+  m_modelRef->setHeaderData(3, Wt::Orientation::Horizontal, Q_TR("Probe"), Wt::ItemDataRole::Display);
   m_modelRef->setHeaderData(4, Wt::Orientation::Horizontal, Q_TR("Details"), Wt::ItemDataRole::Display);
   m_modelRef->setHeaderData(ID_COLUMN, Wt::Orientation::Horizontal, Q_TR("Service ID"), Wt::ItemDataRole::User);
   hideColumn(ID_COLUMN);
@@ -79,7 +78,7 @@ void  WebMsgConsole::layoutSizeChanged(int width, int)
 {
   Wt::WLength em = Wt::WLength(1, Wt::LengthUnit::FontEx);
   setColumnWidth(0, 25 * em);
-  setColumnWidth(1, 10 * em);
+  setColumnWidth(1, 12 * em);
   setColumnWidth(2, 30 * em);
   setColumnWidth(3, 30 * em);
   setColumnWidth(4, width - (55 * em.toPixels() + 90)); /*size of the header image*/

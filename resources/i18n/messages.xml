@@ -14,7 +14,7 @@
   <!-- Menu pane -->
   <div id="ngrt4n-side-pane" class="col-sm-4">
     <div class="page-header">
-      <h2>${menu-get-started}</h2>
+      <legend>${menu-get-started}</legend>
     </div>
     <div class="ngrt4n-content">
       <div class="accordion">
@@ -83,57 +83,47 @@
 
 
 <message id="getting-started.tpl">
-  <div id="kube-features">
-    <div class="row gutters">
-      <div class="col col-4 item">
-        <figure>
-          <img alt="Configure data sources" src="/images/built-in/thumbnails/source-settings.png" />
-        </figure>
-        <h4>Configure Data Sources</h4>
-        <p>
-          Go to <b>Monitoring Sources</b> to define how to connect to the underlying monitoring systems to retrieve data needed for operations views.
-        </p>
-      </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <h3>Bind to Monitoring Sources</h3>
+      <p>
+        Under <b>Monitoring Sources</b> set parameters (i.e. URL and credentials) to connect to Nagios, Zabbix or Kubernetes to retrieve basic probe status data.
+      </p>
+      <figure>
+        <img alt="Configure data sources" src="/images/built-in/thumbnails/source-settings.png" />
+      </figure>
+    </div>
 
-      <div class="col col-4 item">
-        <figure>
-          <img alt="Create service tree views" src="/images/built-in/thumbnails/service-editor.png" />
-        </figure>
-        <h4>Create Service Operations View</h4>
-        <p>
-          Use the built-in <b>Editor</b> to model your business operations using relationship mapping and status aggregation/propagation rules.
-        </p>
-      </div>
+    <div class="col-sm-4">
+      <h3>Create Service Operations View</h3>
+      <p>Under <b>Service Editor</b> model your applications operate, i.e. by mapping relationships and status aggregation and propagation rules.</p>
+      <figure>
+        <img alt="Create service tree views" src="/images/built-in/thumbnails/service-editor.png" />
+      </figure>
+    </div>
 
-      <div class="col col-4 item">
-        <figure>
-          <img alt="Preview to validate views" src="/images/built-in/thumbnails/application-dashboard.png" />
-        </figure>
-        <h4>Preview and Validate Views</h4>
-        <p>
-           Go to <b>Preview</b> to previsualize views you created. This help ensure that they will be running as expected.
-        </p>
-      </div>
+    <div class="col-sm-4">
+      <h3>Preview and Validate Views</h3>
+      <p>Under <b>Preview</b>, preview the configured views you created to ensure they are modeled as expected.</p>
+      <figure>
+        <img alt="Preview to validate views" src="/images/built-in/thumbnails/application-dashboard.png" />
+      </figure>
+    </div>
 
-      <div class="col col-4 item">
-        <figure>
-          <img alt="Assign to build operations views" src="/images/built-in/thumbnails/manage-operations-views.png" />
-        </figure>
-        <h4>Configure Operators Views</h4>
-        <p>
-          Once your views ready, go to <b>Operations View</b> to configure the service views each operator can watch on production.
-        </p>
-      </div>
+    <div class="col-sm-4">
+      <h3>Configure operations views</h3>
+      <p>Under <b>New User</b> create operator users, and then define their visualization permissions (<b>Manage Operations Views</b>).</p>
+      <figure>
+        <img alt="Assign to build operations views" src="/images/built-in/thumbnails/manage-operations-views.png" />
+      </figure>
+    </div>
 
-      <div class="col col-4 item">
-        <figure>
-          <img alt="Let operate" src="/images/built-in/thumbnails/operations-view.png" />
-        </figure>
-        <h3>Let's operate in production</h3>
-        <p>
-          Sign in <b>as operator</b> for daily operations. Get factual insights at a glance. Quickly assess the impact of each incident. Take right decisions.
-        </p>
-      </div>
+    <div class="col-sm-4">
+      <h3>Operations visualization</h3>
+      <p><b>Sign in as operator</b> for daily operations monitoring.</p>
+      <figure>
+        <img alt="Let operate" src="/images/built-in/thumbnails/operations-view.png" />
+      </figure>
     </div>
   </div>
 </message>
@@ -144,7 +134,9 @@
     <div id="ngrt4n-content-pane" class="col-sm-8">
        <div class="ngrt4n-content">
           <div class="row">
-            <h1>&nbsp;Tactical Overview</h1>
+            <div class="col-sm-12">
+              <h2>&nbsp;Tactical Overview</h2>
+            </div>
           </div>
           <div class="row">
             <div class="col-sm-12">
@@ -153,7 +145,7 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
-              <h1>&nbsp;${bi-report-title}</h1>
+              <h2>&nbsp;${bi-report-title}</h2>
             </div>
           </div>
           <div class="row">
@@ -166,7 +158,7 @@
     <!-- Event Feeds Pane -->
     <div id="ngrt4n-side-pane" class="col-sm-4">
       <div class="ngrt4n-content">
-        <h1>Open Events</h1>
+        <h2>Open Events</h2>
         <div>
           ${event-feeds}
         </div>
@@ -238,7 +230,7 @@
 <div id="main">
   <div id="hero" class="primary">
       <h2><img src="/images/built-in/logo.png" /></h2>
-      <p>${tr:Wt.Auth.login-form-info}</p>
+      <div>${tr:Wt.Auth.login-form-info}</div>
       <div class="form-group">
         ${<if:passwords>}
         <div class="form-group row">

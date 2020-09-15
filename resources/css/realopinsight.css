@@ -1,23 +1,38 @@
 body, html {
-  font-family: "EB+Garamond", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
-  font-size: 15px;
-  line-height: 1.42857143;
-  color: #222222;
-  background-color: #f8f8ff;
+  font-family: "gotham, Helvetica, Arial, sans-serif";
+  color: #161B1F;
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 1rem;
   margin: 0;
   overflow: hidden;
 }
-/* Wt-domRoot from Wt */
-.Wt-domRoot {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  z-index: -1;
-  height: 100%;
+
+
+#main {
+  margin: auto;
+  max-width: 100%;
 }
 
-/* Now specific classes */
+#hero {
+  background-color: #fcfcfc;
+  background-image: -webkit-linear-gradient(-45deg, #9DC6DD 0px, #F1F1F1 50%, #FFBB69 75%, #F1F1F1 55%, #9DC6DD);
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+}
+
+#hero p::before {
+  background: #FF8D00;
+}
+
+#hero.primary {
+  padding-top: 120px;
+}
+
+.button.primary {
+  background-color: #868686;
+}
+
+
 #wrapper {
   position: absolute;
   display: block;
@@ -26,6 +41,7 @@ body, html {
   right: 0;
   height: 100%;
 }
+
 #maincontainer {
   position: relative;
   display: block;
@@ -45,19 +61,6 @@ body, html {
 }
 
 
-.Wt-dialog {
-  background-color: white;
-  padding: 1px 0;
-}
-
-.Wt-dialog .titlebar {
-  color: #ffffff;
-  background: #9dc6dd;
-  cursor: move;
-  font: bold 12px Verdana;
-  padding: 1px 3px;
-}
-
 /* these classes come from from bootstrap */
 .navbar {
   margin: 0;
@@ -69,17 +72,17 @@ body, html {
 }
 
 .accordion-heading {
-  background: #9dc6dd; /*for panel */
+  background-image: -webkit-linear-gradient(top, #f7f6f4, rgba(255,255,255,.1)); /*for panel */
 }
 
 .accordion-inner {
-  background: #f8f8ff; /*for panel */
+  background: #fcfcfc; /*for panel */
 }
 .form-actions {
   text-align: center;
 }
 .default-item-background {
-  background-color: #f8f8ff;  
+  background-color: #fcfcfc;
 }
 .severity-normal {
   background-color: #4b7;
@@ -103,7 +106,7 @@ body, html {
 
 /* Related to form and dialog*/
 .ngrt4n-default {
-  background: #F8F8FF;
+  background: #fcfcfc;
 }
 
 .ngrt4n-transparent {
@@ -127,8 +130,7 @@ body, html {
 #ngrt4n-content-pane .ngrt4n-content, 
 #ngrt4n-side-pane .ngrt4n-content {
   border-radius: 5px;
-  overflow: auto;
-  background-color: #ffffff;
+  overflow: hidden;
 }
 
 .admin-page #ngrt4n-content-pane {
@@ -143,7 +145,7 @@ body, html {
 }
 
 .admin-page #ngrt4n-side-pane .ngrt4n-content {
-  background-color: #f8f8ff;
+  background-color: #fcfcfc;
 }
 
 .admin-page #ngrt4n-side-pane li {
@@ -216,13 +218,11 @@ body, html {
 }
 
 
-/* For customizing scrollbars */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px
 }
- 
-/* Track */
+
 ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
     -webkit-border-radius: 5px;
@@ -233,13 +233,12 @@ body, html {
 ::-webkit-scrollbar-thumb {
     -webkit-border-radius: 10px;
     border-radius: 10px;
-    background: #9dc6dd;/*rgba(255,0,0,0.8); */
+    background: #9dc6dd; /*rgba(255,0,0,0.8); */
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
 }
 ::-webkit-scrollbar-thumb:window-inactive {
 	background: rgba(255,0,0,0.4); 
 }
-
 
 .notification-icons-container {
   margin-top: 10px;
@@ -312,7 +311,7 @@ legend {
 
 .breadcrumb {
   margin: 0;
-  background-color: #f8f8ff;
+  background-color: #fcfcfc;
 }
 
 
@@ -363,7 +362,7 @@ legend {
   min-height: 50vh;
   max-height: 65vh;
   overflow: auto;
-  background-color: #f8f8ff;
+  background-color: #fcfcfc;
 }
 
 .dashboard-map {
@@ -379,7 +378,6 @@ legend {
 .dashboard-msg-console, .dashboard-piechart {
   min-height: 25vh;
   max-height: 35vh;
-  overflow: auto;
   overflow-x: hidden;
   resize: none;
 }
@@ -392,7 +390,83 @@ legend {
   border-right: 1px solid #d1d1d1;
 }
 
+h2 {
+  font-size:28px;
+  lineheight:60px;
+  font-weight: 300;
+}
+
+h3 {
+  font-size: 24px;
+  lineheight: 32px;
+  font-weight: 250;
+}
+
+h4 {
+    font-size:20px;
+    lineheight:40px;
+    font-weight: 250;
+}
+
+h5 {
+  font-size:16px;
+  lineheight:36px;
+  font-weight: 250;
+}
+
+h1,
+address,
+blockquote,
+dl,
+fieldset,
+figure,
+form,
+hr,
+ol,
+p,
+pre,
+table,
+img,
+ul {
+ margin-bottom: 1rem;
+}
+
+.Wt-domRoot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  height: 100%;
+}
+
+.Wt-dialog {
+  background-color: white;
+  padding: 1px 0;
+}
+
+.Wt-dialog .titlebar {
+  color: #ffffff;
+  background: #9dc6dd;
+  cursor: move;
+  font: bold 12px Verdana;
+  padding: 1px 3px;
+}
+
 .Wt-treeview {
-  background: #f8f8ff;
+  background: #fcfcfc;
   border: none;
 }
+
+.Wt-treeview .Wt-tv-br,
+.Wt-treeview ul .Wt-tv-c {
+  border: none;
+}
+
+.Wt-treeview .Wt-header, .Wt-tableview .Wt-header {
+  background-image: linear-gradient(to top, #f7f6f4, #fcfcfc 25%, #fcfcfc 25%, #f7f6f4 100%);
+  border: none;
+  min-height: 2rem;
+  vertical-align: middle;
+}
+
