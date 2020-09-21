@@ -30,7 +30,7 @@
 #include "dbo/src/UserManagement.hpp"
 #include "dbo/src/LdapUserManager.hpp"
 #include "WebDashboard.hpp"
-#include "WebPlatformStatusPanel.hpp"
+#include "WebPlatformStatusAnalyticsCharts.hpp"
 #include "WebUtils.hpp"
 #include "WebMsgDialog.hpp"
 #include "WebNotificationSettings.hpp"
@@ -76,7 +76,9 @@ class WebMainUI : public QObject, public Wt::WContainerWidget
     MenuNotificationSettings,
     MenuDatabaseSettings,
     MenuMyAccount,
-    MenuChangePassword
+    MenuChangePassword,
+    MenuExecutiveView,
+    MenuPlatformStatusAnalytics
   };
 
 public:
@@ -123,9 +125,9 @@ private:
   Wt::WTimer m_globalTimer;
   Wt::WText* m_infoBoxRef;
   QMap<int,Wt::WAnchor*> m_menuLinks;
+  QMap<int, std::string> m_menuLabels;
   Wt::WContainerWidget* m_mainWidgetRef;
   Wt::WTemplate* m_settingsPageRef;
-  Wt::WTemplate* m_opsPageRef;
   Wt::WTemplate* m_adminHomePageRef;
   AuthManager* m_authManager;
   DbSession* m_dbSession;
@@ -158,7 +160,9 @@ private:
   WebMsgDialog* m_notificationManager;
   Wt::WVBoxLayout* m_eventFeedLayoutRef;
   QMap<std::string, Wt::WTemplate*>  m_thumbs;
-  WebPlatformStatusPanel* m_qosPanelRef;
+  Wt::WTemplate* m_executiveViewPageRef;
+  WebPlatformStatusAnalyticsCharts* m_platformStatusAnalyticsChartsRef;
+  Wt::WTemplate* m_platformStatusAnalyticsPageRef;
 
 
   /** callbacks */
@@ -195,7 +199,8 @@ private:
   void setupMenus(void);
   void saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path);
   bool createDirectory(const std::string& path, bool cleanContent);
-  Wt::WTemplate* buildOpsPage(void);
+  Wt::WTemplate* buildExecutiveViewPage(void);
+  Wt::WTemplate* buildSlaAnalyticsPage(void);
   std::pair<WebDashboard*, QString> loadView(const std::string& path);
   std::unique_ptr<Wt::WWidget> createDisplayOptionsToolbar(void);
   std::shared_ptr<Wt::WDialog> createAboutDialog(void);

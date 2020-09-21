@@ -1,8 +1,8 @@
 /*
- * WebBiSlaChart.hpp
+ * WebBiDashlet.hpp
 # ------------------------------------------------------------------------ #
 # Copyright (c) 2010-2015 Rodrigue Chakode (rodrigue.chakode@ngrt4n.com)   #
-# Creation: 26-07-2015                                                     #
+# Creation: 17-07-2015                                                     #
 #                                                                          #
 # This file is part of RealOpInsight (http://RealOpInsight.com) authored   #
 # by Rodrigue Chakode <rodrigue.chakode@gmail.com>                         #
@@ -22,39 +22,40 @@
 #--------------------------------------------------------------------------#
  */
 
-#ifndef WEBBISLACHART_HPP
-#define WEBBISLACHART_HPP
+#ifndef WEBBIDASHLET_HPP
+#define WEBBIDASHLET_HPP
 
-#include "dbo/src/DbObjects.hpp"
+#include "WebPlatformStatusAnalyticsData.hpp"
+#include "WebPlatformStatusRaw.hpp"
+#include "WebPieChart.hpp"
+#include "WebPlatformStatusDateFilter.hpp"
+#include "WebCsvReportResource.hpp"
+#include <Wt/WContainerWidget.h>
+#include <Wt/WVBoxLayout.h>
+#include <Wt/WDatePicker.h>
 
-class WebQoSAnalytics
+
+
+class WebPlatformStatusAnalyticsCharts : public QObject, public Wt::WContainerWidget
 {
-public:
-  WebQoSAnalytics(const PlatformStatusList& data);
+  Q_OBJECT
 
-  double normalDuration(void) const {return m_normalDuration;}
-  double minorDuration(void) const {return m_minorDuration;}
-  double majorDuration(void) const {return m_majorDuration;}
-  double criticalDuration(void) const {return m_criticalDuration;}
-  double unknownDuration(void) const {return m_unknownDuration;}
-  double totalDuration(void) const {return m_totalDuration;}
+public:
+  WebPlatformStatusAnalyticsCharts(const DbViewsT& listOfViews, const SourceListT& listOfSources);
+  ~WebPlatformStatusAnalyticsCharts();
+  void updateByView (const std::string& vame, const PlatformMappedStatusHistoryT& statusHistory);
+  long startTime(void) {return m_dateFilterRef->epochStartTime();}
+  long endTime(void) {return m_dateFilterRef->epochEndTime();}
+  Wt::Signal<long, long>& reportPeriodChanged() { return m_reportPeriodChanged; }
 
 
 private:
-  struct TimeStatusT {
-    long timestamp;
-    int status;
-  };
-  typedef QList<TimeStatusT> TimeStatusesT;
-  TimeStatusesT m_plottingData;
-  long m_normalDuration;
-  long m_minorDuration;
-  long m_majorDuration;
-  long m_criticalDuration;
-  long m_unknownDuration;
-  long m_totalDuration;
-
-  void processData(const PlatformStatusList& data);
+  Wt::Signal<long, long> m_reportPeriodChanged;
+  Wt::WVBoxLayout* m_layoutRef;
+  WebPlatformStatusDateFilter* m_dateFilterRef;
+  QMap<std::string, WebPieChart*> m_slaReportsRef;
+  QMap<std::string, WebPlatformStatusRaw*> m_problemReportRef;
+  QMap<std::string, WebCsvExportIcon*> m_csvLinksRef;
 };
 
-#endif // WEBBISLACHART_HPP
+#endif // WEBBIDASHLET_HPP

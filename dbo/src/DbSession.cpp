@@ -337,7 +337,7 @@ DbViewsT DbSession::listViews(void)
   return vlist;
 }
 
-DbViewsT DbSession::listViewListByAssignedUser(const std::string &uname)
+DbViewsT DbSession::listAssignedViewsByUser(const std::string &uname)
 {
   DbViewsT vlist;
   dbo::Transaction transaction(*this);
@@ -662,7 +662,7 @@ int DbSession::addPlatformStatus(const PlatformStatusT &platformStatus)
 }
 
 std::pair<int, QString>
-DbSession::addPlatformStatusList(const PlatformStatusList &platformStatusList)
+DbSession::addPlatformStatusList(const ListofPlatformStatusT &platformStatusList)
 {
   std::pair<int, QString> out{ngrt4n::RcDbError, ""};
 
@@ -688,7 +688,7 @@ DbSession::addPlatformStatusList(const PlatformStatusList &platformStatusList)
   return out;
 }
 
-int DbSession::listPlatformStatus(PlatformStatusListMapT &platformStatusMap, const std::string &view, long fromDate, long toDate)
+int DbSession::listStatusHistory(PlatformMappedStatusHistoryT& statusHistory, const std::string& view, long startDate, long endDate)
 {
   int count = 0;
   dbo::Transaction transaction(*this);
@@ -699,21 +699,21 @@ int DbSession::listPlatformStatus(PlatformStatusListMapT &platformStatusMap, con
       dbEntries = find<DboPlatformStatus>()
           .where("timestamp >= ? AND timestamp <= ?")
           .orderBy("timestamp")
-          .bind(fromDate)
-          .bind(toDate);
+          .bind(startDate)
+          .bind(endDate);
     } else {
       dbEntries = find<DboPlatformStatus>()
           .where("view_name = ? AND timestamp >= ? AND timestamp <= ?")
           .orderBy("timestamp")
           .bind(view)
-          .bind(fromDate)
-          .bind(toDate);
+          .bind(startDate)
+          .bind(endDate);
     }
 
-    platformStatusMap.clear();
+    statusHistory.clear();
     for (auto &entry : dbEntries) {
       auto viewDashboardAliasName = entry->data().view_name;
-      platformStatusMap[viewDashboardAliasName].push_back(entry->data());
+      statusHistory[viewDashboardAliasName].push_back(entry->data());
       ++count;
     }
   }

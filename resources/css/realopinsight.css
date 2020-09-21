@@ -4,7 +4,7 @@ body, html {
   color: rgba(0, 0, 0, 0.7);
   font-size: 1rem;
   margin: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 
@@ -130,7 +130,7 @@ body, html {
 #ngrt4n-content-pane .ngrt4n-content, 
 #ngrt4n-side-pane .ngrt4n-content {
   border-radius: 5px;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .admin-page #ngrt4n-content-pane {
@@ -378,7 +378,7 @@ legend {
 .dashboard-msg-console, .dashboard-piechart {
   min-height: 25vh;
   max-height: 35vh;
-  overflow-x: hidden;
+  overflow-x: auto;
   resize: none;
 }
 
@@ -391,27 +391,21 @@ legend {
 }
 
 h2 {
-  font-size:28px;
-  lineheight:60px;
-  font-weight: 300;
+  font-size:24px;
+  line-height:60px;
+  -  font-weight: 300;
 }
 
 h3 {
-  font-size: 24px;
-  lineheight: 32px;
+  font-size: 18px;
+  line-height: 32px;
   font-weight: 250;
 }
 
 h4 {
-    font-size:20px;
-    lineheight:40px;
+    font-size:14px;
+    line-height:40px;
     font-weight: 250;
-}
-
-h5 {
-  font-size:16px;
-  lineheight:36px;
-  font-weight: 250;
 }
 
 h1,

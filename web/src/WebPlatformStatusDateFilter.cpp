@@ -26,6 +26,7 @@
 
 #include "WebPlatformStatusDateFilter.hpp"
 #include "WebUtils.hpp"
+#include <Wt/WTemplate.h>
 
 
 #define LAST_30_DAYS time(NULL) - 30 * 24 * 3600
@@ -34,43 +35,44 @@ WebPlatformStatusDateFilter::WebPlatformStatusDateFilter(void)
   : m_startDatePickerRef(nullptr),
     m_endDatePickerRef(nullptr)
 {
-  auto layout = std::make_unique<Wt::WHBoxLayout>();
 
-  layout->addWidget(std::make_unique<Wt::WLabel>("Start date"), 1);
   auto startDatePicker= std::make_unique<Wt::WDatePicker>();
   m_startDatePickerRef = startDatePicker.get();
-  setupDatePicker(m_startDatePickerRef, LAST_30_DAYS);
-  layout->addWidget(std::move(startDatePicker), 1);
+  m_startDatePickerRef->setFormat("dd-MM-yyyy");
+  Wt::WDateTime defaultStartDate;
+  defaultStartDate.setTime_t(LAST_30_DAYS);
+  m_startDatePickerRef->setDate(defaultStartDate.date());
 
-  layout->addWidget(std::make_unique<Wt::WLabel>(Q_TR("End date")), 1);
+
   auto endDatePicker= std::make_unique<Wt::WDatePicker>();
   m_endDatePickerRef = endDatePicker.get();
-  setupDatePicker(m_endDatePickerRef, time(NULL));
-  layout->addWidget(std::move(endDatePicker), 1);
+  Wt::WDateTime defaultEndDate;
+  defaultEndDate.setTime_t(time(NULL)); // epoch
+  m_endDatePickerRef->setDate(defaultEndDate.date());
 
-  auto applyBtn = std::make_unique<Wt::WAnchor>(Q_TR("Apply"));
-  applyBtn->setLink(Wt::WLink("#"));
+  auto applyBtn = std::make_unique<Wt::WAnchor>(Wt::WLink("#"), Q_TR("Apply"));
   applyBtn->clicked().connect(this, std::bind([=]{m_reportPeriodChanged.emit(this->epochStartTime(), this->epochEndTime());}));
-  layout->addWidget(std::move(applyBtn), 1);
 
-  setLayout(std::move(layout));
+  auto widget = std::make_unique<Wt::WTemplate>(
+        "<div class=\"row\">"
+        "  <div class=\"col-sm-1\">${start-date-label}</div>"
+        "  <div class=\"col-sm-1\">${start-date-field}</div>"
+        "  <div class=\"col-sm-1\">${end-date-label}</div>"
+        "  <div class=\"col-sm-1\">${end-date-field}</div>"
+        "  <div class=\"col-sm-1\">${apply-btn}</div>"
+        "</div>");
+  widget->bindString("start-date-label", Q_TR("Start date"));
+  widget->bindWidget("start-date-field", std::move(startDatePicker));
+  widget->bindWidget("end-date-field", std::move(endDatePicker));
+  widget->bindString("end-date-label", Q_TR("End date"));
+  widget->bindWidget("apply-btn", std::move(applyBtn));
+
+  addWidget(std::move(widget));
 }
 
 
 WebPlatformStatusDateFilter::~WebPlatformStatusDateFilter()
 {
-}
-
-
-void WebPlatformStatusDateFilter::setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime)
-{
-  if (datePicker) {
-    Wt::WDateTime dt;
-    dt.setTime_t(defaultEpochTime);
-    datePicker->setFormat("dd-MM-yyyy");
-    datePicker->setDate(dt.date());
-    datePicker->setStyleClass("inline");
-  }
 }
 
 

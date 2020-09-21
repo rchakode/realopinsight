@@ -143,16 +143,6 @@
               ${thumbnails}
             </div>
           </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <h2>&nbsp;${bi-report-title}</h2>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              ${bi-report-dashlet}
-            </div>
-          </div>
        </div>
     </div>
     <!-- Event Feeds Pane -->
@@ -164,6 +154,19 @@
         </div>
       </div>
     </div>
+</message>
+
+<message id="platform-status-analytics.tpl">
+<div class="row">
+  <div class="col-sm-12">
+    <h2>&nbsp;Platform Availability Analytics</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    ${platform-analytics-board-charts}
+  </div>
+</div>
 </message>
 
 <message id="dashboard-thumbnail.tpl">

@@ -323,7 +323,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
     constexpr long intervalDurationSec = 10 * 60;
     long toDate = std::time(nullptr);
     long fromDate = toDate - intervalDurationSec;
-    PlatformStatusListMapT pfStatusMap;
+    PlatformMappedStatusHistoryT pfStatusMap;
 
     node->check.host = "-";
     node->check.host_groups = "-";
@@ -331,7 +331,7 @@ ngrt4n::AggregatedSeverityT DashboardBase::computeBpNodeStatus(const QString& _n
     node->check.last_state_change = std::to_string(toDate);
 
     auto listOfExternalViews = node->child_nodes.toStdString();
-    int rc = p_dbSession->listPlatformStatus(pfStatusMap, listOfExternalViews, fromDate, toDate);
+    int rc = p_dbSession->listStatusHistory(pfStatusMap, listOfExternalViews, fromDate, toDate);
     if (rc > 0) {
       node->sev = pfStatusMap[listOfExternalViews].back().status;
       node->actual_msg = QObject::tr("external service - %1").arg(node->child_nodes);

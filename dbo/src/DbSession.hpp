@@ -121,12 +121,12 @@ public:
   int listAssignedUsersEmails(QStringList& emails, const std::string& vname);
 
   int addPlatformStatus(const PlatformStatusT& platformStatus);
-  std::pair<int, QString>  addPlatformStatusList(const PlatformStatusList& platformStatusList);
-  int listPlatformStatus(PlatformStatusListMapT& platformStatusMap, const std::string& view, long fromDate = 0, long toDate = LONG_MAX);
+  std::pair<int, QString>  addPlatformStatusList(const ListofPlatformStatusT& platformStatusList);
+  int listStatusHistory(PlatformMappedStatusHistoryT& statusHistory, const std::string& view, long startDate = 0, long endDate = LONG_MAX);
   int getLastPlatformStatus(PlatformStatusT& platformStatus, const std::string& view);
 
   DbViewsT listViews(void);
-  DbViewsT listViewListByAssignedUser(const std::string& uname);
+  DbViewsT listAssignedViewsByUser(const std::string& uname);
   UserViewsT updateUserViewList(void);
   bool findView(const std::string& vname, DboView& view);
 

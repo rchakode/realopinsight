@@ -58,8 +58,12 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_currentAppBoard(nullptr),
     m_notificationManager(nullptr),
     m_eventFeedLayoutRef(nullptr),
-    m_qosPanelRef(nullptr)
+    m_executiveViewPageRef(nullptr),
+    m_platformStatusAnalyticsChartsRef(nullptr),
+    m_platformStatusAnalyticsPageRef(nullptr)
 {
+  m_menuLabels[MenuExecutiveView] = Q_TR("Executive View");
+  m_menuLabels[MenuPlatformStatusAnalytics] = Q_TR("Platform Availability Analytics");
   m_mainWidgetRef = addNew<Wt::WContainerWidget>();
   m_mainWidgetRef->setId("maincontainer");
 
@@ -141,7 +145,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_settingsPageRef->bindEmpty("menu-new-user");
     m_settingsPageRef->bindEmpty("menu-all-users");
     m_settingsPageRef->bindEmpty("menu-notification-settings");
-    m_opsPageRef = buildOpsPage();
+    m_executiveViewPageRef = buildExecutiveViewPage();
   } else {
     auto infoBox = std::make_unique<Wt::WText>();
     m_infoBoxRef = infoBox.get();
@@ -273,7 +277,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
 
   if (! m_dbSession->isLoggedAdmin()) {
     disableAdminFeatures();
-    switchFeaturePanel(m_opsPageRef);
+    switchFeaturePanel(m_executiveViewPageRef);
     m_boardSelectorRef->setCurrentIndex(0);
     m_showOnlyProblemsSelectorRef->setHidden(true);
   }
@@ -286,28 +290,26 @@ WebMainUI::~WebMainUI()
 }
 
 
-Wt::WTemplate* WebMainUI::buildOpsPage(void)
+Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
 {
-  auto opsPageRef = m_opsStackRef->addNew<Wt::WTemplate>(Wt::WString::tr("ops-home.tpl"));
+  auto executiveViewPageRef = m_opsStackRef->addNew<Wt::WTemplate>(Wt::WString::tr("ops-home.tpl"));
 
   auto thumbsLayout = std::make_unique<Wt::WGridLayout>();
   auto eventFeedLayout = std::make_unique<Wt::WVBoxLayout>();
   m_eventFeedLayoutRef = eventFeedLayout.get();
   auto eventFeedItem = std::make_unique<Wt::WContainerWidget>();
   eventFeedItem->setLayout(std::move(eventFeedLayout));
-  opsPageRef->bindWidget("event-feeds", std::move(eventFeedItem));
+  executiveViewPageRef->bindWidget("event-feeds", std::move(eventFeedItem));
 
   auto infoBox = std::make_unique<Wt::WText>();
   m_infoBoxRef = infoBox.get();
-  opsPageRef->bindWidget("info-box", std::move(infoBox));
+  executiveViewPageRef->bindWidget("info-box", std::move(infoBox));
 
-  auto listOfUserViews = m_dbSession->listViewListByAssignedUser(m_dbSession->loggedUser().username);
+  auto listOfUserViews = m_dbSession->listAssignedViewsByUser(m_dbSession->loggedUser().username);
   if (listOfUserViews.empty()) {
-    opsPageRef->bindEmpty("bi-report-title");
-    opsPageRef->bindEmpty("bi-report-dashlet");
-    opsPageRef->bindEmpty("thumbnails");
+    executiveViewPageRef->bindEmpty("thumbnails");
     showMessage(ngrt4n::OperationFailed, Q_TR("No views to visualize"));
-    return opsPageRef;
+    return executiveViewPageRef;
   }
 
   // Generate view cards
@@ -321,8 +323,6 @@ Wt::WTemplate* WebMainUI::buildOpsPage(void)
       failuresCount.append(failuresCount.empty()? "": ", ").append(sv.name);
       continue;
     }
-
-
     auto board = loadResult.first;
     //TODO want to replace Qt signal handling by the Wt's one
     QObject::connect(board, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
@@ -333,23 +333,13 @@ Wt::WTemplate* WebMainUI::buildOpsPage(void)
     ++cardCount;
   }
 
-  if (m_dbSession->isCompleteUserDashboard()) {
-    opsPageRef->bindString("bi-report-title", Q_TR("Reports"));
-    auto qosPanel = std::make_unique<WebPlatformStatusPanel>(listOfUserViews);
-    m_qosPanelRef = qosPanel.get();
-    m_qosPanelRef->reportPeriodChanged().connect(this, &WebMainUI::handleReportPeriodChanged);
-    opsPageRef->bindWidget("bi-report-dashlet", std::move(qosPanel));
+  if (m_dbSession->displayOnlyTiles()) {
+    doJavaScript("$('#ngrt4n-side-pane').hide();");
+    doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-12');");
   } else {
-    opsPageRef->bindEmpty("bi-report-title");
-    opsPageRef->bindEmpty("bi-report-dashlet");
-    if (m_dbSession->displayOnlyTiles()) {
-      doJavaScript("$('#ngrt4n-side-pane').hide();");
-      doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-12');");
-    } else {
-      doJavaScript("$('#ngrt4n-side-pane').show();");
-      doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-8');");
-      doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
-    }
+    doJavaScript("$('#ngrt4n-side-pane').show();");
+    doJavaScript("$('#ngrt4n-content-pane').removeClass().addClass('col-sm-8');");
+    doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
   }
 
   if (cardCount > 0) {
@@ -359,11 +349,35 @@ Wt::WTemplate* WebMainUI::buildOpsPage(void)
   if (cardCount != static_cast<int>(listOfUserViews.size())) {
     showMessage(ngrt4n::OperationFailed, QObject::tr("Failed to load views => %1. Check details in logs").arg(failuresCount.c_str()).toStdString());
   }
-  auto thumbCard = std::make_unique<Wt::WContainerWidget>();
-  thumbCard->setLayout(std::move(thumbsLayout));
-  opsPageRef->bindWidget("thumbnails", std::move(thumbCard));
+  auto thumbnails = std::make_unique<Wt::WContainerWidget>();
+  thumbnails->setLayout(std::move(thumbsLayout));
+  executiveViewPageRef->bindWidget("thumbnails", std::move(thumbnails));
 
-  return opsPageRef;
+  return executiveViewPageRef;
+}
+
+Wt::WTemplate* WebMainUI::buildSlaAnalyticsPage(void)
+{
+  auto platformStatusAnalyticsPageRef = m_opsStackRef->addNew<Wt::WTemplate>(Wt::WString::tr("platform-status-analytics.tpl"));
+  auto assignedViews = m_dbSession->listAssignedViewsByUser(m_dbSession->loggedUser().username);
+  if (assignedViews.empty()) {
+    platformStatusAnalyticsPageRef->bindEmpty("platform-analytics-board-charts");
+    showMessage(ngrt4n::OperationFailed, Q_TR("No views to visualize"));
+    return platformStatusAnalyticsPageRef;
+  }
+
+  auto statusAnalyticsBoard = std::make_unique<WebPlatformStatusAnalyticsCharts>(assignedViews, m_dbSession->listSources(MonitorT::Any));
+  m_platformStatusAnalyticsChartsRef = statusAnalyticsBoard.get();
+  m_platformStatusAnalyticsChartsRef->reportPeriodChanged().connect(this, &WebMainUI::handleReportPeriodChanged);
+  platformStatusAnalyticsPageRef->bindWidget("platform-analytics-board-charts", std::move(statusAnalyticsBoard));
+
+  for (const auto& view: assignedViews) {
+    PlatformMappedStatusHistoryT statusHistory;
+    m_dbSession->listStatusHistory(statusHistory, view.name, m_platformStatusAnalyticsChartsRef->startTime(), m_platformStatusAnalyticsChartsRef->endTime());
+    m_platformStatusAnalyticsChartsRef->updateByView(view.name, statusHistory);
+  }
+
+  return platformStatusAnalyticsPageRef;
 }
 
 
@@ -373,7 +387,12 @@ std::unique_ptr<Wt::WWidget> WebMainUI::createDisplayOptionsToolbar(void)
   auto boardSelector = std::make_unique<Wt::WComboBox>();
   m_boardSelectorRef = boardSelector.get();
   m_boardSelectorRef->changed().connect(this, &WebMainUI::handleBoardSelectionChanged);
-  (! m_dbSession->isLoggedAdmin()) ? m_boardSelectorRef->addItem(Q_TR("Executive View")) : m_boardSelectorRef->addItem(Q_TR("Admin Home"));
+  if (! m_dbSession->isLoggedAdmin()) {
+    m_boardSelectorRef->addItem(m_menuLabels[MenuExecutiveView]) ;
+    m_boardSelectorRef->addItem(m_menuLabels[MenuPlatformStatusAnalytics]) ;
+  } else {
+    m_boardSelectorRef->addItem(Q_TR("Admin Home"));
+  }
   panel->bindWidget("display-view-selection-box", std::move(boardSelector));
 
   auto showOnlyProblemsSelector = std::make_unique<Wt::WCheckBox>(Q_TR("Show only problems"));
@@ -493,10 +512,10 @@ void WebMainUI::handleRefresh(void)
     if (thumb != m_thumbs.end()) {
       (*thumb)->setStyleClass(ditem->thumbCss());
       (*thumb)->setToolTip(ditem->tooltip());
-      if (! m_dbSession->isLoggedAdmin() && m_qosPanelRef) {
-        PlatformStatusListMapT qosData;
-        m_dbSession->listPlatformStatus(qosData, vname,  m_qosPanelRef->startTime(), m_qosPanelRef->endTime());
-        m_qosPanelRef->updateByView(vname, qosData);
+      if (! m_dbSession->isLoggedAdmin() && m_platformStatusAnalyticsChartsRef) {
+        PlatformMappedStatusHistoryT platformStatusData;
+        m_dbSession->listStatusHistory(platformStatusData, vname, m_platformStatusAnalyticsChartsRef->startTime(), m_platformStatusAnalyticsChartsRef->endTime());
+        m_platformStatusAnalyticsChartsRef->updateByView(vname, platformStatusData);
       }
     }
     ++currentView;
@@ -598,10 +617,10 @@ void WebMainUI::handleChangePassword(const std::string& login, const std::string
 
 void WebMainUI::handleReportPeriodChanged(long start, long end)
 {
-  PlatformStatusListMapT qosData;
-  m_dbSession->listPlatformStatus(qosData, "ALL", start, end);
+  PlatformMappedStatusHistoryT qosData;
+  m_dbSession->listStatusHistory(qosData, "ALL", start, end);
   for (const auto& vname : qosData.keys()) {
-    m_qosPanelRef->updateByView(vname, qosData);
+    m_platformStatusAnalyticsChartsRef->updateByView(vname, qosData);
   }
   showMessage(ngrt4n::OperationSucceeded, Q_TR("Reports updated: ")
               .append(ngrt4n::wHumanTimeText(start).toUTF8())
@@ -620,18 +639,25 @@ void WebMainUI::handleDataSourceSettings(void)
 
 void WebMainUI::handleBoardSelectionChanged(void)
 {
-  std::string entry = m_boardSelectorRef->currentText().toUTF8();
-  auto appBoard = m_appBoards.find(entry.c_str());
+  std::string viewSelected = m_boardSelectorRef->currentText().toUTF8();
+  auto appBoard = m_appBoards.find(viewSelected.c_str());
   if (appBoard != m_appBoards.end()) {
     showAppBoard(*appBoard);
     m_showOnlyProblemsSelectorRef->setHidden(false);
   } else {
     m_currentAppBoard = nullptr;
     m_showOnlyProblemsSelectorRef->setHidden(true);
-    if (! m_dbSession->isLoggedAdmin()) {
-      switchFeaturePanel(m_opsPageRef);
-    } else {
+    if (m_dbSession->isLoggedAdmin()) {
       switchFeaturePanel(m_settingsPageRef);
+    } else {
+      if (viewSelected == m_menuLabels[MenuPlatformStatusAnalytics]) {
+        if (! m_platformStatusAnalyticsPageRef) {
+          m_platformStatusAnalyticsPageRef = buildSlaAnalyticsPage();
+        }
+        switchFeaturePanel(m_platformStatusAnalyticsPageRef);
+      } else {
+        switchFeaturePanel(m_executiveViewPageRef);
+      }
     }
   }
 }
@@ -698,9 +724,9 @@ std::pair<WebDashboard*, QString> WebMainUI::loadView(const std::string& path)
     if (m_eventFeedLayoutRef) {
       m_eventFeedLayoutRef->addItem(myboard->eventItemsContainerLayout());
     }
-    std::unique_ptr<WebDashboard> myboardHolder;
-    myboardHolder.reset(myboard);
-    m_opsStackRef->addWidget(std::move(myboardHolder));
+    std::unique_ptr<WebDashboard> myBoardUptr;
+    myBoardUptr.reset(myboard);
+    m_opsStackRef->addWidget(std::move(myBoardUptr));
   } catch (const std::bad_alloc& ex) {
     CORE_LOG("error", tr("dashboard initialization failed with bad_alloc: %1").arg(ex.what()).toStdString());
     showMessage(ngrt4n::OperationFailed, Q_TR("memory overflow"));

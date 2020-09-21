@@ -454,11 +454,11 @@ HEADERS += \
     web/src/WebApplication.hpp \
     web/src/WebInputField.hpp \
     web/src/WebInputList.hpp \
-    web/src/WebPlatformStatusAnalytics.hpp \
     web/src/WebPlatformStatusDateFilter.hpp \
-    web/src/WebPlatformStatusPanel.hpp \
     web/src/WebPlatformStatusRaw.hpp \
-    web/src/PlatformStatusCollector.hpp
+    web/src/PlatformStatusCollector.hpp \
+    web/src/WebPlatformStatusAnalyticsData.hpp \
+    web/src/WebPlatformStatusAnalyticsCharts.hpp
 
 SOURCES +=  core/src/Base.cpp \
     core/src/Parser.cpp \
@@ -508,11 +508,11 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebApplication.cpp \
     web/src/WebInputField.cpp \
     web/src/WebInputList.cpp \
-    web/src/WebPlatformStatusAnalytics.cpp \
     web/src/WebPlatformStatusDateFilter.cpp \
-    web/src/WebPlatformStatusPanel.cpp \
     web/src/WebRaw.cpp \
-    web/src/PlatformStatusCollector.cpp
+    web/src/PlatformStatusCollector.cpp \
+    web/src/WebPlatformStatusAnalyticsData.cpp \
+    web/src/WebPlatformStatusAnalyticsCharts.cpp
 
 
 LIBS += -L"$(WT_ROOT)/lib" \

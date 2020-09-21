@@ -34,7 +34,7 @@ public:
   WebPlatformStatusRaw(const std::string& vame);
   void setViewName(const std::string& vname) {m_viewName = vname;}
   std::string viewName() const {return m_viewName;}
-  void updateData(const PlatformStatusList& data);
+  void updateData(const ListofPlatformStatusT& data);
 
 private:
   std::string m_viewName;

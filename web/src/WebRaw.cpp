@@ -46,7 +46,7 @@ void WebPlatformStatusRaw::setChartTitle(void)
   setTitle(Q_TR("Trend of IT problems (%)"));
 }
 
-void WebPlatformStatusRaw::updateData(const PlatformStatusList& data)
+void WebPlatformStatusRaw::updateData(const ListofPlatformStatusT& data)
 {
   auto model = std::make_unique<Wt::WStandardItemModel>(static_cast<int>(data.size()), 9);
   model->setHeaderData(0, Q_TR("Date/time"));

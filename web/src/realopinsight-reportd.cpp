@@ -64,7 +64,7 @@ void runCollector(int period)
     DbSession dbSession;
     WebBaseSettings settings;
     Notificator notificator;
-    PlatformStatusList platformStatusList;
+    ListofPlatformStatusT platformStatusList;
     NodeListT rootNodes;
     DbViewsT vlist;
 

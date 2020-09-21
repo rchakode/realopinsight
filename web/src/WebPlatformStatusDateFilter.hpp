@@ -54,7 +54,6 @@ private:
   Wt::Signal<long, long> m_reportPeriodChanged;
   Wt::WDatePicker* m_startDatePickerRef;
   Wt::WDatePicker* m_endDatePickerRef;
-  void setupDatePicker(Wt::WDatePicker* datePicker, long defaultEpochTime);
 };
 
 

@@ -8,26 +8,25 @@
 WebCsvExportResource::WebCsvExportResource(void)
   : Wt::WResource()
 {
-  m_qosData.clear();
+  m_platformStatusData.clear();
 }
 
 void WebCsvExportResource::setExportFileName(void)
 {
-  if (! m_viewName.empty()) {
-    std::string escapedBaseName = QString(m_viewName.c_str()).replace(" ", "_").toStdString();
-    suggestFileName(Wt::WString("RealOpInsight_REPORT_{1}.csv")
-                    .arg(escapedBaseName));
+  if (! m_vname.empty()) {
+    std::string escapedBaseName = QString(m_vname.c_str()).replace(" ", "_").toStdString();
+    suggestFileName(Wt::WString("RealOpInsight_REPORT_{1}.csv").arg(escapedBaseName));
   } else {
     suggestFileName("RealOpInsight_REPORT_UNSET_VIEW.csv");
   }
 }
 
 
-void WebCsvExportResource::updateData(const std::string& viewName, const PlatformStatusList& qosData)
+void WebCsvExportResource::updateData(const std::string& vname, const ListofPlatformStatusT& qosData)
 {
-  m_qosData.clear();
-  std::copy(qosData.begin(), qosData.end(), std::back_inserter(m_qosData));
-  m_viewName = viewName;
+  m_platformStatusData.clear();
+  std::copy(qosData.begin(), qosData.end(), std::back_inserter(m_platformStatusData));
+  m_vname = vname;
 }
 
 
@@ -35,8 +34,10 @@ void WebCsvExportResource::handleRequest(const Wt::Http::Request&, Wt::Http::Res
 {
   setExportFileName();
   response.setMimeType("text/csv");
-  response.out() << "Timestamp,View Name,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
-  for (const auto& entry: m_qosData) response.out() << entry.toString() << std::endl;
+  response.out() << "Timestamp,Platform Name,Status,Normal (%),Minor (%),Major (%),Critical (%),Unknown (%)\n";
+  for (const auto& entry: m_platformStatusData) {
+    response.out() << entry.toString() << std::endl;
+  }
 }
 
 
@@ -52,7 +53,7 @@ WebCsvExportIcon::WebCsvExportIcon(void)
 }
 
 
-void WebCsvExportIcon::updateData(const std::string& viewName, const PlatformStatusList& qosData)
+void WebCsvExportIcon::updateData(const std::string& vname, const ListofPlatformStatusT& statusData)
 {
-  m_csvResource->updateData(viewName, qosData);
+  m_csvResource->updateData(vname, statusData);
 }
