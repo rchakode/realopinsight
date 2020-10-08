@@ -38,7 +38,6 @@ WebPieChart::WebPieChart(int dataType)
   setupChartPalette();
   setupPieChartModel();
   setupChartStyle();
-  setTitleFont(ngrt4n::chartTitleFont());
 }
 
 WebPieChart::WebPieChart(void)
@@ -92,7 +91,7 @@ void WebPieChart::repaint()
   }
 
   if (m_dataType == SLAData) {
-    setTitle(QObject::tr("SLA: %1%")
+    setTitle(QObject::tr("Availability: %1%")
              .arg(QString::number(m_severityRatio[ngrt4n::Normal]))
              .toStdString()
              );

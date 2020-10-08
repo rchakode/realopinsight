@@ -379,9 +379,3 @@ void ngrt4n::releaseSemaphore(sem_t* my_sem)
 }
 
 
-Wt::WFont ngrt4n::chartTitleFont(void)
-{
-  Wt::WFont tf;
-  return tf;
-}
-

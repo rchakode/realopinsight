@@ -38,7 +38,6 @@ public:
 
 private:
   std::string m_viewName;
-  void setChartTitle(void);
 };
 
 #endif // WEBBIRAWCHART_HPP

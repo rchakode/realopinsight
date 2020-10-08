@@ -27,7 +27,7 @@ CONFIG += no_keywords
 TEMPLATE = app
 RESOURCES += realopinsight.qrc
 
-PACKAGE_VERSION=2020.01.0-beta1
+PACKAGE_VERSION=20.10.1-beta1
 
 DEFINES *= "REALOPINSIGHT_RELEASE_NAME='\"Concret\"'"
 DEFINES *= "REALOPINSIGHT_RELEASE_YEAR='\"2020\"'"
@@ -509,10 +509,10 @@ SOURCES +=  core/src/Base.cpp \
     web/src/WebInputField.cpp \
     web/src/WebInputList.cpp \
     web/src/WebPlatformStatusDateFilter.cpp \
-    web/src/WebRaw.cpp \
     web/src/PlatformStatusCollector.cpp \
     web/src/WebPlatformStatusAnalyticsData.cpp \
-    web/src/WebPlatformStatusAnalyticsCharts.cpp
+    web/src/WebPlatformStatusAnalyticsCharts.cpp \
+    web/src/WebPlatformStatusRaw.cpp
 
 
 LIBS += -L"$(WT_ROOT)/lib" \

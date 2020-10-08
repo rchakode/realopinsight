@@ -31,24 +31,22 @@ WebPlatformStatusRaw::WebPlatformStatusRaw(const std::string& vame)
   : Wt::Chart::WCartesianChart(),
     m_viewName(vame)
 {
-  auto model = std::make_unique<Wt::WStandardItemModel>();
-  setModel(std::move(model));
-  setStyleClass("bi-chart");
   setLegendEnabled(false);
   setType(Wt::Chart::ChartType::Scatter);
   axis(Wt::Chart::Axis::X).setScale(Wt::Chart::AxisScale::DateTime);
-  setTitleFont(ngrt4n::chartTitleFont());
+  axis(Wt::Chart::Axis::Y).setTitle(Q_TR("Probe status (%)"));
+  axis(Wt::Chart::Axis::Y).setLabelAngle(90);
+  setPlotAreaPadding(50, Wt::Side::Left);
+  axis(Wt::Chart::Axis::Y).setTitleOrientation(Wt::Orientation::Vertical);
+  setToolTip("<p><em>Ctrl+Wheel</em> to zoom</p>"
+             "<p><em>Click+Hold+Move</em> to navigate</p>",
+             Wt::TextFormat::XHTML);
 }
 
-
-void WebPlatformStatusRaw::setChartTitle(void)
-{
-  setTitle(Q_TR("Trend of IT problems (%)"));
-}
 
 void WebPlatformStatusRaw::updateData(const ListofPlatformStatusT& data)
 {
-  auto model = std::make_unique<Wt::WStandardItemModel>(static_cast<int>(data.size()), 9);
+  auto model = std::make_shared<Wt::WStandardItemModel>(3, 9);
   model->setHeaderData(0, Q_TR("Date/time"));
   model->setHeaderData(1, Q_TR("Status"));
   model->setHeaderData(2, Q_TR("% Normal"));
@@ -87,8 +85,7 @@ void WebPlatformStatusRaw::updateData(const ListofPlatformStatusT& data)
     model->setData(row, 8, 100.0);
     ++row;
   }
-
-  setModel(std::move(model));
+  setModel(model);
 
   setXSeriesColumn(0);
 
@@ -113,5 +110,7 @@ void WebPlatformStatusRaw::updateData(const ListofPlatformStatusT& data)
     serie->setFillRange(Wt::Chart::FillRangeType::MinimumValue);
     addSeries(std::move(serie));
   }
-  setChartTitle();
+  resize(900, 300);
+  setPanEnabled(true);
+  setZoomEnabled(true);
 }

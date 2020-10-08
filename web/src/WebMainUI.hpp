@@ -159,7 +159,8 @@ private:
 
   WebMsgDialog* m_notificationManager;
   Wt::WVBoxLayout* m_eventFeedLayoutRef;
-  QMap<std::string, Wt::WTemplate*>  m_thumbs;
+  QMap<std::string, Wt::WTemplate*>  m_thumbnails;
+  QMap<std::string, Wt::WLabel*>  m_thumbnailComments;
   Wt::WTemplate* m_executiveViewPageRef;
   WebPlatformStatusAnalyticsCharts* m_platformStatusAnalyticsChartsRef;
   Wt::WTemplate* m_platformStatusAnalyticsPageRef;

@@ -53,7 +53,7 @@ public:
   }
 
   std::string problemsMsg(void) {
-    auto&& nbProblems = problemCount();
+    auto nbProblems = problemCount();
     return QObject::tr("%1 probe%2 - %3 problem%4")
         .arg(QString::number(m_dataCount))
         .arg(m_dataCount > 1? "s": "")

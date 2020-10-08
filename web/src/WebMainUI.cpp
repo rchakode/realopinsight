@@ -294,7 +294,7 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
 {
   auto executiveViewPageRef = m_opsStackRef->addNew<Wt::WTemplate>(Wt::WString::tr("ops-home.tpl"));
 
-  auto thumbsLayout = std::make_unique<Wt::WGridLayout>();
+  auto thumbnailsLayout = std::make_unique<Wt::WGridLayout>();
   auto eventFeedLayout = std::make_unique<Wt::WVBoxLayout>();
   m_eventFeedLayoutRef = eventFeedLayout.get();
   auto eventFeedItem = std::make_unique<Wt::WContainerWidget>();
@@ -313,7 +313,7 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
   }
 
   // Generate view cards
-  int cardCount = 0;
+  int currentThumbailIndex = 0;
   int cardPerRow = m_dbSession->boardCardsPerRow();
   std::string failuresCount = "";
   for (const auto& sv : listOfUserViews) {
@@ -326,11 +326,18 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
     auto board = loadResult.first;
     //TODO want to replace Qt signal handling by the Wt's one
     QObject::connect(board, SIGNAL(dashboardSelected(std::string)), this, SLOT(handleDashboardSelected(std::string)));
-    auto thumb = createThumb(board->thumbTitle(), board->thumbMsg(), board->thumbURL(), board->thumbLink());
-    thumb->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, board->thumbTitle()));
-    m_thumbs.insert(board->thumbTitle(), thumb.get());
-    thumbsLayout->addWidget(std::move(thumb), cardCount / cardPerRow, cardCount % cardPerRow);
-    ++cardCount;
+
+    auto thumbnail = std::make_unique<Wt::WTemplate>(Wt::WString::tr("dashboard-thumbnail.tpl"));
+    auto thumbnailTitle = board->thumbTitle();
+    thumbnail->setStyleClass("btn btn-unknown");
+    thumbnail->bindWidget("thumb-titlebar", std::make_unique<Wt::WLabel>(thumbnailTitle));
+    thumbnail->bindWidget("thumb-image", std::make_unique<Wt::WImage>(Wt::WLink(board->thumbURL())));
+
+    thumbnail->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, thumbnailTitle));
+    m_thumbnailComments[thumbnailTitle] = thumbnail->bindNew<Wt::WLabel>("thumb-problem-details", "");
+    m_thumbnails.insert(thumbnailTitle, thumbnail.get());
+    thumbnailsLayout->addWidget(std::move(thumbnail), currentThumbailIndex / cardPerRow, currentThumbailIndex % cardPerRow);
+    ++currentThumbailIndex;
   }
 
   if (m_dbSession->displayOnlyTiles()) {
@@ -342,15 +349,15 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
     doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
   }
 
-  if (cardCount > 0) {
+  if (currentThumbailIndex > 0) {
     startDashbaordUpdate();
   }
 
-  if (cardCount != static_cast<int>(listOfUserViews.size())) {
+  if (currentThumbailIndex != static_cast<int>(listOfUserViews.size())) {
     showMessage(ngrt4n::OperationFailed, QObject::tr("Failed to load views => %1. Check details in logs").arg(failuresCount.c_str()).toStdString());
   }
   auto thumbnails = std::make_unique<Wt::WContainerWidget>();
-  thumbnails->setLayout(std::move(thumbsLayout));
+  thumbnails->setLayout(std::move(thumbnailsLayout));
   executiveViewPageRef->bindWidget("thumbnails", std::move(thumbnails));
 
   return executiveViewPageRef;
@@ -489,17 +496,16 @@ void WebMainUI::handleRefresh(void)
   }
 
   int currentView = 1;
-  for (auto& ditem : m_appBoards) {
-    ditem->setDbSession(m_dbSession);
-    auto loadDsOut = ditem->loadDataSources();
+  for (auto& currentBoard : m_appBoards) {
+    currentBoard->setDbSession(m_dbSession);
+    auto loadDsOut = currentBoard->loadDataSources();
     if (loadDsOut.first != ngrt4n::RcSuccess) {
       CORE_LOG("error", loadDsOut.second.toStdString());
       continue;
     }
-    ditem->updateAllNodesStatus();
-    ditem->updateMap();
-    ditem->updateThumb();
-    NodeT currentRootNode = ditem->rootNode();
+    currentBoard->updateAllNodesStatus();
+    currentBoard->updateMap();
+    NodeT currentRootNode = currentBoard->rootNode();
     int overvallSeverity = qMin(currentRootNode.sev, static_cast<int>(ngrt4n::Unknown));
     if (overvallSeverity != ngrt4n::Normal) {
       ++appStates[overvallSeverity];
@@ -508,16 +514,22 @@ void WebMainUI::handleRefresh(void)
       }
     }
     std::string vname = currentRootNode.name.toStdString();
-    auto thumb = m_thumbs.find(vname);
-    if (thumb != m_thumbs.end()) {
-      (*thumb)->setStyleClass(ditem->thumbCss());
-      (*thumb)->setToolTip(ditem->tooltip());
+    auto thumb = m_thumbnails.find(vname);
+    if (thumb != m_thumbnails.end()) {
+      (*thumb)->setStyleClass(currentBoard->thumbCss());
+      (*thumb)->setToolTip(currentBoard->tooltip());
       if (! m_dbSession->isLoggedAdmin() && m_platformStatusAnalyticsChartsRef) {
         PlatformMappedStatusHistoryT platformStatusData;
         m_dbSession->listStatusHistory(platformStatusData, vname, m_platformStatusAnalyticsChartsRef->startTime(), m_platformStatusAnalyticsChartsRef->endTime());
         m_platformStatusAnalyticsChartsRef->updateByView(vname, platformStatusData);
       }
     }
+    auto thumbComment = m_thumbnailComments.find(vname);
+    if (thumbComment != m_thumbnailComments.end()) {
+      (*thumbComment)->setText(currentBoard->thumbMsg());
+    }
+
+
     ++currentView;
   }
 
@@ -839,7 +851,6 @@ std::unique_ptr<Wt::WTemplate> WebMainUI::createThumb(std::string title, std::st
   auto page = std::make_unique<Wt::WTemplate>(Wt::WString::tr("dashboard-thumbnail.tpl"));
   page->setStyleClass("btn btn-unknown");
   page->bindWidget("thumb-titlebar", std::make_unique<Wt::WLabel>(title));
-  page->bindWidget("thumb-problem-details", std::make_unique<Wt::WLabel>(msg));
   auto img = std::make_unique<Wt::WImage>(imgURL);
   img->setImageLink (imgLink);
   page->bindWidget("thumb-image", std::move(img));

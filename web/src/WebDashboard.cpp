@@ -62,7 +62,6 @@ std::pair<int, QString> WebDashboard::initialize(const QString& vfile)
     CORE_LOG("error", initResult.second.toStdString());
   } else {
     m_thumbTitle = rootNode().name.toStdString();
-    m_thumbMsg = "";
   }
   return initResult;
 }
@@ -109,11 +108,6 @@ void WebDashboard::buildMap(void)
 void WebDashboard::updateMap(const NodeT& _node, const QString& _tip)
 {
   m_mapRef->updateNode(_node, _tip);
-}
-
-void WebDashboard::updateThumb(void)
-{
-  m_thumbMsg = m_chartRef->problemsMsg();
 }
 
 

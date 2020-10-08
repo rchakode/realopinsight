@@ -243,7 +243,6 @@ void WebMap::updateThumb(void)
   if (m_thumbURL.empty()) {
     m_thumbURL = QString("/run/thumb-%1.svg").arg(toBase64RootNodeName()).toStdString();
   }
-  m_thumbLink = m_thumbURL+"?"+QString::number(++roundCount).toStdString();
 
   std::ofstream output(wApp->docRoot() + m_thumbURL);
   thumbSvg.write(output);

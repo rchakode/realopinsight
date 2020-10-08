@@ -53,9 +53,6 @@ public:
   std::string thumbURL(void) {
     return m_thumbURL;
   }
-  std::string thumbLink(void) {
-    return m_thumbLink;
-  }
 
 
 protected:
@@ -70,7 +67,6 @@ private:
   Wt::JSignal<double, double, double, double> m_containerSizeChanged;
   Wt::Signal<> m_loaded;
   std::string m_thumbURL;
-  std::string m_thumbLink;
   double m_translateY;
   std::string m_thumbImg;
 

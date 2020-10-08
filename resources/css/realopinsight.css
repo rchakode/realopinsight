@@ -7,6 +7,42 @@ body, html {
   overflow: auto;
 }
 
+h2 {
+  font-size:24px;
+  line-height:60px;
+  -  font-weight: 300;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 32px;
+  font-weight: 250;
+}
+
+h4 {
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 200;
+}
+
+h1,
+address,
+blockquote,
+dl,
+fieldset,
+figure,
+form,
+hr,
+ol,
+p,
+pre,
+table,
+img,
+ul {
+ margin-bottom: 1rem;
+}
+
+
 
 #main {
   margin: auto;
@@ -270,7 +306,7 @@ legend {
 
 
 .btn {
- min-width: 18ch;
+  min-width: 10ch;
 }
 
 /* red button */
@@ -308,6 +344,10 @@ legend {
   border-color: #999999;
 }
 
+.btn h1, .btn h2, .btn h3, .btn h4, .btn h5 {
+  margin: 1px;
+  padding: 1px;
+}
 
 .breadcrumb {
   margin: 0;
@@ -390,40 +430,6 @@ legend {
   border-right: 1px solid #d1d1d1;
 }
 
-h2 {
-  font-size:24px;
-  line-height:60px;
-  -  font-weight: 300;
-}
-
-h3 {
-  font-size: 18px;
-  line-height: 32px;
-  font-weight: 250;
-}
-
-h4 {
-    font-size:14px;
-    line-height:40px;
-    font-weight: 250;
-}
-
-h1,
-address,
-blockquote,
-dl,
-fieldset,
-figure,
-form,
-hr,
-ol,
-p,
-pre,
-table,
-img,
-ul {
- margin-bottom: 1rem;
-}
 
 .Wt-domRoot {
   position: absolute;
@@ -464,3 +470,13 @@ ul {
   vertical-align: middle;
 }
 
+.problem-trends-chart {
+  min-height: 300px;
+  min-width: 600px;
+  padding: 3rem 2rem;
+  overflow-x: auto;
+}
+
+/*.problem-trends-chart canvas {
+  margin: 3rem 2rem;
+}*/

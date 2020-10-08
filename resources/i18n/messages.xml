@@ -156,6 +156,19 @@
     </div>
 </message>
 
+
+<message id="thumbnail.tpl">
+  <div class="row">
+    <div class="col-sm-6"><h3>${problem-status-percent-title}</h3></div>
+    <div class="col-sm-6">&nbsp;</div>
+  </div>
+  <div class="row">
+    <div class="col-sm-8 problem-trends-chart">${problem-status-percent-chart}</div>
+    <div class="col-sm-1">${platform-availability-csv-export}</div>
+    <div class="col-sm-3">${platform-availability-chart}</div>
+  </div>
+</message>
+
 <message id="platform-status-analytics.tpl">
 <div class="row">
   <div class="col-sm-12">
@@ -197,6 +210,9 @@
     </div>
   </div>
 </message>
+
+
+
 
 <message id="event-feed.tpl">
   <div class="media">
@@ -418,10 +434,11 @@
   <nav>
     <ul>
       <li>RealOpInsight v${version}</li>
-      <li>&copy; ${release-year} Rodrigue Chakode and contributors</li>
       <li><a href="http://realopinsight.com/docs/" target="_blank">Documentation</a></li>
       <li><a href="https://github.com/rchakode/realopinsight/blob/master/LICENSE" target="_blank">Terms</a></li>
       <li><a href="https://github.com/rchakode/realopinsight/issues" target="_blank">Issues &amp; Support</a></li>
+      <li><a href="https://krossboard.app/" target="_blank">Krossboard (Kubernetes Usage Analytics) </a></li>
+      <li>&copy; ${release-year} Rodrigue Chakode and contributors</li>
     </ul>
   </nav>
 </footer>

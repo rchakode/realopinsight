@@ -54,7 +54,6 @@ public:
   void updateMap(void);
   void buildMap(void);
   void buildTree(void);
-  void updateThumb(void);
 
   WebMap* mapRef(void) {
     return m_mapRef;
@@ -62,14 +61,11 @@ public:
   std::string thumbURL(void) {
     return m_mapRef->thumbURL();
   }
-  std::string thumbLink(void) {
-    return m_mapRef->thumbLink();
-  }
   std::string thumbTitle(void) {
     return m_thumbTitle;
   }
   std::string thumbMsg(void) {
-    return m_thumbMsg;
+    return m_chartRef->problemsMsg();
   }
   std::string thumbCss(void) {
     return ngrt4n::thumbCss(rootNode().sev);
@@ -103,7 +99,6 @@ private:
   WebMsgConsole* m_eventConsoleRef;
   WebPieChart* m_chartRef;
   std::string m_thumbTitle;
-  std::string m_thumbMsg;
   std::unique_ptr<Wt::WVBoxLayout> m_eventItemsContainerLayout;
   QHash<QString, Wt::WWidget*> m_eventItems;
 

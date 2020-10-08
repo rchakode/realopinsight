@@ -79,7 +79,6 @@ void updateSeverityItem(Wt::WStandardItem* itemRef, int severity);
 std::string getItemData(Wt::WStandardItem *itemRef);
 sem_t *createSemaphoreOrDie(const std::string &sem_name);
 void releaseSemaphore(sem_t *my_sem);
-Wt::WFont chartTitleFont(void);
 } // namespace ngrt4n
 
 #endif // WEBUTILS_HPP

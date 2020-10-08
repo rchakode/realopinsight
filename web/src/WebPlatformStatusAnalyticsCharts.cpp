@@ -41,39 +41,29 @@ WebPlatformStatusAnalyticsCharts::WebPlatformStatusAnalyticsCharts(const DbViews
   layout->addWidget(std::move(dateFilter));
 
   for (const auto& view : listOfViews) {
-    auto problemReport = std::make_unique<WebPlatformStatusRaw>(view.name);
-    m_problemReportRef.insert(view.name, problemReport.get());
-    auto slaReport = std::make_unique<WebPieChart>(ChartBase::SLAData);
-    m_slaReportsRef.insert(view.name, slaReport.get());
-    auto csvExportIcon = std::make_unique<WebCsvExportIcon>();
-    m_csvLinksRef.insert(view.name, csvExportIcon.get());
+    auto row = std::make_unique<Wt::WTemplate>(Wt::WString::tr("thumbnail.tpl"));
 
-    auto rowWidget = std::make_unique<Wt::WTemplate>(
-          "<div class=\"row\">"
-          "  <div class=\"col-sm-6\"><h3>${problem-status-percent-title}</h3></div>"
-          "  <div class=\"col-sm-6\">&nbsp;</div>"
-          "</div>"
-          "<div class=\"row\">"
-          "  <div class=\"col-sm-7\">${problem-status-percent-chart}</div>"
-          "  <div class=\"col-sm-1\">${platform-availability-csv-export}</div>"
-          "  <div class=\"col-sm-4\">${platform-availability-chart}</div>"
-          "</div>"
-          );
-
+    auto title = view.name;
     std::smatch regexMatch;
-    QString sourceId = "UNDEFINED SOURCE";
-    std::string shortViewName = view.name;
     if (std::regex_match(view.name, regexMatch, std::regex("(Source[0-9]):(.+)"))) {
-      sourceId = QString::fromStdString(regexMatch[1].str());
-      shortViewName = regexMatch[2].str();
+      auto sourceId = QString::fromStdString(regexMatch[1].str());
+      auto& source = listOfSources[sourceId];
+      title = Wt::WString("{1} @ {2}").arg(regexMatch[2].str()).arg(source.mon_url.toStdString()).toUTF8();
     }
-    auto& source = listOfSources[sourceId];
-    rowWidget->bindWidget("problem-status-percent-chart", std::move(problemReport));
-    rowWidget->bindWidget("platform-availability-chart", std::move(slaReport));
-    rowWidget->bindString("problem-status-percent-title", Wt::WString("{1} - {2}").arg(shortViewName).arg(source.mon_url.toStdString()));
-    rowWidget->bindWidget("platform-availability-csv-export", std::move(csvExportIcon));
+    row->bindString("problem-status-percent-title", title);
 
-    layout->addWidget(std::move(rowWidget));
+    auto container = std::make_unique<Wt::WContainerWidget>();
+    auto problemReportChart = container->addNew<WebPlatformStatusRaw>(view.name);
+    m_problemReportRef.insert(view.name, problemReportChart);
+    row->bindWidget("problem-status-percent-chart", std::move(container));
+
+    auto slaReportChart = row->bindNew<WebPieChart>("platform-availability-chart", ChartBase::SLAData);
+    m_slaReportsRef.insert(view.name, slaReportChart);
+
+    auto csvExportIcon = row->bindNew<WebCsvExportIcon>("platform-availability-csv-export");
+    m_csvLinksRef.insert(view.name, csvExportIcon);
+
+    layout->addWidget(std::move(row));
   }
 
   setLayout(std::move(layout));
