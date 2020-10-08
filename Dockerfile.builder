@@ -1,5 +1,4 @@
 FROM rabits/qt:5.13-desktop as builder-deps
-MAINTAINER Rodrigue Chakode <rodrigue.chakode @ gmail dot com>
 
 ENV QT_ROOT /usr
 ENV WT_ROOT /usr/local
@@ -33,7 +32,7 @@ RUN apt update && \
 
 FROM builder-deps as builder
 WORKDIR /tmt/wt
-RUN WT_VERSION=4.3.0 && \
+RUN WT_VERSION=4.3.1 && \
     WT_TARBALL=${WT_VERSION}.tar.gz && \
     wget https://github.com/emweb/wt/archive/${WT_TARBALL} && \
     tar zxf ${WT_TARBALL} && \
@@ -42,4 +41,7 @@ RUN WT_VERSION=4.3.0 && \
     cd build && \
     cmake .. -DWEBUSER=www-data -DWEBGROUP=www-data -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick && \
     make install && \
-    rm -rf /tmt/wt
+    rm -rf /tmt/wt && \
+    PROM_CPP_DEB=prometheus-cpp_0.10.0_amd64.deb \
+    PROM_CPP_DEB_URL=https://github.com/rchakode/prometheus-cpp/releases/download/v0.10.0/$PROM_CPP_DEB && \
+    apt-get install $PROM_CPP_DEB

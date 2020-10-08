@@ -1,5 +1,4 @@
 FROM rchakode/realopinsight:builder-1586803201 as dist-maker
-MAINTAINER Rodrigue Chakode <rodrigue.chakode @ gmail dot com>
 ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
 WORKDIR /app
 COPY . .
@@ -13,7 +12,6 @@ ENTRYPOINT ["/bin/bash"]
 
 
 FROM ubuntu:18.04
-MAINTAINER Rodrigue Chakode <rodrigue.chakode @ gmail dot com>
 ENV APP_USER_UID=54583
 ENV APP_USER realopinsight
 ENV LD_LIBRARY_PATH /app/lib:$LD_LIBRARY_PATH
