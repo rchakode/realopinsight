@@ -1,0 +1,43 @@
+name: Build image
+on:
+  push:
+    tags:
+      - v*
+      
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build and push Docker image
+      env:
+        IMAGE_NAME: rchakode/realopinsight
+        REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+        REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+      run: |
+        echo "computing build version"
+        GIT_LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1` || echo "")
+        GIT_LATEST_SHA=$(git rev-parse --short HEAD)
+        if [ -z "$GIT_LATEST_TAG" ]; then
+          RELEASE_VERSION=$GIT_LATEST_SHA
+        else
+          MATCHED_TAG=$(git describe --exact-match $GIT_LATEST_SHA || echo "TAG_NOT_MATCHED")
+          RELEASE_VERSION=$(echo $GIT_LATEST_TAG | sed 's/v//')
+          if [ "$MATCHED_TAG" != "$GIT_LATEST_TAG" ]; then
+            RELEASE_VERSION="${RELEASE_VERSION}-${GIT_LATEST_SHA}"
+          fi
+        fi
+
+        echo "patching final version in project file"
+        VERSION_FILE=realopinsight.pro
+        VERSION_LINE=$(grep -n '^PACKAGE_VERSION=' $VERSION_FILE | cut -f1 -d:)
+        VERSION_ORIG=$(grep '^PACKAGE_VERSION=' $VERSION_FILE | cut -d= -f2)
+        sed -i "${VERSION_LINE}s/${VERSION_ORIG}/${RELEASE_VERSION}/" $VERSION_FILE
+        cat $VERSION_FILE
+
+        echo "building Docker image with tag => ${IMAGE_NAME}:${RELEASE_VERSION}"
+        docker build -t ${IMAGE_NAME}:${RELEASE_VERSION} .
+        docker tag $IMAGE_NAME:${RELEASE_VERSION} ${IMAGE_NAME}:latest
+        docker login --username ${REGISTRY_USERNAME} --password ${REGISTRY_PASSWORD}
+        docker push $IMAGE_NAME
+

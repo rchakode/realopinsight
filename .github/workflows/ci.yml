@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build and push Docker image
+      env:
+        IMAGE_NAME: rchakode/realopinsight
+        REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+        REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+      run: |
+        echo "building code"
+        docker build --target builder .
+
