@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - v*
-      
+
 jobs:
   build:
     runs-on: ubuntu-18.04
@@ -37,7 +37,7 @@ jobs:
 
         echo "building Docker image with tag => ${IMAGE_NAME}:${RELEASE_VERSION}"
         docker build -t ${IMAGE_NAME}:${RELEASE_VERSION} .
-        docker tag $IMAGE_NAME:${RELEASE_VERSION} ${IMAGE_NAME}:latest
+        # docker tag $IMAGE_NAME:${RELEASE_VERSION} ${IMAGE_NAME}:latest
         docker login --username ${REGISTRY_USERNAME} --password ${REGISTRY_PASSWORD}
         docker push $IMAGE_NAME
 
