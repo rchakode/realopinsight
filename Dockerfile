@@ -1,4 +1,4 @@
-FROM rchakode/realopinsight:builder-1586803201 as dist-maker
+FROM rchakode/realopinsight:builder-20201008t1602134119 as builder
 ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
 WORKDIR /app
 COPY . .
@@ -18,7 +18,7 @@ ENV LD_LIBRARY_PATH /app/lib:$LD_LIBRARY_PATH
 ENV REALOPINSIGHT_ROOT_DIR /app
 ENV REALOPINSIGHT_DATA_DIR /data
 WORKDIR /app
-COPY --from=dist-maker /app/dist .
+COPY --from=builder /app/dist .
 RUN apt update && \
     apt install -y libsqlite3-0 graphviz sudo && \
     (id ${APP_USER} || useradd ${APP_USER} -u $APP_USER_UID) && \

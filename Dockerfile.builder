@@ -31,7 +31,7 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*
 
 FROM builder-deps as builder
-WORKDIR /tmt/wt
+WORKDIR /tmp
 RUN WT_VERSION=4.3.1 && \
     WT_TARBALL=${WT_VERSION}.tar.gz && \
     wget https://github.com/emweb/wt/archive/${WT_TARBALL} && \
@@ -42,6 +42,9 @@ RUN WT_VERSION=4.3.1 && \
     cmake .. -DWEBUSER=www-data -DWEBGROUP=www-data -DWT_WRASTERIMAGE_IMPLEMENTATION=GraphicsMagick && \
     make install && \
     rm -rf /tmt/wt && \
-    PROM_CPP_DEB=prometheus-cpp_0.10.0_amd64.deb \
-    PROM_CPP_DEB_URL=https://github.com/rchakode/prometheus-cpp/releases/download/v0.10.0/$PROM_CPP_DEB && \
-    apt-get install $PROM_CPP_DEB
+    cd /tmp && \
+    PROM_CPP_VERSION=0.10.0 && \
+    PROM_CPP_DEB=prometheus-cpp_${PROM_CPP_VERSION}_amd64.deb \
+    PROM_CPP_DEB_URL=https://github.com/rchakode/prometheus-cpp/releases/download/v${PROM_CPP_VERSION}/${PROM_CPP_DEB} && \
+    wget $PROM_CPP_DEB_URL && \
+    apt-get install ./$PROM_CPP_DEB
