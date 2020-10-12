@@ -576,7 +576,7 @@
 
      <fieldset id="source-api-settings">
        <div class="form-group row">
-         <label class="control-label col-sm-3">Monitor API Base URL&nbsp;</label>
+         <label class="control-label col-sm-3">API Endpoint URL&nbsp;</label>
          <div class="controls col-sm-6">${monitor-url}</div>
          <div class="controls col-sm-3">${dont-verify-ssl-certificate}</div>
        </div>
