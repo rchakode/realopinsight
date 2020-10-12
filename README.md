@@ -14,21 +14,21 @@ RealOpInsight allows to monitor, measure and observe end-user applications avail
 - [Copyrights & License](#copyrights--license)
 
 # Key Features
-Fully open source ([GPL v3 Licence](LICENSE)) RealOpinsight features include:
-* **Federated & Unified Monitoring:** RealOpInsight allows you to collect and consolidate data from a wide range of distributed and heterogeneous monitoring systems and provide to your operations staffs unified application operations dashboards.
-* **Monitoring of Business Values:** by allowing you Focus on applications that underlie your business services. You can fire notifications at application-level, and easily generate availability reports over time.
-* **Relationship Mapping & Event Correlation:** Map relationships among your applications' components along with custom severity calculation and propagation policies to meet your specific management needs.
-* **Simple and Secured Integration through API:** Don't waste time on complex or boring configuration tasks, RealOpInsight only requires a read-only access to the API of the monitoring data collection backends (i.e. Kubernetes API, Zabbix API...). It's released as Docker images along with Kubernetes Helm3 manifests to ease its deployment.
-* **Tactical Dashboards:** Whether you're an operations staff or executive, RealOpInsight provides tactical dashboards that allow you to have a quick insight on how your applications are operating while be able to have more details in one click.
+Fully open source ([GPL v3 Licence](LICENSE)), RealOpinsight features include:
+* **Monitor business values, Define & track SLA/SLO targets:** Focus on the applications that underlie your business, set up application-aware notifications, measure, observe and analyze applications availability over time.
+* **Federated & unified applications monitoring:** RealOpInsight enables to set up unified applications monitoring views on top of applications and corporate environments that rely on many monitoring systems. Thereby breaking monitoring silos, it boosts the productivity of operations staffs while helping them solving incident with relevant priorities.
+* **Relationship mapping & event correlation:** Map relationships among each application components, set up application-specific policies to calculate and propagate the severity of incidents so as to meet your particular incident management needs.
+* **Simple and secured integration through API:** Don't waste time on complex or boring configuration tasks, RealOpInsight only requires a read-only access to the API of the monitoring data collection backends (i.e. Kubernetes API, Zabbix API...). It's released as Docker images along with Kubernetes Helm3 manifests to ease its deployment.
+* **Tactical Operations Dashboards:** Whether you're an operations staff or executive, RealOpInsight allows to build user-specific tactical dashboards that allow you to have a quick insight on how your applications are operating while be able to have more details in one click.
 
 ![](./images/banners/screenshots.png)
 
 # Quick Start
 RealOpInsight is released as Docker images along with Kubernetes Helm3 manifests to ease its deployment.
 
-The following two subsections show how to set an instance of RealOpInsight in a couple of seconds. The first subsection described describe installation on Kubernetes and the second one the deployment on Docker (or any equivalent container engine).
+The below sections show how to set an instance of RealOpInsight in a couple of seconds on Kubernetes or on an [OCI](https://opencontainers.org/)-compliant container engine (Docker, Podman, CRI-O, etc).
 
-## Deployment on kubernetes
+## Deployment on Kubernetes
 Assuming you have a Linux terminal with Helm3 installed and able to access a KUBECONFIG file to deploy resources on Kubernetes, the following command shall install an instance in the `monitoring` namespace. **The specified namespace must exist**, it can be changed to another value.
 
 ```bash
@@ -72,7 +72,7 @@ Then point your browser at the following address: http://localhost:4583/realopin
 The default username and password are `admin` and `qDmin123` (`password` prior to RealOpInsight `v20.10.1`).
 
 
-## Getting Started
+## Configuration and next steps
 Consider one of the following resources to start integrating RealOpInsight with your target monitoring environment.
 * [Integration with Kubernetes](https://realopinsight.com/docs/quickstart-kubernetes-dashboard/)
 * [Integration with Zabbix](https://realopinsight.com/docs/quickstart-zabbix-dashboard/)
