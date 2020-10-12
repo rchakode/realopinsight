@@ -43,22 +43,25 @@ spec:
           {{- end }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.targetPort }}
+            - name: http-ui
+              containerPort: {{ .Values.service.targetPortUI }}
+              protocol: TCP
+            - name: http-metrics
+              containerPort: {{ .Values.service.targetPortMetrics }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /ui
+              port: http-ui
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /ui
+              port: http-ui
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.dataVolume.persist }}
           volumeMounts:
-            - mountPath: /data
+            - mountPath: /opt/realopinsight
               name: data-vol
   volumeClaimTemplates:
   - metadata:

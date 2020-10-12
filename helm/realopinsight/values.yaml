@@ -31,7 +31,8 @@ metadata:
 service:
   type: ClusterIP
   port: 80
-  targetPort: 4583
+  targetPortUI: 4583
+  targetPortMetrics: 4584
 
 ingress:
   enabled: false
@@ -39,16 +40,16 @@ ingress:
     - host: realopinsight.local
       paths: []
 # uncomment the following lines and ajust the values to enable TLS
-  # tls: 
+  # tls:
   #  - secretName: realopinsight-tls
   #    hosts:
   #      - realopinsight.local
 
 resources: {}
 # No resource requests not limits is specified by default.
-# We leave this as a conscious choice for the user, as this increases chances charts run 
-# on environments with little resources, such as Minikube. 
-# If you do want to specify resources, uncomment the following lines, adjust them as necessary, 
+# We leave this as a conscious choice for the user, as this increases chances charts run
+# on environments with little resources, such as Minikube.
+# If you do want to specify resources, uncomment the following lines, adjust them as necessary,
 # and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 256m
