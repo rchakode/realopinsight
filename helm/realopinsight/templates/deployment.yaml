@@ -61,7 +61,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
 {{- if .Values.dataVolume.persist }}
           volumeMounts:
-            - mountPath: /opt/realopinsight
+            - mountPath: /data
               name: data-vol
   volumeClaimTemplates:
   - metadata:
