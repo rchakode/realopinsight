@@ -32,6 +32,7 @@ service:
   type: ClusterIP
   port: 80
   targetPortUI: 4583
+  portMetrics: 4584
   targetPortMetrics: 4584
 
 ingress:
