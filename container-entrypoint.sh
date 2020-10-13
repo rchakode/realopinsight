@@ -13,7 +13,7 @@ trap "[INIT] echo TRAPed signal" HUP INT QUIT KILL TERM
 echo "[INIT] starting realopinsight-server"
 /app/realopinsight-server --docroot /app/www --http-address=0.0.0.0 --http-port 4583 --deploy /ui &
 
-while sleep 60; do
+while sleep 5; do
   ps aux |grep realopinsight-reportd |grep -q -v grep
   REPORTD_STATUS=$?
   ps aux |grep realopinsight-server |grep -q -v grep
