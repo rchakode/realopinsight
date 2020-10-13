@@ -23,7 +23,7 @@ RUN apt update && \
     apt install -y libsqlite3-0 graphviz sudo && \
     (id ${APP_USER} || useradd ${APP_USER} -u $APP_USER_UID) && \
     echo "${APP_USER} ALL=NOPASSWD: ALL" > /etc/sudoers.d/user && \
-    mkdir -p /app/run /data && \
+    mkdir -p /app/www/run /data && \
     chown -R ${APP_USER}:${APP_USER} /app /data
 VOLUME ["/data"]
 USER ${APP_USER}

@@ -28,7 +28,7 @@ get_absolute_path()
 {
   path=$1
   case $path in
-    /*) 
+    /*)
       ;;
     *) path=$PWD/$path
       ;;
@@ -51,20 +51,20 @@ extract_binary_deplibs()
 {
   binary=$1
   dest_folder=$2
-  
+
   index=$(echo "0" | bc)
   declare -a dependencies
   for l in  $(ldd $binary | awk '{print $1}'); do
     dependencies[$index]="$l"
     index=$(echo "$index + 1" | bc)
   done
-  
+
   # now copy lib
   index=$(echo "0" | bc)
   for f in $(ldd $binary | awk '{print $3}'); do
     if [ -e "$f" ]; then
       install -m 755 "$f" ${dest_folder}/
-    else 
+    else
       echo "====================>>>>>>>>>>>>>>>> [WARNING] Library not found => ${dependencies[$index]}"
     fi
     index=$(echo "$index + 1" | bc)
@@ -75,7 +75,7 @@ extract_binary_file()
 {
   path=$1
   dest_folder=$2
-  
+
   check_file $path
 
   extract_binary_deplibs $path $dest_folder/
@@ -89,9 +89,7 @@ else
 fi
 
 mkdir ./dist/etc
-mkdir -p ./dist/data
 mkdir -p ./dist/www/resources/themes/bootstrap/img # required path for missing glyphicons
-mkdir -p ./dist/www/run     # directory for thumbnails
 
 extract_binary_file "realopinsight-server" ./dist/
 extract_binary_file "realopinsight-reportd" ./dist/
