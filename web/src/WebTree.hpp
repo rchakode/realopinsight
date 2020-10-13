@@ -42,7 +42,7 @@ class WebTree : public Wt::WTreeView
     void updateItemDecoration(const NodeT& nodeInfo, const QString& tooltip);
     void build(void);
     void activateEditionFeatures(void);
-    void newNodeItem(const NodeT& nodeInfo, const QString& parentId, bool selectNewNode);
+    void registerNodeItem(const NodeT& nodeInfo, const QString& parentId, bool selectNewNode);
     QString findNodeIdFromTreeItem(const Wt::WModelIndex& index) const;
     void expandNodeById(const QString& nodeId);
     void selectNodeById(const QString& nodeId);
@@ -50,8 +50,9 @@ class WebTree : public Wt::WTreeView
 
   private:
     CoreDataT* m_cdata;
-    std::map<QString, Wt::WStandardItem*> m_items;
-    std::shared_ptr<Wt::WStandardItemModel> m_model;
+    std::map<QString, Wt::WStandardItem*> m_itemsRef;
+    std::map<QString, std::unique_ptr<Wt::WStandardItem>> m_registeredItems;
+    Wt::WStandardItemModel* m_model;
 
     void activateDashboardFeatures(void);
     Wt::WStandardItem* findItemByNodeId(const QString& nodeId);

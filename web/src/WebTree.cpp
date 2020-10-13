@@ -29,15 +29,18 @@
 
 WebTree::WebTree(CoreDataT* cdata)
   : Wt::WTreeView(),
-    m_cdata(cdata)
+    m_cdata(cdata),
+    m_model(nullptr)
 {
-  m_model = std::make_shared<Wt::WStandardItemModel>(0, 1);
-  m_model->setHeaderData(0, Wt::Orientation::Horizontal, newEditionTip());
-  setModel(m_model);
+  auto model = std::make_shared<Wt::WStandardItemModel>(1, 1);
+  m_model = model.get();
+  model->setHeaderData(0, Wt::Orientation::Horizontal, newEditionTip());
+  setModel(model);
   activateDashboardFeatures();
 }
 
-WebTree::~WebTree(){}
+WebTree::~WebTree(){
+}
 
 void WebTree::activateDashboardFeatures(void)
 {
@@ -59,25 +62,29 @@ void WebTree::activateEditionFeatures(void)
 
 void WebTree::build(void)
 {
-  m_items.clear();
+  m_itemsRef.clear();
+  m_registeredItems.clear();
   m_model->clear();
 
   // create bpnodes
   for(const auto & node : m_cdata->bpnodes) {
-    WebTree::newNodeItem(node, "", true);
+    WebTree::registerNodeItem(node, "", true);
   }
+
   // create cnodes
   for(const auto & node : m_cdata->cnodes) {
-    WebTree::newNodeItem(node, "", true);
+    WebTree::registerNodeItem(node, "", true);
   }
+
   // bind dependencies
   for (QMultiMap<QString, QString>::Iterator edge=m_cdata->edges.begin(), end=m_cdata->edges.end(); edge != end; ++edge) {
     bindChildToParent(edge.value(), edge.key());
   }
+
   // update model
-  auto treeRoot = m_items.find(ngrt4n::ROOT_ID);
-  if (treeRoot != m_items.end() && treeRoot->second) {
-    m_model->appendRow(std::move(std::unique_ptr<Wt::WStandardItem>(treeRoot->second)));
+  auto rootItem = m_registeredItems.find(ngrt4n::ROOT_ID);
+  if (rootItem != m_registeredItems.end() && rootItem->second) {
+    m_model->appendRow(std::move(rootItem->second));
     m_model->setHeaderData(0, Wt::Orientation::Horizontal, childMgntTip());
   }
 }
@@ -85,50 +92,53 @@ void WebTree::build(void)
 
 void WebTree::expandNodeById(const QString& nodeId)
 {
-  auto item = m_items.find(nodeId);
-  if (item != m_items.end() && item->second) {
+  auto item = m_itemsRef.find(nodeId);
+  if (item != m_itemsRef.end() && item->second) {
     expand((item->second)->index());
   }
 }
 
 void WebTree::selectNodeById(const QString& nodeId)
 {
-  auto item = m_items.find(nodeId);
-  if (item != m_items.end() && item->second) {
+  auto item = m_itemsRef.find(nodeId);
+  if (item != m_itemsRef.end() && item->second) {
     select((item->second)->index());
   }
 }
 
-void WebTree::newNodeItem(const NodeT& nodeInfo, const QString& parentId, bool selectNewNode)
+void WebTree::registerNodeItem(const NodeT& nodeInfo, const QString& parentId, bool selectNewNode)
 {
-  auto item = new Wt::WStandardItem();
+  auto item = std::make_unique<Wt::WStandardItem>();
   item->setText(Wt::WString(nodeInfo.name.toStdString()));
   item->setIcon("images/built-in/unknown.png");
   item->setData(nodeInfo.id, Wt::ItemDataRole::User);
-  m_items[nodeInfo.id] = item;
+  m_itemsRef[nodeInfo.id] = item.get();
 
   if (! parentId.isEmpty()) {
     bindChildToParent(nodeInfo.id, parentId);
   }
+
   if (selectNewNode) {
     select(item->index());
   }
+
+  m_registeredItems[nodeInfo.id] = std::move(item);
 }
 
 
 Wt::WStandardItem* WebTree::findItemByNodeId(const QString& nodeId)
 {
-  auto itemIt = m_items.find(nodeId);
-  return (itemIt != m_items.end())? itemIt->second : nullptr;
+  auto itemIt = m_itemsRef.find(nodeId);
+  return (itemIt != m_itemsRef.end())? itemIt->second : nullptr;
 }
 
 
 void WebTree::bindChildToParent(const QString& childId, const QString& parentId)
 {
-  auto citem = findItemByNodeId(childId);
-  auto pitem = findItemByNodeId(parentId);
-  if (citem != nullptr && pitem != nullptr) {
-    pitem->appendRow(std::move(std::unique_ptr<Wt::WStandardItem>(citem)));
+  auto citem = m_registeredItems.find(childId);
+  auto pitemRef = findItemByNodeId(parentId);
+  if (pitemRef != nullptr && citem !=  m_registeredItems.end()) {
+    pitemRef->appendRow(std::move(citem->second));
   } else {
     CORE_LOG("debug", QObject::tr("ignoring dependency with child or parent not found").arg(parentId, childId).toStdString());
   }
@@ -146,7 +156,8 @@ void WebTree::updateItemDecoration(const NodeT& nodeInfo, const QString& tooltip
 
 QString WebTree::findNodeIdFromTreeItem(const Wt::WModelIndex& index) const
 {
-  if (! index.isValid()) {
+  if (! index.isValid()
+      || ! m_model) {
     return "";
   }
 

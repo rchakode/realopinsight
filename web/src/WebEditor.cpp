@@ -379,7 +379,7 @@ void WebEditor::addChildUnderTreeIndex(const Wt::WModelIndex& index)
     return;
   }
 
-  m_treeRef->newNodeItem(child, nodeId, true);
+  m_treeRef->registerNodeItem(child, nodeId, true);
   // FIXME: check the construction of parent->child dependency
 }
 
