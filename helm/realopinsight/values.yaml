@@ -30,9 +30,9 @@ metadata:
 
 service:
   type: ClusterIP
-  port: 80
-  targetPortUI: 4583
+  portUI: 80
   portMetrics: 4584
+  targetPortUI: 4583
   targetPortMetrics: 4584
 
 ingress:
