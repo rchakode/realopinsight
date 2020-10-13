@@ -224,7 +224,6 @@ void WebMap::handleContainedSizeChanged(double mapWidth, double mapHeight, doubl
 
 void WebMap::updateThumb(void)
 {
-  static int roundCount = 0;
   double thumbScaleX = THUMBNAIL_WIDTH / m_cdata->map_width;
   double thumbScaleY = THUMBNAIL_HEIGHT / m_cdata->map_height;
 
