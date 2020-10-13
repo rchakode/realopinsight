@@ -637,8 +637,6 @@ int DbSession::checkUserCookie(const DboLoginSession &session)
 
 int DbSession::addPlatformStatus(const PlatformStatusT &platformStatus)
 {
-  REPORTD_LOG("info", QObject::tr("Adding platform status entry: %1").arg(platformStatus.toString().c_str()));
-
   int retValue = ngrt4n::RcGenericFailure;
   dbo::Transaction transaction(*this);
   try
