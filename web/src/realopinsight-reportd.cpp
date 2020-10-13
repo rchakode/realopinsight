@@ -50,7 +50,7 @@ void runCollector(int period)
 {
   ngrt4n::initReportdLogger();
 
-  prometheus::Exposer promExposer{"127.0.0.1:4584"};
+  prometheus::Exposer promExposer{"0.0.0.0:4584"};
 
   auto registry = std::make_shared<prometheus::Registry>();
   auto& promMetrics = prometheus::BuildGauge()
