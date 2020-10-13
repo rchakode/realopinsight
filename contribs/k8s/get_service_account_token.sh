@@ -20,9 +20,10 @@
 # along with the Software.  If not, see <http://www.gnu.org/licenses/>.	   #
 #--------------------------------------------------------------------------#
 
+
 SERVICE_ACCOUNT_NAME=realopinsight
 CONTEXT=$(kubectl config current-context)
-NAMESPACE=default
+NAMESPACE=${1:-default}
 
 SECRET_NAME=$(kubectl get serviceaccount ${SERVICE_ACCOUNT_NAME} \
   --context ${CONTEXT} \
