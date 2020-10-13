@@ -112,7 +112,7 @@
 
     <div class="col-sm-4">
       <h3>Configure operations views</h3>
-      <p>Under <b>New User</b> create operator users, and then define their visualization permissions (<b>Manage Operations Views</b>).</p>
+      <p>Under <b>New User</b> create operator users, and then define their visualization permissions (<b>Operations Profiles</b>).</p>
       <figure>
         <img alt="Assign to build operations views" src="/images/built-in/thumbnails/manage-operations-views.png" />
       </figure>
