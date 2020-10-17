@@ -63,6 +63,11 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data-vol
+            - mountPath: /opt/realopinsight/etc
+              name: config-data-vol
+      volumes:
+      - name: config-data-vol
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: data-vol
@@ -72,6 +77,9 @@ spec:
       resources:
         requests:
           storage: {{ .Values.dataVolume.capacity }}
+{{- else }}
+      - name: data-vol
+        emptyDir: {}
 {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
