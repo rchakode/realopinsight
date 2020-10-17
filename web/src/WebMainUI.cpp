@@ -188,7 +188,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_adminStackRef->addWidget(std::move(aclPage));
 
     // link views and acl
-    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles").toStdString());
+    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles Views").toStdString());
     linkPtr->clicked().connect(this, &WebMainUI::handleViewAclMenu);
     m_menuLinks.insert(MenuViewAndAcl, linkPtr.get());
     m_settingsPageRef->bindWidget("menu-all-views", std::move(linkPtr));
@@ -365,18 +365,18 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
 
 Wt::WTemplate* WebMainUI::buildSlaAnalyticsPage(void)
 {
-  auto platformStatusAnalyticsPageRef = m_opsStackRef->addNew<Wt::WTemplate>(Wt::WString::tr("platform-status-analytics.tpl"));
+  auto statusAnalyticsPage = m_opsStackRef->addNew<Wt::WTemplate>(Wt::WString::tr("platform-status-analytics.tpl"));
   auto assignedViews = m_dbSession->listAssignedViewsByUser(m_dbSession->loggedUser().username);
   if (assignedViews.empty()) {
-    platformStatusAnalyticsPageRef->bindEmpty("platform-analytics-board-charts");
+    statusAnalyticsPage->bindEmpty("platform-analytics-board-charts");
     showMessage(ngrt4n::OperationFailed, Q_TR("No views to visualize"));
-    return platformStatusAnalyticsPageRef;
+    return statusAnalyticsPage;
   }
 
   auto statusAnalyticsBoard = std::make_unique<WebPlatformStatusAnalyticsCharts>(assignedViews, m_dbSession->listSources(MonitorT::Any));
   m_platformStatusAnalyticsChartsRef = statusAnalyticsBoard.get();
   m_platformStatusAnalyticsChartsRef->reportPeriodChanged().connect(this, &WebMainUI::handleReportPeriodChanged);
-  platformStatusAnalyticsPageRef->bindWidget("platform-analytics-board-charts", std::move(statusAnalyticsBoard));
+  statusAnalyticsPage->bindWidget("platform-analytics-board-charts", std::move(statusAnalyticsBoard));
 
   for (const auto& view: assignedViews) {
     PlatformMappedStatusHistoryT statusHistory;
@@ -384,7 +384,7 @@ Wt::WTemplate* WebMainUI::buildSlaAnalyticsPage(void)
     m_platformStatusAnalyticsChartsRef->updateByView(view.name, statusHistory);
   }
 
-  return platformStatusAnalyticsPageRef;
+  return statusAnalyticsPage;
 }
 
 
@@ -519,9 +519,12 @@ void WebMainUI::handleRefresh(void)
       (*thumb)->setStyleClass(currentBoard->thumbCss());
       (*thumb)->setToolTip(currentBoard->tooltip());
       if (! m_dbSession->isLoggedAdmin() && m_platformStatusAnalyticsChartsRef) {
-        PlatformMappedStatusHistoryT platformStatusData;
-        m_dbSession->listStatusHistory(platformStatusData, vname, m_platformStatusAnalyticsChartsRef->startTime(), m_platformStatusAnalyticsChartsRef->endTime());
-        m_platformStatusAnalyticsChartsRef->updateByView(vname, platformStatusData);
+        std::string currentView = m_boardSelectorRef->currentText().toUTF8();
+        if (currentView == m_menuLabels[MenuPlatformStatusAnalytics]) {
+          PlatformMappedStatusHistoryT platformStatusData;
+          m_dbSession->listStatusHistory(platformStatusData, vname, m_platformStatusAnalyticsChartsRef->startTime(), m_platformStatusAnalyticsChartsRef->endTime());
+          m_platformStatusAnalyticsChartsRef->updateByView(vname, platformStatusData);
+        }
       }
     }
     auto thumbComment = m_thumbnailComments.find(vname);
@@ -651,8 +654,8 @@ void WebMainUI::handleDataSourceSettings(void)
 
 void WebMainUI::handleBoardSelectionChanged(void)
 {
-  std::string viewSelected = m_boardSelectorRef->currentText().toUTF8();
-  auto appBoard = m_appBoards.find(viewSelected.c_str());
+  std::string currentView = m_boardSelectorRef->currentText().toUTF8();
+  auto appBoard = m_appBoards.find(currentView.c_str());
   if (appBoard != m_appBoards.end()) {
     showAppBoard(*appBoard);
     m_showOnlyProblemsSelectorRef->setHidden(false);
@@ -662,7 +665,7 @@ void WebMainUI::handleBoardSelectionChanged(void)
     if (m_dbSession->isLoggedAdmin()) {
       switchFeaturePanel(m_settingsPageRef);
     } else {
-      if (viewSelected == m_menuLabels[MenuPlatformStatusAnalytics]) {
+      if (currentView == m_menuLabels[MenuPlatformStatusAnalytics]) {
         if (! m_platformStatusAnalyticsPageRef) {
           m_platformStatusAnalyticsPageRef = buildSlaAnalyticsPage();
         }
