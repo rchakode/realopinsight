@@ -119,12 +119,17 @@ void WebDashboard::updateMap(void)
 
 void WebDashboard::updateEventFeeds(const NodeT &node)
 {
+  if (! m_eventItemsContainerLayout) {
+    return;
+  }
+
   auto oldItem = m_eventItems.find(node.id);
   if (oldItem != m_eventItems.end()) {
     auto itemPtr = m_eventItemsContainerLayout->removeWidget(*oldItem);
     itemPtr.reset(nullptr);
     m_eventItems.erase(oldItem);
   }
+
   if (node.sev != ngrt4n::Normal) {
     auto newEventItem = createEventFeedTpl(node);
     m_eventItems.insert(node.id, newEventItem.get());
