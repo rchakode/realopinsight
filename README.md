@@ -29,55 +29,60 @@ RealOpInsight is released as Docker images along with Kubernetes Helm3 manifests
 The below sections show how to set an instance of RealOpInsight in a couple of seconds on Kubernetes or on an [OCI](https://opencontainers.org/)-compliant container engine (Docker, Podman, CRI-O, etc).
 
 ## Deployment on Kubernetes
-Assuming you have a Linux terminal with Helm3 installed and able to access a KUBECONFIG file to deploy resources on Kubernetes, the following command shall install an instance in the `monitoring` namespace. **The specified namespace must exist**, it can be changed to another value.
+Assuming you have a Linux terminal with Helm3 installed and able to access a KUBECONFIG file to deploy resources on Kubernetes, the following command shall install an instance in the `monitoring` namespace. **The namespace must exist**, it can be changed to another value.
 
-```bash
+```
 helm upgrade \
   --namespace monitoring \
   --install realopinsight \
   helm/realopinsight/
 ```
 
-The Helm manifests deploy a ClusterIP service named `realopinsight` on port `80` to get access to the RealOpInsight's web interface.
+By default the Helm manifests also deploy a ClusterIP service named realopinsiht to expose the UI on port 80 (in-cluster URL: http://realopinsight.monitoring/ui) and Prometheus metrics on port 4584 (in-cluster URL: http://realopinsight.monitoring:4583/metrics).
 
-To get a remote access to the web interface you can either enable an Ingress access or through port-forward as follows (change the namespace if different):
+To get a remote access to the UI there are two options: either to enable an Ingress access (see [Helm value files](helm/realopinsight/values.yaml)), or to set up port-forward to the related service as follows (change the namespace if different):
 
 
-```bash
+```
 kubectl port-forward \
   --namespace monitoring \
-  service/realopinsight 4583:80
+  service/realopinsight-ui 4583:80
 ```
 
-Then point your browser at the following address: http://localhost:4583/realopinsight/.
+Then point your browser at the following address: http://localhost:4583/ui/.
 
-The default username and password are `admin` and `qDmin123` (`password` prior to RealOpInsight `v20.10.1`).
+The default username and password are `admin` and `qDmin123` (`password` prior to version `v20.10.1`).
 
 ## Deployment on Docker
 The following command shall pull the image and start an instance of RealOpInsight in background. The option `-d` can be removed to start the instance in foreground.
 
 With this command the data of the instance will be stored locally on the Docker machine at the specified path (value of option `--volume`, can be changed if needed).
 
-```bash
+```
 $ docker run -d \
   --name realopinsight \
   --network host \
   --publish 4583:4583 \
+  --publish 4584:4584 \
   --volume $HOME/.realopinsight:/opt/realopinsight \
   rchakode/realopinsight
 ```
 
-Then point your browser at the following address: http://localhost:4583/realopinsight/.
+Then point your browser at the following address: http://localhost:4583/ui/.
 
-The default username and password are `admin` and `qDmin123` (`password` prior to RealOpInsight `v20.10.1`).
+The default username and password are `admin` and `qDmin123` (`password` prior to version `v20.10.1`).
 
+This command also exposes the Prometheus metrics on port `4584`.
+
+## Integration architecture
+* [Configure Monitoring Sources for Probes](https://realopinsight.com/docs/monitoring-data-sources/)
 
 ## Configuration and next steps
-Consider one of the following resources to start integrating RealOpInsight with your target monitoring environment.
+Consider the following resources to start integrating RealOpInsight with your target monitoring environment.
+* [Configure Monitoring Sources for Probes](https://realopinsight.com/docs/monitoring-data-sources/)
 * [Integration with Kubernetes](https://realopinsight.com/docs/quickstart-kubernetes-dashboard/)
 * [Integration with Zabbix](https://realopinsight.com/docs/quickstart-zabbix-dashboard/)
 * [Integration with Nagios and related systems](https://realopinsight.com/docs/quickstart-nagios-icinga-centreon-dashboard/)
-
 
 # Contributions
 Contributions in any form (feedback, code, documentation...) are welcome.
