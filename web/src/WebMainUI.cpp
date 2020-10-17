@@ -188,7 +188,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_adminStackRef->addWidget(std::move(aclPage));
 
     // link views and acl
-    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Manage Operators Views").toStdString());
+    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles").toStdString());
     linkPtr->clicked().connect(this, &WebMainUI::handleViewAclMenu);
     m_menuLinks.insert(MenuViewAndAcl, linkPtr.get());
     m_settingsPageRef->bindWidget("menu-all-views", std::move(linkPtr));
@@ -940,7 +940,7 @@ void  WebMainUI::handleViewAclMenu(void)
 {
   m_adminStackRef->setCurrentWidget(m_aclPageRef);
   m_aclPageRef->updateFieldStates();
-  m_adminPageTitleRef->setText(Q_TR("Operations Views"));
+  m_adminPageTitleRef->setText(Q_TR("Operations Profiles"));
 }
 
 
