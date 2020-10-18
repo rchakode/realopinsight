@@ -89,13 +89,13 @@ public:
     return m_loggedUser;
   }
   bool isCompleteUserDashboard(void) const {
-    return loggedUser().dashboardDisplayMode == DboUser::CompleteDashboard;
+    return loggedUser().dashboardDisplayMode == DboUser::OperationsProfileFull;
   }
   bool displayOnlyTiles(void) const {
-    return loggedUser().dashboardDisplayMode == DboUser::TileDashboard;
+    return loggedUser().dashboardDisplayMode == DboUser::OperationsProfileTacticalViewOnly;
   }
   bool isReportUserDashboard(void) const {
-    return loggedUser().dashboardDisplayMode == DboUser::NoReportDashboard;
+    return loggedUser().dashboardDisplayMode == DboUser::OperationsProfileNoAnalytics;
   }
   int boardCardsPerRow(void) const {
     return (loggedUser().dashboardTilesPerRow <= 0 ? 5 : loggedUser().dashboardTilesPerRow);

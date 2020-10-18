@@ -148,8 +148,8 @@ DbSession::updateUser(const DboUserT &userInfo)
     userPtr.modify()->firstname = userInfo.firstname;
     userPtr.modify()->email = userInfo.email;
     userPtr.modify()->role = userInfo.role;
-    userPtr.modify()->dashboardDisplayMode = userInfo.dashboardDisplayMode;
-    userPtr.modify()->dashboardTilesPerRow = userInfo.dashboardTilesPerRow;
+    userPtr.modify()->dashboardDisplayMode = userInfo.opsProfileMode;
+    userPtr.modify()->dashboardTilesPerRow = userInfo.opsProfileTilesPerRow;
     authInfo.modify()->setEmail(userInfo.email);
     out.first = ngrt4n::RcSuccess;
     transaction.commit();

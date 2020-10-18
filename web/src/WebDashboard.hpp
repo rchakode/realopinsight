@@ -74,13 +74,13 @@ public:
   std::string tooltip(void) {
     return m_chartRef->toStdString();
   }
-  void refreshMsgConsoleOnProblemStates(void);
-  std::unique_ptr<Wt::WVBoxLayout> eventItemsContainerLayout(void) {
-    return std::move(m_eventItemsContainerLayout);
+  void setEventFeedLayout(Wt::WVBoxLayout* eventFeedLayout) {
+    m_eventFeedLayout = eventFeedLayout;
   }
   void handleDashboardSelected(std::string viewName) {
     Q_EMIT dashboardSelected(viewName);
   }
+  void refreshMsgConsoleOnProblemStates(void);
 
 
 protected:
@@ -99,7 +99,7 @@ private:
   WebMsgConsole* m_eventConsoleRef;
   WebPieChart* m_chartRef;
   std::string m_thumbTitle;
-  std::unique_ptr<Wt::WVBoxLayout> m_eventItemsContainerLayout;
+  Wt::WVBoxLayout* m_eventFeedLayout;
   QHash<QString, Wt::WWidget*> m_eventItems;
 
   std::string m_treeContainerId;

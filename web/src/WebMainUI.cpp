@@ -188,7 +188,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_adminStackRef->addWidget(std::move(aclPage));
 
     // link views and acl
-    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles Views").toStdString());
+    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles").toStdString());
     linkPtr->clicked().connect(this, &WebMainUI::handleViewAclMenu);
     m_menuLinks.insert(MenuViewAndAcl, linkPtr.get());
     m_settingsPageRef->bindWidget("menu-all-views", std::move(linkPtr));
@@ -737,7 +737,7 @@ std::pair<WebDashboard*, QString> WebMainUI::loadView(const std::string& path)
     m_appBoards.insert(appName, myboard);
     m_boardSelectorRef->addItem(appName.toStdString());
     if (m_eventFeedLayoutRef) {
-      m_eventFeedLayoutRef->addItem(myboard->eventItemsContainerLayout());
+      myboard->setEventFeedLayout(m_eventFeedLayoutRef);
     }
     std::unique_ptr<WebDashboard> myBoardUptr;
     myBoardUptr.reset(myboard);

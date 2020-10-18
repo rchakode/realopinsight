@@ -42,9 +42,9 @@ const double MAP_DEFAULT_HEIGHT = 600.0;
 
 
 WebDashboard::WebDashboard(DbSession* dbSession)
-  : DashboardBase(dbSession)
+  : DashboardBase(dbSession),
+    m_eventFeedLayout(nullptr)
 {
-  m_eventItemsContainerLayout = std::make_unique<Wt::WVBoxLayout>();
   auto dashboardTpl = std::make_unique<Wt::WTemplate>(Wt::WString::tr("dashboard-item.tpl"));
   m_treeRef = dashboardTpl->bindNew<WebTree>("dashboard-tree", &m_cdata);
   m_mapRef = dashboardTpl->bindNew<WebMap>("dashboard-map", &m_cdata);
@@ -119,13 +119,13 @@ void WebDashboard::updateMap(void)
 
 void WebDashboard::updateEventFeeds(const NodeT &node)
 {
-  if (! m_eventItemsContainerLayout) {
+  if (! m_eventFeedLayout) {
     return;
   }
 
   auto oldItem = m_eventItems.find(node.id);
   if (oldItem != m_eventItems.end()) {
-    auto itemPtr = m_eventItemsContainerLayout->removeWidget(*oldItem);
+    auto itemPtr = m_eventFeedLayout->removeWidget(*oldItem);
     itemPtr.reset(nullptr);
     m_eventItems.erase(oldItem);
   }
@@ -133,7 +133,7 @@ void WebDashboard::updateEventFeeds(const NodeT &node)
   if (node.sev != ngrt4n::Normal) {
     auto newEventItem = createEventFeedTpl(node);
     m_eventItems.insert(node.id, newEventItem.get());
-    m_eventItemsContainerLayout->insertWidget(0, std::move(newEventItem));
+    m_eventFeedLayout->insertWidget(0, std::move(newEventItem));
   }
 }
 

@@ -78,8 +78,8 @@ public:
   static constexpr Wt::WFormModel::Field EmailField = "email";
   static constexpr Wt::WFormModel::Field UserLevelField = "role";
   static constexpr Wt::WFormModel::Field RegistrationDateField = "registration-date";
-  static constexpr Wt::WFormModel::Field DashboardDisplayMode = "dashboard-mode";
-  static constexpr Wt::WFormModel::Field DashboardTilesPerRow = "dashboard-tilesperrow";
+  static constexpr Wt::WFormModel::Field OperationsProfileMode = "dashboard-mode";
+  static constexpr Wt::WFormModel::Field OperationsProfileTilesPerRow = "dashboard-tilesperrow";
 
   UserFormModel(const DboUserT* user, bool changePassword, bool userForm);
   void setWritable(bool writtable);
@@ -120,8 +120,8 @@ private:
   UserFormModel* m_modelRef;
   Wt::WText* m_infoBox;
   Wt::WDialog *m_changePasswordDialog;
-  Wt::WComboBox* m_dashboardDispalyModeFieldRef;
-  Wt::WSpinBox* m_dashboardTilesPerRowFieldRef;
+  Wt::WComboBox* m_opsProfileModeFieldRef;
+  Wt::WSpinBox* m_opsProfileTilesPerRowFieldRef;
 
   Wt::Signal<DboUserT> m_validated;
   Wt::Signal<std::string> m_deleteTriggered;
@@ -134,7 +134,7 @@ private:
   void handleCloseClick(Wt::WMouseEvent ev);
   void handleCancelClick(Wt::WMouseEvent ev);
   void handleChangePasswordClick(const std::string& login, const std::string& currentPass,const std::string& newPass);
-  std::unique_ptr<Wt::WComboBox> createUserLevelField(void);
+  std::unique_ptr<Wt::WComboBox> createUserRoleField(void);
   std::unique_ptr<Wt::WLineEdit> createPaswordField(void);
   void createChangePasswordDialog(void);
   std::unique_ptr<Wt::WComboBox> createDashboardDisplayModeField(void);

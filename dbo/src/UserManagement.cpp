@@ -69,8 +69,8 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   addField(EmailField);
   addField(UserLevelField);
   addField(RegistrationDateField);
-  addField(DashboardDisplayMode);
-  addField(DashboardTilesPerRow);
+  addField(OperationsProfileMode);
+  addField(OperationsProfileTilesPerRow);
 
   setValidator(UsernameField, createNameValidator());;
   setValidator(PasswordField, createPasswordValidator());
@@ -98,8 +98,8 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
     setVisible(EmailField, false);
     setVisible(UserLevelField, false);
     setVisible(RegistrationDateField, false);
-    setVisible(DashboardDisplayMode, false);
-    setVisible(DashboardTilesPerRow, false);
+    setVisible(OperationsProfileMode, false);
+    setVisible(OperationsProfileTilesPerRow, false);
   } else {
     setVisible(CurrentPasswordField, false);
     if (user) {
@@ -120,8 +120,8 @@ void UserFormModel::setWritable(bool writtable)
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
   setReadOnly(EmailField, readonly);
-  setReadOnly(DashboardDisplayMode, readonly);
-  setReadOnly(DashboardTilesPerRow, readonly);
+  setReadOnly(OperationsProfileMode, readonly);
+  setReadOnly(OperationsProfileTilesPerRow, readonly);
   if (readonly) {
     setReadOnly(UserLevelField, readonly);
   } else {
@@ -136,8 +136,8 @@ void UserFormModel::setData(const DboUserT & user)
   setValue(LastNameField, user.lastname);
   setValue(EmailField, user.email);
   setValue(UserLevelField, DboUser::role2Text(user.role));
-  setValue(DashboardDisplayMode, DboUser::dashboardMode2Text(user.dashboardDisplayMode));
-  setValue(DashboardTilesPerRow, user.dashboardTilesPerRow);
+  setValue(OperationsProfileMode, DboUser::dashboardMode2Text(user.opsProfileMode));
+  setValue(OperationsProfileTilesPerRow, user.opsProfileTilesPerRow);
   setValue(RegistrationDateField, user.registrationDate);
 }
 
@@ -178,14 +178,6 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
     m_infoBox(new Wt::WText(""))
 {
   m_modelRef = new UserFormModel(user, changePasswordTriggered, userForm);
-  std::unique_ptr<Wt::WPushButton> changedPwdButton;
-  std::unique_ptr<Wt::WPushButton> submitButton;
-  std::unique_ptr<Wt::WPushButton> cancelButton;
-  std::unique_ptr<Wt::WComboBox> dashboardDispalyModeField = createDashboardDisplayModeField();
-  std::unique_ptr<Wt::WSpinBox> dashboardTilesPerRowField = createDashboardTilesPerRowField();
-  m_dashboardDispalyModeFieldRef = dashboardDispalyModeField.get();
-  m_dashboardTilesPerRowFieldRef = dashboardTilesPerRowField.get();
-
 
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
@@ -196,11 +188,19 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   setFormWidget(UserFormModel::FirstNameField, std::make_unique<Wt::WLineEdit>());
   setFormWidget(UserFormModel::LastNameField, std::make_unique<Wt::WLineEdit>());
   setFormWidget(UserFormModel::EmailField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::UserLevelField, createUserLevelField());
+  setFormWidget(UserFormModel::UserLevelField, createUserRoleField());
   setFormWidget(UserFormModel::RegistrationDateField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::DashboardDisplayMode, std::move(dashboardDispalyModeField));
-  setFormWidget(UserFormModel::DashboardTilesPerRow, std::move(dashboardTilesPerRowField));
 
+
+  auto opsProfileModeField = createDashboardDisplayModeField();
+  m_opsProfileModeFieldRef = opsProfileModeField.get();
+  setFormWidget(UserFormModel::OperationsProfileMode, std::move(opsProfileModeField));
+
+  auto opsProfileTilesPerRowField = createDashboardTilesPerRowField();
+  m_opsProfileTilesPerRowFieldRef = opsProfileTilesPerRowField.get();
+  setFormWidget(UserFormModel::OperationsProfileTilesPerRow, std::move(opsProfileTilesPerRowField));
+
+  Wt::WPushButton* changedPwdButtonRef = nullptr;
   if (user) {
     m_user = *user;
     if (m_changePassword) {
@@ -208,10 +208,10 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
     } else {
       if (! userForm) {
         bindEmpty("title");
-        auto changedPwdButton = bindNew<Wt::WPushButton>("change-password-link");
-        changedPwdButton->setText(Q_TR("Change password"));
-        changedPwdButton->setStyleClass("btn btn-warning");
-        changedPwdButton->clicked().connect(std::bind([=, &user]() { m_changePasswordDialog->show();}));
+        changedPwdButtonRef = bindNew<Wt::WPushButton>("change-password-link");
+        changedPwdButtonRef->setText(Q_TR("Change password"));
+        changedPwdButtonRef->setStyleClass("btn btn-warning");
+        changedPwdButtonRef->clicked().connect(std::bind([=, &user]() { m_changePasswordDialog->show();}));
       } else {
         bindEmpty("change-password-link");
       }
@@ -221,8 +221,8 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   }
 
   // Bind buttons, but alter later
-  submitButton = std::make_unique<Wt::WPushButton>(Q_TR("Submit") );
-  cancelButton = std::make_unique<Wt::WPushButton>(Q_TR("Clear") );
+  auto submitButton = std::make_unique<Wt::WPushButton>(Q_TR("Submit") );
+  auto cancelButton = std::make_unique<Wt::WPushButton>(Q_TR("Clear") );
   Wt::WPushButton* submitButtonRef = submitButton.get();
   Wt::WPushButton* cancelButtonRef = cancelButton.get();
 
@@ -253,7 +253,8 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
     cancelButtonRef->clicked().connect(std::bind([=]() {m_modelRef->reset(); updateView(m_modelRef);}));
   }
 
-  // If user, it's for update. At first time the fields are disable
+  // If user is not null,  it means it's an update request.
+  // By default all the fields are disabled.
   if (user && ! changePasswordTriggered) {
     submitButtonRef->clicked().connect(std::bind([=](){setWritable(true); submitButtonRef->clicked().connect(this, &UserFormView::process);}));
   } else {
@@ -267,8 +268,8 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
     if (cancelButtonRef) {
       cancelButtonRef->setDisabled(true);
     }
-    if (changedPwdButton) {
-      changedPwdButton->setDisabled(true);
+    if (changedPwdButtonRef) {
+      changedPwdButtonRef->setDisabled(true);
     }
   }
 
@@ -304,9 +305,9 @@ void UserFormView::resetValidationState(bool writtable)
 void UserFormView::process(void)
 {
   updateModel(m_modelRef);
-  bool isvalid = m_modelRef->validate();
+  bool isValid = m_modelRef->validate();
   updateView(m_modelRef);
-  if (isvalid) {
+  if (isValid) {
     if (m_changePassword) {
       m_changePasswordTriggered.emit(m_user.username,
                                      m_modelRef->valueText(UserFormModel::CurrentPasswordField).toUTF8(),
@@ -319,8 +320,8 @@ void UserFormView::process(void)
       m_user.lastname = m_modelRef->valueText(UserFormModel::LastNameField).toUTF8();
       m_user.email = m_modelRef->valueText(UserFormModel::EmailField).toUTF8();
       m_user.role = DboUser::role2Int(m_modelRef->valueText(UserFormModel::UserLevelField).toUTF8());
-      m_user.dashboardDisplayMode = m_dashboardDispalyModeFieldRef->currentIndex();
-      m_user.dashboardTilesPerRow = m_dashboardTilesPerRowFieldRef->value();
+      m_user.opsProfileMode = m_opsProfileModeFieldRef->currentIndex();
+      m_user.opsProfileTilesPerRow = m_opsProfileTilesPerRowFieldRef->value();
       m_user.registrationDate = Wt::WDateTime::currentDateTime().toString().toUTF8();
       m_validated.emit(m_user);
     }
@@ -358,7 +359,7 @@ void UserFormView::handleChangePasswordClick(const std::string& login, const std
   m_changePasswordDialog->accept();
 }
 
-std::unique_ptr<Wt::WComboBox> UserFormView::createUserLevelField(void)
+std::unique_ptr<Wt::WComboBox> UserFormView::createUserRoleField(void)
 {
   auto fieldModel = std::make_shared<Wt::WStandardItemModel>(2, 1);
 
@@ -398,22 +399,22 @@ void UserFormView::createChangePasswordDialog(void)
 
 std::unique_ptr<Wt::WComboBox> UserFormView::createDashboardDisplayModeField(void)
 {
-  auto displayModel = std::make_shared<Wt::WStandardItemModel>(2, 1);
+  auto model = std::make_shared<Wt::WStandardItemModel>(2, 1);
 
-  auto dashboardModeOnlyTiles = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::TileDashboard));
-  dashboardModeOnlyTiles->setData(DboUser::TileDashboard, Wt::ItemDataRole::User);
-  displayModel->setItem(DboUser::TileDashboard, 0, std::move(dashboardModeOnlyTiles));
+  auto opsProfileTacticalViewOnly = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::OperationsProfileTacticalViewOnly));
+  opsProfileTacticalViewOnly->setData(DboUser::OperationsProfileTacticalViewOnly, Wt::ItemDataRole::User);
+  model->setItem(DboUser::OperationsProfileTacticalViewOnly, 0, std::move(opsProfileTacticalViewOnly));
 
-  auto dashboardModeFull = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::CompleteDashboard));
-  dashboardModeFull->setData(DboUser::CompleteDashboard, Wt::ItemDataRole::User);
-  displayModel->setItem(DboUser::CompleteDashboard, 0, std::move(dashboardModeFull));
+  auto opsProfileModeFull = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::OperationsProfileFull));
+  opsProfileModeFull->setData(DboUser::OperationsProfileFull, Wt::ItemDataRole::User);
+  model->setItem(DboUser::OperationsProfileFull, 0, std::move(opsProfileModeFull));
 
-  auto dashboardModeNoRepport = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::NoReportDashboard));
-  dashboardModeNoRepport->setData(DboUser::NoReportDashboard, Wt::ItemDataRole::User);
-  displayModel->setItem(DboUser::NoReportDashboard, 0, std::move(dashboardModeNoRepport));
+  auto opsProfileNoAnalytics = std::make_unique<Wt::WStandardItem>(DboUser::dashboardMode2Text(DboUser::OperationsProfileNoAnalytics));
+  opsProfileNoAnalytics->setData(DboUser::OperationsProfileNoAnalytics, Wt::ItemDataRole::User);
+  model->setItem(DboUser::OperationsProfileNoAnalytics, 0, std::move(opsProfileNoAnalytics));
 
   auto fieldWidget = std::make_unique<Wt::WComboBox>();
-  fieldWidget->setModel(displayModel);
+  fieldWidget->setModel(model);
 
   return fieldWidget;
 }

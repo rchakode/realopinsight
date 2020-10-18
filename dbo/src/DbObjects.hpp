@@ -100,8 +100,8 @@ struct DboUserT {
   std::string email;
   int role;
   int authsystem;
-  int dashboardDisplayMode;
-  int dashboardTilesPerRow;
+  int opsProfileMode;
+  int opsProfileTilesPerRow;
   std::string registrationDate;
 };
 
@@ -112,10 +112,10 @@ public:
     OpRole = 101
   };
 
-  enum DashboardModeT {
-    CompleteDashboard = 0,
-    NoReportDashboard = 1,
-    TileDashboard = 2
+  enum OperationProfileModeT {
+    OperationsProfileFull = 0,
+    OperationsProfileNoAnalytics = 1,
+    OperationsProfileTacticalViewOnly = 2
   };
 
   std::string username;
@@ -156,8 +156,8 @@ public:
     role = userInfo.role;
     registrationDate = userInfo.registrationDate;
     authsystem = userInfo.authsystem;
-    dashboardDisplayMode = userInfo.dashboardDisplayMode;
-    dashboardTilesPerRow = userInfo.dashboardTilesPerRow;
+    dashboardDisplayMode = userInfo.opsProfileMode;
+    dashboardTilesPerRow = userInfo.opsProfileTilesPerRow;
   }
 
   DboUserT data(void) const {
@@ -170,8 +170,8 @@ public:
     u.role = role;
     u.registrationDate = registrationDate;
     u.authsystem = authsystem;
-    u.dashboardDisplayMode = dashboardDisplayMode;
-    u.dashboardTilesPerRow = dashboardTilesPerRow;
+    u.opsProfileMode = dashboardDisplayMode;
+    u.opsProfileTilesPerRow = dashboardTilesPerRow;
     return u;
   }
 
@@ -184,13 +184,13 @@ public:
   static std::string dashboardMode2Text(int mode) {
     std::string result = Q_TR("Default");
     switch(mode) {
-      case TileDashboard:
+      case OperationsProfileTacticalViewOnly:
         result = Q_TR("Only Tiles");
         break;
-      case NoReportDashboard:
+      case OperationsProfileNoAnalytics:
         result = Q_TR("No Report");
         break;
-      case CompleteDashboard:
+      case OperationsProfileFull:
       default:
         result = Q_TR("Complete");
         break;
