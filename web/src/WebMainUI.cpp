@@ -943,7 +943,7 @@ void  WebMainUI::handleViewAclMenu(void)
 {
   m_adminStackRef->setCurrentWidget(m_aclPageRef);
   m_aclPageRef->updateFieldStates();
-  m_adminPageTitleRef->setText(Q_TR("Operations Profiles"));
+  m_adminPageTitleRef->setText(Q_TR("Manage Operations Profiles"));
 }
 
 
