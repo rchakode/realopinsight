@@ -304,7 +304,7 @@ void UserFormView::resetValidationState(bool writtable)
 
 void UserFormView::process(void)
 {
-  updateModel(m_modelRef);
+  // updateModel(m_modelRef);
   bool isValid = m_modelRef->validate();
   updateView(m_modelRef);
   if (isValid) {
@@ -448,11 +448,11 @@ DbUserManager::~DbUserManager(void){}
 void DbUserManager::updateDbUsers(void)
 {
   m_dbUserListWidgetRef->bindWidget("user-list", nullptr);
-  for (auto user: m_dbSession->listUsers()) {
-    auto usersListContainer = std::make_unique<Wt::WContainerWidget>();
+  auto usersListContainer = std::make_unique<Wt::WContainerWidget>();
+  for (auto& user: m_dbSession->listUsers()) {
     usersListContainer->addWidget(createUserPanel(user.data()));
-    m_dbUserListWidgetRef->bindWidget("user-list", std::move(usersListContainer));
   }
+  m_dbUserListWidgetRef->bindWidget("user-list", std::move(usersListContainer));
 }
 
 
