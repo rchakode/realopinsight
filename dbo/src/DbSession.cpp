@@ -383,7 +383,7 @@ int DbSession::initDb(void)
     createTables();
     DboUserT adm;
     adm.username = "admin";
-    adm.password = "qDmin123";
+    adm.password = "password";
     adm.firstname = "Default";
     adm.lastname = "Administrator";
     adm.role = DboUser::AdmRole;
