@@ -86,9 +86,10 @@
 @media (max-width: 979px) {
   .nav-collapse .dropdown-menu {
     display: block !important;
+    position: static !important;
   }
   .nav-collapse .dropdown-menu li > a:hover {
-    color: #555555;
+    color: #555;
     background: #f2f2f2;
   }
   .nav-collapse .dropdown-menu .active > a {
@@ -105,7 +106,7 @@
  */
 .navbar .nav > li.submenu > a:hover,
 .navbar .nav > li.submenu > a.active {
-  color: #555555;
+  color: #555;
   text-decoration: none;
   background-color: #e5e5e5;
   -webkit-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
@@ -124,7 +125,7 @@
 /*
  * Show pointer even if anchor has no href
  */
-.navbar .nav > li > a {
+.nav > li > a {
   cursor: pointer;
 }
 /*
@@ -137,11 +138,15 @@
 /*
  * Dialog extensions
  */
-.modal .modal-header {
+.modal .movable .modal-header {
   cursor: move;
 }
 .modal .modal-body .modal-footer {
   margin: 0px -15px -15px;
+}
+
+.modal .modal-body {
+  max-height: none; /* override max-height: 400px in Bootstrap */
 }
 /*
  * Message box
@@ -171,16 +176,16 @@
   cursor: col-resize;
 }
 .Wt-hrh2 {
-  background: url(../splitter-v.png) no-repeat 50% 50% #eeeeee;
+  background: url(../splitter-v.png) no-repeat 50% 50% #EEE;
 }
 .Wt-vrh2 {
-  background: url(../splitter-h.png) no-repeat 50% 50% #eeeeee;
+  background: url(../splitter-h.png) no-repeat 50% 50% #EEE;
 }
 .Wt-hsh2,
 .Wt-vsh2,
 .Wt-vrh2:hover,
 .Wt-hrh2:hover {
-  background-color: #999999;
+  background-color: #999;
 }
 /*
  * WCalendar
@@ -226,10 +231,10 @@
   cursor: pointer;
 }
 .Wt-cal tr:first-child th:hover {
-  background: #eeeeee;
+  background: #eee;
 }
 .Wt-cal tr:first-child th select {
-  width: 105px;
+  width: 125px;
   margin: 0px;
 }
 .Wt-cal tr:first-child th input {
@@ -237,31 +242,29 @@
   margin: 0px;
 }
 .Wt-cal .days td:hover {
-  background: #eeeeee;
+  background: #eee;
   cursor: pointer;
 }
 .Wt-cal .days td .Wt-cal-oom {
-  color: #999999;
+  color: #999;
 }
 .Wt-cal .days td .Wt-cal-oor {
-  color: #999999;
+  color: #999;
 }
 .Wt-cal .days td .Wt-cal-sel,
 .Wt-cal .days td .Wt-cal-sel:hover {
-  color: #ffffff;
   background-color: #006dcc;
-  background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-  background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-  background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-  background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+  background-image: -moz-linear-gradient(top, #08c, #0044cc);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#08c), to(#0044cc));
+  background-image: -webkit-linear-gradient(top, #08c, #0044cc);
+  background-image: -o-linear-gradient(top, #08c, #0044cc);
+  background-image: linear-gradient(to bottom, #08c, #0044cc);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
   border-color: #0044cc #0044cc #002a80;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #0044cc;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
-
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
@@ -276,7 +279,7 @@
 .Wt-cal .days td .Wt-cal-sel:hover.disabled,
 .Wt-cal .days td .Wt-cal-sel[disabled],
 .Wt-cal .days td .Wt-cal-sel:hover[disabled] {
-  color: #ffffff;
+  color: #fff;
   background-color: #0044cc;
   *background-color: #003bb3;
 }
@@ -285,6 +288,26 @@
 .Wt-cal .days td .Wt-cal-sel.active,
 .Wt-cal .days td .Wt-cal-sel:hover.active {
   background-color: #003399 \9;
+}
+/*
+ * WTimeEdit
+ */
+.Wt-timeedit {
+  background-image: url('time-edit-button.png');
+  background-repeat: no-repeat;
+  background-position: right top;
+  padding-right: 40px;
+}
+.Wt-timeedit:hover {
+  cursor: default;
+  background-position: right -34px;
+}
+.Wt-timeedit:active {
+  cursor: default;
+  background-position: right -68px;
+}
+.Wt-timeedit::-ms-clear {
+  display: none;
 }
 /*
  * WDateEdit
@@ -334,7 +357,8 @@
 /*
  * WPushButton
  */
-.btn.with-label img {
+.btn.with-label img,
+.list-group-item.with-label img {
   padding-right: 10px;
 }
 /*
@@ -374,8 +398,8 @@
   left: -1px;
   margin-top: -5px;
   height: 8px;
-  border: 1px solid #dddddd;
-  background: #eeeeee;
+  border: 1px solid #ddd;
+  background: #eee;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -384,8 +408,8 @@
   top: 50%;
   margin-top: -5px;
   height: 8px;
-  border: 1px solid #0088cc;
-  background: #0088cc;
+  border: 1px solid #08c;
+  background: #08c;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -394,22 +418,21 @@
   top: 50% !important;
   margin-top: -10px;
   height: 18px !important;
-  border: 1px solid #bbbbbb;
-  color: #333333;
+  border: 1px solid #bbb;
+  color: #333;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
   background-color: #f5f5f5;
-  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
-  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #fff, #e6e6e6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fff), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, #fff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #fff, #e6e6e6);
+  background-image: linear-gradient(to bottom, #fff, #e6e6e6);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #e6e6e6;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
-
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -420,7 +443,7 @@
 .Wt-slider-h .handle.active,
 .Wt-slider-h .handle.disabled,
 .Wt-slider-h .handle[disabled] {
-  color: #333333;
+  color: #333;
   background-color: #e6e6e6;
   *background-color: #d9d9d9;
 }
@@ -447,8 +470,8 @@
   left: 50%;
   margin-left: -5px;
   width: 8px;
-  border: 1px solid #dddddd;
-  background: #eeeeee;
+  border: 1px solid #ddd;
+  background: #eee;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -458,8 +481,8 @@
   margin-left: -5px;
   bottom: -1px;
   width: 8px;
-  border: 1px solid #0088cc;
-  background: #0088cc;
+  border: 1px solid #08c;
+  background: #08c;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -468,22 +491,21 @@
   left: 50% !important;
   margin-left: -10px;
   width: 18px !important;
-  border: 1px solid #bbbbbb;
-  color: #333333;
+  border: 1px solid #bbb;
+  color: #333;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
   background-color: #f5f5f5;
-  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
-  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
-  background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #fff, #e6e6e6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fff), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, #fff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #fff, #e6e6e6);
+  background-image: linear-gradient(to bottom, #fff, #e6e6e6);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #e6e6e6;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
-
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -494,7 +516,7 @@
 .Wt-slider-v .handle.active,
 .Wt-slider-v .handle.disabled,
 .Wt-slider-v .handle[disabled] {
-  color: #333333;
+  color: #333;
   background-color: #e6e6e6;
   *background-color: #d9d9d9;
 }
@@ -532,7 +554,7 @@
 .dropdown-menu.typeahead {
   cursor: pointer;
 }
-.dropdown-menu.typeahead li > a:hover {
+.dropdown-menu.typeahead li:not(.active) > a:hover {
   color: inherit;
   background: inherit;
 }
@@ -543,15 +565,11 @@
   cursor: default;
   white-space: nowrap;
   background: white;
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   /* header */
-
   /* resize handles */
-
   /* sort handles */
-
   /* item drag & drop */
-
 }
 .Wt-itemview.Wt-itemview-paged {
   overflow: auto;
@@ -575,15 +593,15 @@
 .Wt-itemview th .Wt-tv-br {
   overflow: hidden;
 }
-.Wt-itemview Wt-header .Wt-label {
+.Wt-itemview .Wt-header .Wt-label {
   font-weight: bold;
   text-overflow: ellipsis;
   overflow: hidden;
   /* needed for IE only */
-
   white-space: nowrap;
+  height: 100%;
 }
-.Wt-itemview Wt-header .Wt-wwrap .Wt-label {
+.Wt-itemview .Wt-header .Wt-wwrap .Wt-label {
   overflow: visible;
   white-space: normal;
 }
@@ -605,7 +623,7 @@
   cursor: pointer;
 }
 .Wt-itemview .Wt-tv-rh:hover {
-  background-color: #999999;
+  background-color: #999;
 }
 .Wt-itemview .Wt-tv-sh-none {
   background: url(../sort-arrow-none.gif) no-repeat 0 6px;
@@ -617,9 +635,9 @@
   background: url(../sort-arrow-down.gif) no-repeat 0 6px;
 }
 .Wt-itemview .active {
-  color: #ffffff;
+  color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
-  background-color: #0088cc;
+  background-color: #08c;
   cursor: default;
 }
 .Wt-itemview .Wt-drop-site {
@@ -640,21 +658,22 @@ body.Wt-rtl .Wt-itemview .Wt-tv-no-rh {
 .Wt-tableview {
   white-space: nowrap;
   /* header */
-
   /* borders */
-
+}
+.Wt-tableview select {
+  width: 100%;
 }
 .Wt-tableview .Wt-header .Wt-tv-c {
   padding-left: 6px;
 }
 .Wt-tableview .Wt-tv-contents {
-  background-color: #ffffff;
+  background-color: #fff;
 }
 .Wt-tableview .Wt-tv-contents.Wt-striped div.Wt-tv-c:nth-child(odd) {
   background-color: #f9f9f9;
 }
 .Wt-tableview .Wt-tv-contents.Wt-striped div.active:nth-child(odd) {
-  background-color: #0088cc;
+  background-color: #08c;
 }
 .Wt-tableview .Wt-tv-contents .Wt-tv-c,
 .Wt-tableview .Wt-plaintable td,
@@ -681,7 +700,7 @@ body.Wt-rtl .Wt-itemview .Wt-tv-no-rh {
   padding: 0px;
 }
 .Wt-tableview .Wt-tv-br {
-  border-right: 1px solid #dddddd;
+  border-right: 1px solid #ddd;
 }
 .Wt-tableview .Wt-plaintable .Wt-tv-br {
   border-right: 0;
@@ -689,15 +708,18 @@ body.Wt-rtl .Wt-itemview .Wt-tv-no-rh {
 .Wt-tableview .Wt-tv-contents .Wt-tv-c,
 .Wt-tableview .Wt-plaintable td,
 .Wt-tableview .Wt-plaintable th {
-  border-right: 1px solid #dddddd;
-  border-bottom: 1px solid #dddddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  margin-top: -1px;
+}
+.Wt-tableview .Wt-spacer {
+  border-bottom: 1px solid #ddd;
 }
 .Wt-tableview .Wt-header {
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #ddd;
 }
 body.Wt-rtl .Wt-tableview {
   /* borders */
-
 }
 body.Wt-rtl .Wt-tableview .Wt-header .Wt-tv-c {
   padding-left: 0px;
@@ -714,12 +736,12 @@ body.Wt-rtl .Wt-tableview table {
 }
 body.Wt-rtl .Wt-tableview .Wt-tv-br {
   border-right: 0;
-  border-left: 1px solid #dddddd;
+  border-left: 1px solid #ddd;
 }
 body.Wt-rtl .Wt-tableview .Wt-tv-contents .Wt-tv-c,
 body.Wt-rtl .Wt-tableview .Wt-plaintable tbody .Wt-tv-c {
   border-right: 0;
-  border-left: 1px solid #dddddd;
+  border-left: 1px solid #ddd;
 }
 /*
  * WTree(node)
@@ -751,9 +773,9 @@ body.Wt-rtl .Wt-tableview .Wt-plaintable tbody .Wt-tv-c {
   background-repeat: no-repeat;
 }
 .Wt-tree .active {
-  color: #ffffff;
+  color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
-  background-color: #0088cc;
+  background-color: #08c;
   cursor: default;
 }
 .Wt-tree .Wt-ctrl {
@@ -807,7 +829,7 @@ body.Wt-rtl .Wt-tree .cols-row {
 }
 .Wt-treetable .Wt-header {
   font-weight: bold;
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #ddd;
   line-height: 28px;
 }
 .Wt-sbspacer {
@@ -826,7 +848,6 @@ body.Wt-rtl .Wt-sbspacer {
 /* Layout styling */
 .Wt-treeview {
   /* nodes */
-
 }
 .Wt-treeview ul {
   margin: 0px;
@@ -841,7 +862,7 @@ body.Wt-rtl .Wt-sbspacer {
   margin: 0px 3px 2px 0px;
 }
 .Wt-treeview .Wt-header {
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #ddd;
 }
 .Wt-treeview .Wt-header .Wt-tv-c {
   padding: 0px;
@@ -850,14 +871,12 @@ body.Wt-rtl .Wt-sbspacer {
 .Wt-treeview .Wt-tv-br,
 .Wt-treeview ul .Wt-tv-c {
   /* data */
-
   margin-right: 0px;
-  border-right: 1px solid #dddddd;
+  border-right: 1px solid #ddd;
 }
 .Wt-treeview button.Wt-tv-c {
   border-right-color: transparent;
   /* doesn't work */
-
 }
 .Wt-treeview .Wt-tv-c {
   padding: 0px 3px;
@@ -933,10 +952,9 @@ body.Wt-rtl .Wt-treeview .Wt-header .Wt-tv-c {
 body.Wt-rtl .Wt-treeview .Wt-tv-br,
 body.Wt-rtl .Wt-treeview ul .Wt-tv-c {
   /* data */
-
   border-right: 0px;
   margin-left: 0px;
-  border-left: 1px solid #dddddd;
+  border-left: 1px solid #ddd;
 }
 body.Wt-rtl .Wt-treeview .Wt-tv-row {
   float: left;
@@ -979,8 +997,8 @@ body.Wt-rtl .Wt-treeview .Wt-ctrl.noexpand {
   margin: 0px 4px;
 }
 .Wt-in-place-edit span:hover {
-  color: #ffffff;
-  background-color: #0088cc;
+  color: #fff;
+  background-color: #08c;
 }
 /*
  * WStackedWidget
@@ -988,4 +1006,64 @@ body.Wt-rtl .Wt-treeview .Wt-ctrl.noexpand {
 .Wt-stack.Wt-animated {
   overflow: hidden;
   position: relative;
+}
+/*
+ * WResizable
+ */
+.Wt-resizable,
+.Wt-resizable.modal .modal-footer {
+  background-image: url(../../../resizable.png);
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-position: right bottom;
+}
+/*
+ * WFileDropWidget
+ */
+.Wt-filedropzone {
+  width: 200px;
+  height: 200px;
+  border: thick dashed grey;
+  background-color: lightgrey;
+}
+.Wt-filedropzone.Wt-dropzone-hover {
+  border-color: green;
+}
+.Wt-filedropzone.Wt-dropzone-hover * {
+  pointer-events: none;
+}
+
+.Wt-fileupload-hidden {
+    display: none !important;
+}
+
+.Wt-filedropzone.Wt-dropzone-dragstyle {
+    position: relative;
+    z-index: 20001;
+}
+
+.Wt-filedropzone.Wt-dropzone-indication {
+    border-color: green;
+}
+
+.Wt-dropcover {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: -100;
+}
+.Wt-dropcover.Wt-dropzone-drag {
+    z-index: 20000;
+}
+.Wt-icon {
+    display: inline-block;
+    margin-right: 8px;
+    background-repeat: no-repeat;
+    background-position: center left;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    vertical-align: text-top;
 }

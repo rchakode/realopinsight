@@ -73,25 +73,15 @@
   display: inline;
 }
 
-/*
- * Custom collapse nav support
- */
-
-.navbar .navbar-collapse {
-  display: block !important;
-}
-
-@media (max-width: 979px) {
-  .navbar-collapse .dropdown-menu {
+@media (min-width: 768px) {
+  .navbar .navbar-collapse {
     display: block !important;
   }
-  .navbar-collapse .dropdown-menu li > a:hover {
-    color: #333333;
-    background: #f2f2f2;
-  }
-  .navbar-collapse .dropdown-menu .active > a {
-    color: inherit;
-    background: inherit;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav .open .dropdown-menu {
+    position: static !important;
   }
 }
 
@@ -129,7 +119,7 @@
  * Show pointer even if anchor has no href
  */
 
-.navbar .nav > li > a {
+.nav > li > a {
   cursor: pointer;
 }
 
@@ -150,7 +140,7 @@
   display: block;
 }
 
-.modal-dialog .modal-header {
+.modal-dialog .movable .modal-header {
   cursor: move;
 }
 
@@ -265,7 +255,7 @@
 }
 
 .Wt-cal tr:first-child th select {
-  width: 105px;
+  width: 125px;
   margin: 0;
 }
 
@@ -330,6 +320,31 @@
 }
 
 /*
+ * WTimeEdit
+ */
+
+.Wt-timeedit {
+  padding-right: 40px;
+  background-image: url('time-edit-button.png');
+  background-position: right top;
+  background-repeat: no-repeat;
+}
+
+.Wt-timeedit:hover {
+  cursor: default;
+  background-position: right -34px;
+}
+
+.Wt-timeedit:active {
+  cursor: default;
+  background-position: right -68px;
+}
+
+.Wt-timeedit::-ms-clear {
+  display: none;
+}
+
+/*
  * WDatePicker
  */
 
@@ -361,7 +376,8 @@
  * WPushButton
  */
 
-.btn.with-label img {
+.btn.with-label img,
+.list-group-item.with-label img {
   padding-right: 10px;
 }
 
@@ -597,11 +613,6 @@ fieldset[disabled] .Wt-slider-v .handle.active {
   cursor: pointer;
 }
 
-.dropdown-menu.typeahead li > a:hover {
-  color: inherit;
-  background: inherit;
-}
-
 /*
  * WAbstractItemView (WTableView and WTreeView)
  */
@@ -640,14 +651,15 @@ fieldset[disabled] .Wt-slider-v .handle.active {
   overflow: hidden;
 }
 
-.Wt-itemview Wt-header .Wt-label {
+.Wt-itemview .Wt-header .Wt-label {
+  height: 100%;
   overflow: hidden;
   font-weight: bold;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.Wt-itemview Wt-header .Wt-wwrap .Wt-label {
+.Wt-itemview .Wt-header .Wt-wwrap .Wt-label {
   overflow: visible;
   white-space: normal;
 }
@@ -1153,4 +1165,75 @@ body.Wt-rtl .Wt-treeview .Wt-ctrl.noexpand {
 
 .Wt-calendar .form-control {
   display: initial;
+}
+
+/*
+ * WResizable
+ */
+
+.modal-dialog.Wt-resizable .modal-content {
+  background-attachment: scroll;
+  background-image: url(../../../resizable.png);
+  background-position: right bottom;
+  background-repeat: no-repeat;
+}
+
+.close {
+  position: relative;
+  z-index: 10;
+}
+
+/*
+ * WFileDropWidget
+ */
+
+.Wt-filedropzone {
+  width: 200px;
+  height: 200px;
+  background-color: lightgrey;
+  border: thick dashed grey;
+}
+
+.Wt-filedropzone.Wt-dropzone-hover {
+  border-color: green;
+}
+
+.Wt-filedropzone.Wt-dropzone-hover * {
+  pointer-events: none;
+}
+
+.Wt-fileupload-hidden {
+    display: none !important;
+}
+
+.Wt-filedropzone.Wt-dropzone-dragstyle {
+    position: relative;
+    z-index: 20001;
+}
+
+
+.Wt-filedropzone.Wt-dropzone-indication {
+    border-color: green;
+}
+
+.Wt-dropcover {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: -100;
+}
+.Wt-dropcover.Wt-dropzone-dragstyle {
+    z-index: 20000;
+}
+.Wt-icon {
+    display: inline-block;
+    margin-right: 8px;
+    background-repeat: no-repeat;
+    background-position: center left;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    vertical-align: text-top;
 }
