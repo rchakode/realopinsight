@@ -40,7 +40,6 @@ jobs:
         if [ "$MATCHED_TAG" != "$GIT_LATEST_TAG" ]; then
           docker tag $IMAGE_NAME:${RELEASE_VERSION} ${IMAGE_NAME}:${GIT_LATEST_TAG}
         fi
-        # docker tag $IMAGE_NAME:${RELEASE_VERSION} ${IMAGE_NAME}:latest
+        docker tag $IMAGE_NAME:${RELEASE_VERSION} ${IMAGE_NAME}:latest
         docker login --username ${REGISTRY_USERNAME} --password ${REGISTRY_PASSWORD}
         docker push $IMAGE_NAME
-
