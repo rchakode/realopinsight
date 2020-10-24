@@ -637,10 +637,6 @@ void WebMainUI::handleReportPeriodChanged(long start, long end)
   for (const auto& vname : qosData.keys()) {
     m_platformStatusAnalyticsChartsRef->updateByView(vname, qosData);
   }
-  showMessage(ngrt4n::OperationSucceeded, Q_TR("Reports updated: ")
-              .append(ngrt4n::wHumanTimeText(start).toUTF8())
-              .append(" - ")
-              .append(ngrt4n::wHumanTimeText(end).toUTF8()));
 }
 
 
@@ -927,7 +923,7 @@ void WebMainUI::handleManageBuiltinUsers(void)
 {
   m_adminStackRef->setCurrentWidget(m_dbUserManager->dbUserListWidgetRef());
   m_dbUserManager->updateDbUsers();
-  m_adminPageTitleRef->setText(Q_TR("Users"));
+  m_adminPageTitleRef->setText(Q_TR("Manage Users"));
 }
 
 

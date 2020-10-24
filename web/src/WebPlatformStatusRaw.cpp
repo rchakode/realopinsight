@@ -34,13 +34,14 @@ WebPlatformStatusRaw::WebPlatformStatusRaw(const std::string& vame)
   setLegendEnabled(false);
   setType(Wt::Chart::ChartType::Scatter);
   axis(Wt::Chart::Axis::X).setScale(Wt::Chart::AxisScale::DateTime);
+  axis(Wt::Chart::Axis::Y).setScale(Wt::Chart::AxisScale::Log);
+  axis(Wt::Chart::Axis::Y).setMaximum(100.0);
   axis(Wt::Chart::Axis::Y).setTitle(Q_TR("Probe status (%)"));
   axis(Wt::Chart::Axis::Y).setLabelAngle(90);
   setPlotAreaPadding(50, Wt::Side::Left);
   axis(Wt::Chart::Axis::Y).setTitleOrientation(Wt::Orientation::Vertical);
   setToolTip("<p><em>Ctrl+Wheel</em> to zoom</p>"
-             "<p><em>Click+Hold+Move</em> to navigate</p>",
-             Wt::TextFormat::XHTML);
+             "<p><em>Click+Hold+Move</em> to navigate</p>", Wt::TextFormat::XHTML);
 }
 
 
