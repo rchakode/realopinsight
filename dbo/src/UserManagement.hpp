@@ -127,6 +127,7 @@ private:
   Wt::Signal<std::string> m_deleteTriggered;
   Wt::Signal<std::string, std::string, std::string> m_changePasswordTriggered;
   Wt::Signal<Wt::WMouseEvent> m_close;
+  Wt::WLineEdit* m_lastNameFieldRef;
 
 
   void process(void);

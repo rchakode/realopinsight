@@ -182,13 +182,16 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
   setFormWidget(UserFormModel::UsernameField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::CurrentPasswordField, createPaswordField());
-  setFormWidget(UserFormModel::PasswordField, createPaswordField());
-  setFormWidget(UserFormModel::PasswordConfimationField, createPaswordField());
+  setFormWidget(UserFormModel::CurrentPasswordField, std::move(createPaswordField()));
+  setFormWidget(UserFormModel::PasswordField, std::move(createPaswordField()));
+  setFormWidget(UserFormModel::PasswordConfimationField, std::move(createPaswordField()));
   setFormWidget(UserFormModel::FirstNameField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::LastNameField, std::make_unique<Wt::WLineEdit>());
+
+  auto lastNameField = std::make_unique<Wt::WLineEdit>();
+  m_lastNameFieldRef = lastNameField.get();
+  setFormWidget(UserFormModel::LastNameField, std::move(lastNameField));
   setFormWidget(UserFormModel::EmailField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::UserLevelField, createUserRoleField());
+  setFormWidget(UserFormModel::UserLevelField, std::move(createUserRoleField()));
   setFormWidget(UserFormModel::RegistrationDateField, std::make_unique<Wt::WLineEdit>());
 
 
@@ -256,7 +259,10 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   // If user is not null,  it means it's an update request.
   // By default all the fields are disabled.
   if (user && ! changePasswordTriggered) {
-    submitButtonRef->clicked().connect(std::bind([=](){setWritable(true); submitButtonRef->clicked().connect(this, &UserFormView::process);}));
+    submitButtonRef->clicked().connect(std::bind([=](){
+      setWritable(true);
+      submitButtonRef->clicked().connect(this, &UserFormView::process);
+    }));
   } else {
     submitButtonRef->clicked().connect(this, &UserFormView::process);
   }
@@ -304,7 +310,7 @@ void UserFormView::resetValidationState(bool writtable)
 
 void UserFormView::process(void)
 {
-  // updateModel(m_modelRef);
+  updateModel(m_modelRef);
   bool isValid = m_modelRef->validate();
   updateView(m_modelRef);
   if (isValid) {
