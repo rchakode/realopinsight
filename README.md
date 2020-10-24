@@ -38,19 +38,21 @@ helm upgrade \
   helm/realopinsight/
 ```
 
-By default the Helm manifests also deploy a ClusterIP service named realopinsiht to expose the UI on port 80 (in-cluster URL: `http://realopinsight.monitoring/ui`) and Prometheus metrics on port 4584 (in-cluster URL: `http://realopinsight.monitoring:4583/metrics`).
+By default the Helm manifests also deploy a **ClusterIP** service named `realopinsiht` to expose the UI on port `80` and Prometheus metrics on port `4584`. The associated in-cluster URLs are the following:
+  * UI: `http://realopinsight.monitoring/ui`.
+  * Prometheus metrics: `http://realopinsight.monitoring:4583/metrics`.
 
-To get a remote access to the UI there are two options: either to enable an Ingress access (see [Helm value files](helm/realopinsight/values.yaml)), or to set up port-forward to the related service as follows (change the namespace if different):
-
-```
-kubectl port-forward \
-  --namespace monitoring \
-  service/realopinsight-ui 4583:80
-```
-
-Then point your browser at the following address: http://localhost:4583/ui/.
-
-The default username and password are `admin` and `password`.
+## Remote access to the UI
+To get a remote access to the UI, use one of the following options:
+  * Change the service type to **LoadBalancer** (see [Helm value files](helm/realopinsight/values.yaml));
+  * Enable an Ingress access (see [Helm value files](helm/realopinsight/values.yaml));
+  * Enable port-forwarding from your local machine as follows (change the namespace if different).
+    ```
+    kubectl port-forward \
+      --namespace monitoring \
+      service/realopinsight-ui 4583:80
+    ```
+    Then point your browser at the following address: http://localhost:4583/ui/.
 
 ## Deployment on Docker
 The following command shall pull the image and start an instance of RealOpInsight in background. The `-d` option can be removed to start the instance in foreground.
@@ -65,9 +67,10 @@ $ docker run -d \
 ```
 
 Once the container started, it shall enable the following endpoints:
- * UI: http://localhost:4583/ui.
- * Prometheus metrics: http://localhost:4584/metrics.
+ * UI: `http://localhost:4583/ui`.
+ * Prometheus metrics: `http://localhost:4584/metrics`.
 
+## Default admin credentials
 The default username and password for the UI are `admin` and `password`.
 
 > For a production setup, you must change this default password as quick as possible.
