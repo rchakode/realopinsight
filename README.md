@@ -38,10 +38,9 @@ helm upgrade \
   helm/realopinsight/
 ```
 
-By default the Helm manifests also deploy a ClusterIP service named realopinsiht to expose the UI on port 80 (in-cluster URL: http://realopinsight.monitoring/ui) and Prometheus metrics on port 4584 (in-cluster URL: http://realopinsight.monitoring:4583/metrics).
+By default the Helm manifests also deploy a ClusterIP service named realopinsiht to expose the UI on port 80 (in-cluster URL: `http://realopinsight.monitoring/ui`) and Prometheus metrics on port 4584 (in-cluster URL: `http://realopinsight.monitoring:4583/metrics`).
 
 To get a remote access to the UI there are two options: either to enable an Ingress access (see [Helm value files](helm/realopinsight/values.yaml)), or to set up port-forward to the related service as follows (change the namespace if different):
-
 
 ```
 kubectl port-forward \
@@ -51,35 +50,31 @@ kubectl port-forward \
 
 Then point your browser at the following address: http://localhost:4583/ui/.
 
-The default username and password are `admin` and `qDmin123` (`password` prior to version `v20.10.1`).
+The default username and password are `admin` and `password`.
 
 ## Deployment on Docker
-The following command shall pull the image and start an instance of RealOpInsight in background. The option `-d` can be removed to start the instance in foreground.
-
+The following command shall pull the image and start an instance of RealOpInsight in background. The `-d` option can be removed to start the instance in foreground.
 With this command the data of the instance will be stored locally on the Docker machine at the specified path (value of option `--volume`, can be changed if needed).
 
 ```
 $ docker run -d \
   --name realopinsight \
   --network host \
-  --publish 4583:4583 \
-  --publish 4584:4584 \
   --volume $HOME/.realopinsight:/opt/realopinsight \
   rchakode/realopinsight
 ```
 
-Then point your browser at the following address: http://localhost:4583/ui/.
+Once the container started, it shall enable the following endpoints:
+ * UI: http://localhost:4583/ui.
+ * Prometheus metrics: http://localhost:4584/metrics.
 
-The default username and password are `admin` and `qDmin123` (`password` prior to version `v20.10.1`).
+The default username and password for the UI are `admin` and `password`.
 
-This command also exposes the Prometheus metrics on port `4584`.
-
-## Integration architecture
-* [Configure Monitoring Sources for Probes](https://realopinsight.com/docs/monitoring-data-sources/)
+> For a production setup, you must change this default password as quick as possible.
 
 ## Configuration and next steps
 Consider the following resources to start integrating RealOpInsight with your target monitoring environment.
-* [Configure Monitoring Sources for Probes](https://realopinsight.com/docs/monitoring-data-sources/)
+* [Architecture & Supported Monitoring Sources](https://realopinsight.com/docs/monitoring-data-sources/)
 * [Integration with Kubernetes](https://realopinsight.com/docs/quickstart-kubernetes-dashboard/)
 * [Integration with Zabbix](https://realopinsight.com/docs/quickstart-zabbix-dashboard/)
 * [Integration with Nagios and related systems](https://realopinsight.com/docs/quickstart-nagios-icinga-centreon-dashboard/)
