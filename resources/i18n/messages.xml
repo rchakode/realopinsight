@@ -20,7 +20,7 @@
       <div class="accordion">
         <fieldset class="accordion-group" id="viewMenuBlock">
           <div class="accordion-heading">
-            <i class="fa fa-dashboard"></i> View Management
+            <i class="fa fa-dashboard"></i> Operations Views
           </div>
           <div class="accordion-body collapse in">
               <div class="accordion-inner">
@@ -87,7 +87,7 @@
     <div class="col-sm-4">
       <h3>Bind to Monitoring Sources</h3>
       <p>
-        Under <b>Monitoring Sources</b> set parameters (i.e. URL and credentials) to connect to Nagios, Zabbix or Kubernetes to retrieve basic probe status data.
+        Under <b>Data Sources</b> set parameters (i.e. URL and credentials) to connect to Nagios, Zabbix or Kubernetes to retrieve basic probe status data.
       </p>
       <figure>
         <img alt="Configure data sources" src="/images/built-in/thumbnails/source-settings.png" />
@@ -112,7 +112,7 @@
 
     <div class="col-sm-4">
       <h3>Configure operations views</h3>
-      <p>Under <b>New User</b> create operator users, and then define their visualization permissions (<b>Operations Profiles</b>).</p>
+      <p>Under <b>New User</b> create operator users, and then define their visualization permissions (<b>Profiles</b>).</p>
       <figure>
         <img alt="Assign to build operations views" src="/images/built-in/thumbnails/manage-operations-views.png" />
       </figure>

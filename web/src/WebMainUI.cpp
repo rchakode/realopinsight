@@ -188,7 +188,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_adminStackRef->addWidget(std::move(aclPage));
 
     // link views and acl
-    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles").toStdString());
+    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Profiles").toStdString());
     linkPtr->clicked().connect(this, &WebMainUI::handleViewAclMenu);
     m_menuLinks.insert(MenuViewAndAcl, linkPtr.get());
     m_settingsPageRef->bindWidget("menu-all-views", std::move(linkPtr));
@@ -226,7 +226,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   m_sourceConfigRef->setEnabledInputs(true);
   m_sourceConfigRef->operationCompleted().connect(this, &WebMainUI::showMessage);
 
-  auto linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Monitoring Sources"));
+  auto linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Data Sources"));
   linkPtr->clicked().connect(this, &WebMainUI::handleDataSourceSettings);
   m_menuLinks.insert(MenuMonitoringSettings, linkPtr.get());
   m_settingsPageRef->bindWidget("menu-monitoring-settings", std::move(linkPtr));
@@ -253,7 +253,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   m_dbPageRef = m_adminStackRef->addNew<WebDatabaseSettings>();
   m_dbPageRef->operationCompleted().connect(this, &WebMainUI::showMessage);
 
-  linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Database Backend"));
+  linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Database Settings"));
   linkPtr->clicked().connect(this, &WebMainUI::handleDatabaseSettings);
   m_menuLinks.insert(MenuDatabaseSettings, linkPtr.get());
   m_settingsPageRef->bindWidget("menu-database-settings", std::move(linkPtr));
