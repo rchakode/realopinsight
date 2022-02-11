@@ -12,8 +12,9 @@ The deployment can be achieved using `Helm` or `kubectl` + `Kustomize`. Select t
 ## Installation using kubectl and Kustomize
 First review the default configuration settings in the deployment ConfigMap: `kustomize/realopinsight-config.yaml`.
 
-Then, perform the following command to submit the deployment.
-The target namespace (`monitoring`) is assumed to exist. Otherwise, create it first.
+The manifests are configured to achieve the deployment in the namespace `monitoring`. The namespace is assumed to exist, otherwise create it first.
+
+Use the below command to trigger the deployment.
 
 ```
 kubectl -n monitoring apply -k ./manifests/kustomize
