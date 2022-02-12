@@ -36,7 +36,7 @@ Key features:
   * [Integration with Nagios and alike](https://realopinsight.com/docs/quickstart-nagios-icinga-centreon-dashboard/)
   * [Design fundamentals](https://realopinsight.com/docs/monitoring-data-sources/)
 
-> The default credentials: username => `admin`, password => `password` (should be changed).
+> Default credentials: username => `admin`, password => `password` (should be changed).
 
 # License
 RealOpInsight is licensed under the terms of [GPLv3 License](LICENSE), mainly due to copyleft contamination by third-party software to which it's bound (e.g. [Qt](https://www.qt.io/), [Wt](https://www.webtoolkit.eu/wt)).
