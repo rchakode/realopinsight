@@ -27,4 +27,4 @@ jobs:
         IMAGE_TAGGED_NAME=${IMAGE_BASENAME}:${RELEASE_VERSION}
         docker build -t ${IMAGE_TAGGED_NAME} .
         docker login --username ${REGISTRY_USERNAME} --password ${REGISTRY_PASSWORD}
-        docker push $IMAGE_BASENAME
+        docker push $IMAGE_TAGGED_NAME
