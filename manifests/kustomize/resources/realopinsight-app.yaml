@@ -50,7 +50,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: realopinsight
-          image: "rchakode/realopinsight"
+          image: realopinsight
           imagePullPolicy: Always
           env:
             - name: "REALOPINSIGHT_DATA_DIR"
