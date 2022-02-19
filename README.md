@@ -15,11 +15,11 @@
 - [Contributions](#contributions)
 
 # Overview
-RealOpInsight features application-specific knowledges to monitors an IT infrastructure from an end-user service point of view. It leverages low-level probes from Kubernetes®, Zabbix® and/or Nagios®, and enable to build on top of that an application service tree allowing to easily evaluate the impact of each incident on the service availability. 
+RealOpInsight leverages probes status from Kubernetes®, Zabbix® and/or Nagios® to feature upon that application-specific high-level visualization to track the availability of applications over time. 
 
 Key features:
 
-  * **Monitor business values, Define & track SLA/SLO targets:** Focus on the applications that underlie your business, set up application-aware notifications, measure, observe and analyze applications availability over time.
+  * **Monitor business values, Define & track SLA/SLO targets:** Focus on the applications that underlie your business, set up application-aware notifications, measure, observe and analyze applications availability over time. Be able to easily evaluate the real impact of each incident.
   * **Federated & unified applications monitoring:** Break silos by setting up unified applications monitoring operations views that hide the underlying monitoring systems while helping you solving incidents with relevant business priorities.
   * **Relationship mapping & event correlation:** Map relationships among application components, set up specific business-oriented policies to handle and propagate each incident with appropriate business impact.
   * **Simple and secured integration through API:** Don't waste time on complex configuration tasks, just a couple of minute is required to deploy and get started with RealOpInsight.
