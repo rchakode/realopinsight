@@ -1,4 +1,4 @@
-FROM rabits/qt:5.13-desktop as builder-deps
+FROM rabits/qt:5.15-desktop as builder-deps
 
 ENV QT_ROOT /usr
 ENV WT_ROOT /usr/local
@@ -32,7 +32,7 @@ RUN apt update && \
 
 FROM builder-deps as builder
 WORKDIR /tmp
-RUN WT_VERSION=4.3.1 && \
+RUN WT_VERSION=4.7.1 && \
     WT_TARBALL=${WT_VERSION}.tar.gz && \
     wget https://github.com/emweb/wt/archive/${WT_TARBALL} && \
     tar zxf ${WT_TARBALL} && \

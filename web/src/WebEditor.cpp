@@ -469,16 +469,15 @@ void WebEditor::bindParentChildEdges(void)
   m_cdata.edges.clear();
   for (const auto& node:  m_cdata.bpnodes) {
     if (! node.parents.empty()) {
-      m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
+      m_cdata.edges.insert(*node.parents.begin(), node.id);
     }
   }
 
   for (const auto& node:  m_cdata.cnodes) {
     if (! node.parents.empty()) {
-      m_cdata.edges.insertMulti(*node.parents.begin(), node.id);
+      m_cdata.edges.insert(*node.parents.begin(), node.id);
     }
   }
-
 }
 
 

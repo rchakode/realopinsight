@@ -562,9 +562,9 @@ int ZbxHelper::setBusinessServiceDependencies(NodeListT &bpnodes, const ZabbixPa
 
 int ZbxHelper::setITServiceDataPoint(NodeListT &cnodes, const ZabbixServiceTriggerDependenciesMapT &serviceTriggerDependencies)
 {
+  auto triggerIdList = serviceTriggerDependencies.values();
+  QSet<QString> uniqueTriggerIds(triggerIdList.begin(), triggerIdList.end());
   QStringList params;
-
-  QSet<QString> uniqueTriggerIds = serviceTriggerDependencies.values().toSet();
   params.push_back(getTriggersIdsJsonList(uniqueTriggerIds));
   params.push_back(QString::number(GetTriggersByIds));
 

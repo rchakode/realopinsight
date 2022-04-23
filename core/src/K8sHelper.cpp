@@ -458,11 +458,11 @@ QSet<QString> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, Q
                                              const QMap<QString, QVariant>& podLabels)
 {
   QSet<QString>&& out{};
-
-  auto&& podLabelsTags = QSet<QString>::fromList(podLabels.keys());
+  auto&& labelsList = podLabels.keys();
+  QSet<QString> podLabelsTags (labelsList.begin(), labelsList.end());
   for (auto&& currentServiceSelectors: allServicesSelectors.toStdMap()) {
-    auto&& selectorTags = currentServiceSelectors.second.keys();
-    if (podLabelsTags.contains(QSet<QString>::fromList(selectorTags))) {
+    auto selectorTags = currentServiceSelectors.second.keys();
+    if (podLabelsTags.contains(QSet<QString>(selectorTags.begin(), selectorTags.end()))) {
       bool matched = true;
       for (auto&& curTag: selectorTags) {
         if (currentServiceSelectors.second[curTag] != podLabels[curTag]) {
@@ -475,7 +475,7 @@ QSet<QString> K8sHelper::findMatchingService(const QMap<QString, QMap<QString, Q
       }
     }
   }
-  return std::move(out);
+  return out;
 }
 
 void K8sHelper::setNetworkReplySslOptions(QNetworkReply* reply, bool verifyPeerOption)

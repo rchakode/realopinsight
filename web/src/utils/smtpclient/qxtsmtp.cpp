@@ -387,28 +387,18 @@ void QxtSmtpPrivate::startTLS()
 
 void QxtSmtpPrivate::authenticate()
 {
-    if (!extensions.contains("AUTH") || username.isEmpty() || password.isEmpty())
-    {
+    if (!extensions.contains("AUTH") || username.isEmpty() || password.isEmpty()) {
         state = Authenticated;
         Q_EMIT qxt_p().authenticated();
-    }
-    else
-    {
-        QStringList auth = extensions["AUTH"].toUpper().split(' ', QString::SkipEmptyParts);
-        if (auth.contains("CRAM-MD5") && (allowedAuthTypes & QxtSmtp::AuthCramMD5))
-        {
+    } else {
+        QStringList auth = extensions["AUTH"].toUpper().split(' ');
+        if (auth.contains("CRAM-MD5") && (allowedAuthTypes & QxtSmtp::AuthCramMD5)) {
             authCramMD5();
-        }
-        else if (auth.contains("PLAIN") && (allowedAuthTypes & QxtSmtp::AuthPlain))
-        {
+        } else if (auth.contains("PLAIN") && (allowedAuthTypes & QxtSmtp::AuthPlain)) {
             authPlain();
-        }
-        else if (auth.contains("LOGIN") && (allowedAuthTypes & QxtSmtp::AuthLogin))
-        {
+        } else if (auth.contains("LOGIN") && (allowedAuthTypes & QxtSmtp::AuthLogin)) {
             authLogin();
-        }
-        else
-        {
+        } else {
             state = Authenticated;
             Q_EMIT qxt_p().authenticated();
         }
@@ -417,14 +407,11 @@ void QxtSmtpPrivate::authenticate()
 
 void QxtSmtpPrivate::authCramMD5(const QByteArray& challenge)
 {
-    if (state != AuthRequestSent)
-    {
+    if (state != AuthRequestSent) {
         socket->write("auth cram-md5\r\n");
         authType = QxtSmtp::AuthCramMD5;
         state = AuthRequestSent;
-    }
-    else
-    {
+    } else {
         QxtHmac hmac(QCryptographicHash::Md5);
         hmac.setKey(password);
         hmac.addData(QByteArray::fromBase64(challenge));

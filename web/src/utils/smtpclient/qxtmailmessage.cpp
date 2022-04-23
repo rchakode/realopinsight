@@ -855,7 +855,7 @@ QxtMailAttachment* QxtRfc2822Parser::parseAttachment(const QHash<QString,QString
         {
             if (src.mid(i,2) == "\r\n")
             {
-                dest << endl;
+                dest << Qt::endl;
                 i++;
             }
             else if (src[i] == '=')

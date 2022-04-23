@@ -176,7 +176,7 @@ std::unique_ptr<Wt::WWidget> ngrt4n::footer(void)
   page->bindString("version", PKG_VERSION.toStdString());
   page->bindString("package-url", PKG_URL.toStdString());
   page->bindString("release-year", REL_YEAR.toStdString());
-  return std::move(page);
+  return page;
 }
 
 
@@ -238,7 +238,7 @@ std::unique_ptr<Wt::WText>  ngrt4n::createFontAwesomeTextButton(const std::strin
 {
   auto link = std::make_unique<Wt::WText>(QObject::tr("<span class=\"btn\"><i class=\"%1\"></i></span>").arg(iconClasses.c_str()).toStdString(), Wt::TextFormat::XHTML);
   link->setToolTip(tip);
-  return std::move(link);
+  return link;
 }
 
 void ngrt4n::logCore(const std::string& level, const std::string& msg)
@@ -326,7 +326,7 @@ std::unique_ptr<Wt::WStandardItem> ngrt4n::createSeverityStandardItem(const Node
   itemRef->setData(QString::number(_node.sev).toStdString(), Wt::ItemDataRole::User);
   itemRef->setText(Severity(_node.sev).toString().toStdString());
   updateSeverityItem(itemRef, _node.sev);
-  return std::move(item);
+  return item;
 }
 
 void ngrt4n::updateSeverityItem(Wt::WStandardItem* itemRef, int severity)

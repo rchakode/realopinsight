@@ -148,7 +148,7 @@ std::unique_ptr<Wt::WValidator> UserFormModel::createNameValidator(void)
   validator->setMandatory(true);
   validator->setMinimumLength(1);
   validator->setMaximumLength(MAX_LENGTH);
-  return std::move(validator);
+  return validator;
 }
 
 std::unique_ptr<Wt::WValidator> UserFormModel::createPasswordValidator(void)
@@ -156,7 +156,7 @@ std::unique_ptr<Wt::WValidator> UserFormModel::createPasswordValidator(void)
   auto validator = std::make_unique<Wt::Auth::PasswordStrengthValidator>();
   validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 6);
   validator->setMandatory(true);
-  return std::move(validator);
+  return validator;
 }
 
 std::unique_ptr<Wt::WValidator> UserFormModel::createEmailValidator(void)
@@ -165,7 +165,7 @@ std::unique_ptr<Wt::WValidator> UserFormModel::createEmailValidator(void)
   validator->setInvalidBlankText(Q_TR("Required field"));
   validator->setInvalidBlankText(Q_TR("Invalid email"));
   validator->setMandatory(true);
-  return std::move(validator);
+  return validator;
 }
 
 std::unique_ptr<Wt::WValidator> UserFormModel::createConfirmPasswordValidator(void)
@@ -379,7 +379,7 @@ std::unique_ptr<Wt::WComboBox> UserFormView::createUserRoleField(void)
 
   auto fieldWidget = std::make_unique<Wt::WComboBox>();
   fieldWidget->setModel(fieldModel);
-  return std::move(fieldWidget);
+  return fieldWidget;
 }
 
 
@@ -387,7 +387,7 @@ std::unique_ptr<Wt::WLineEdit> UserFormView::createPaswordField(void)
 {
   auto field = std::make_unique<Wt::WLineEdit>();
   field->setEchoMode(Wt::EchoMode::Password);
-  return std::move(field);
+  return field;
 }
 
 
@@ -431,7 +431,7 @@ std::unique_ptr<Wt::WSpinBox> UserFormView::createDashboardTilesPerRowField(void
   spinbox->setMinimum(1);
   spinbox->setMaximum(16);
   spinbox->setValue(5);
-  return std::move(spinbox);
+  return spinbox;
 }
 
 
@@ -476,7 +476,7 @@ std::unique_ptr<Wt::WPanel> DbUserManager::createUserPanel(const DboUserT& user)
   panel->setCentralWidget(std::move(form));
   panel->setCollapsible(true);
   panel->setCollapsed(true);
-  return std::move(panel);
+  return panel;
 }
 
 void DbUserManager::handleFormAddUser(DboUserT dboUser)

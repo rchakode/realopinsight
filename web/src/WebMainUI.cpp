@@ -409,7 +409,7 @@ std::unique_ptr<Wt::WWidget> WebMainUI::createDisplayOptionsToolbar(void)
   showOnlyProblemsSelector->setHidden(true);
   panel->bindWidget("display-only-trouble-event-box", std::move(showOnlyProblemsSelector));
 
-  return std::move(panel);
+  return panel;
 }
 
 void WebMainUI::handleShowSettingsView(void)
@@ -457,7 +457,7 @@ std::unique_ptr<Wt::WWidget> WebMainUI::createNotificationToolbar(void)
 
   tpl->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
 
-  return std::move(tpl);
+  return tpl;
 }
 
 
@@ -689,7 +689,7 @@ std::unique_ptr<Wt::WAnchor> WebMainUI::createLogoLink(void)
   link.setTarget(Wt::LinkTarget::NewWindow);
   auto image = std::make_unique<Wt::WImage>("images/built-in/logo-mini.png");
   auto result = std::make_unique<Wt::WAnchor>(link, std::move(image));
-  return std::move(result);
+  return result;
 }
 
 
@@ -840,7 +840,7 @@ std::shared_ptr<Wt::WDialog> WebMainUI::createAboutDialog(void)
   page->bindWidget("footer", ngrt4n::footer());
   dialog->contents()->addWidget(std::move(page));
 
-  return std::move(dialog);
+  return dialog;
 }
 
 
@@ -853,7 +853,7 @@ std::unique_ptr<Wt::WTemplate> WebMainUI::createThumb(std::string title, std::st
   auto img = std::make_unique<Wt::WImage>(imgURL);
   img->setImageLink (imgLink);
   page->bindWidget("thumb-image", std::move(img));
-  return std::move(page);
+  return page;
 }
 
 void WebMainUI::setInternalPath(const std::string& path)
