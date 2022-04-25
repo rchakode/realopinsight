@@ -1,4 +1,4 @@
-FROM rchakode/realopinsight:builder-20201008t1602134119 as builder
+FROM rchakode/realopinsight-builder:v22.05.00-qt515-wt471 as builder
 ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
 WORKDIR /app
 COPY . .
