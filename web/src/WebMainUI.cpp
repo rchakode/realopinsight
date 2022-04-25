@@ -727,7 +727,6 @@ std::pair<WebDashboard*, QString> WebMainUI::loadView(const std::string& path)
     if (bfound != m_appBoards.end()) {
       m_opsStackRef->removeWidget(*bfound);
       m_appBoards.remove(appName);
-      delete *bfound;
     }
 
     m_appBoards.insert(appName, myboard);
