@@ -1,1 +1,7 @@
+.qmake.stash
+.vscode/
+Makefile
+log
+realopinsight.pro.user
 generated
+.idea

@@ -196,7 +196,7 @@ void LdapHelper::parseObjectAttr(LDAPMessage* objectData, LdapUserAttrsT& userIn
        curAttr != nullptr; curAttr = ldap_next_attribute(m_handler, objectData, ber) ) {
     if ((values = ldap_get_values_len(m_handler, objectData, curAttr)) != nullptr ) {
       for (int attrIndex = 0; values[attrIndex] != nullptr; attrIndex++ ) {
-        userInfo.insertMulti(QString(curAttr).toLower().toStdString(), values[attrIndex]->bv_val);
+        userInfo.insert(QString(curAttr).toLower().toStdString(), values[attrIndex]->bv_val);
       }
       ldap_value_free_len(values);
     }

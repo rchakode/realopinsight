@@ -188,7 +188,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     m_adminStackRef->addWidget(std::move(aclPage));
 
     // link views and acl
-    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Operations Profiles").toStdString());
+    linkPtr = std::make_unique<Wt::WAnchor>("#", QObject::tr("Profiles").toStdString());
     linkPtr->clicked().connect(this, &WebMainUI::handleViewAclMenu);
     m_menuLinks.insert(MenuViewAndAcl, linkPtr.get());
     m_settingsPageRef->bindWidget("menu-all-views", std::move(linkPtr));
@@ -226,7 +226,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   m_sourceConfigRef->setEnabledInputs(true);
   m_sourceConfigRef->operationCompleted().connect(this, &WebMainUI::showMessage);
 
-  auto linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Monitoring Sources"));
+  auto linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Data Sources"));
   linkPtr->clicked().connect(this, &WebMainUI::handleDataSourceSettings);
   m_menuLinks.insert(MenuMonitoringSettings, linkPtr.get());
   m_settingsPageRef->bindWidget("menu-monitoring-settings", std::move(linkPtr));
@@ -253,7 +253,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   m_dbPageRef = m_adminStackRef->addNew<WebDatabaseSettings>();
   m_dbPageRef->operationCompleted().connect(this, &WebMainUI::showMessage);
 
-  linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Database Backend"));
+  linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("Database Settings"));
   linkPtr->clicked().connect(this, &WebMainUI::handleDatabaseSettings);
   m_menuLinks.insert(MenuDatabaseSettings, linkPtr.get());
   m_settingsPageRef->bindWidget("menu-database-settings", std::move(linkPtr));
@@ -409,7 +409,7 @@ std::unique_ptr<Wt::WWidget> WebMainUI::createDisplayOptionsToolbar(void)
   showOnlyProblemsSelector->setHidden(true);
   panel->bindWidget("display-only-trouble-event-box", std::move(showOnlyProblemsSelector));
 
-  return std::move(panel);
+  return panel;
 }
 
 void WebMainUI::handleShowSettingsView(void)
@@ -457,7 +457,7 @@ std::unique_ptr<Wt::WWidget> WebMainUI::createNotificationToolbar(void)
 
   tpl->clicked().connect(this, &WebMainUI::handleShowNotificationManager);
 
-  return std::move(tpl);
+  return tpl;
 }
 
 
@@ -689,7 +689,7 @@ std::unique_ptr<Wt::WAnchor> WebMainUI::createLogoLink(void)
   link.setTarget(Wt::LinkTarget::NewWindow);
   auto image = std::make_unique<Wt::WImage>("images/built-in/logo-mini.png");
   auto result = std::make_unique<Wt::WAnchor>(link, std::move(image));
-  return std::move(result);
+  return result;
 }
 
 
@@ -727,7 +727,6 @@ std::pair<WebDashboard*, QString> WebMainUI::loadView(const std::string& path)
     if (bfound != m_appBoards.end()) {
       m_opsStackRef->removeWidget(*bfound);
       m_appBoards.remove(appName);
-      delete *bfound;
     }
 
     m_appBoards.insert(appName, myboard);
@@ -840,7 +839,7 @@ std::shared_ptr<Wt::WDialog> WebMainUI::createAboutDialog(void)
   page->bindWidget("footer", ngrt4n::footer());
   dialog->contents()->addWidget(std::move(page));
 
-  return std::move(dialog);
+  return dialog;
 }
 
 
@@ -853,7 +852,7 @@ std::unique_ptr<Wt::WTemplate> WebMainUI::createThumb(std::string title, std::st
   auto img = std::make_unique<Wt::WImage>(imgURL);
   img->setImageLink (imgLink);
   page->bindWidget("thumb-image", std::move(img));
-  return std::move(page);
+  return page;
 }
 
 void WebMainUI::setInternalPath(const std::string& path)

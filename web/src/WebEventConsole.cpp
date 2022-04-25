@@ -115,7 +115,7 @@ std::unique_ptr<Wt::WStandardItem> WebMsgConsole::createItem(const Wt::WString& 
   if (row & 1) {
     item->setStyleClass(ngrt4n::severityCssClass(-1));
   }
-  return std::move(item);
+  return item;
 }
 
 
@@ -127,7 +127,7 @@ std::unique_ptr<Wt::WStandardItem> WebMsgConsole::createDateItem(const std::stri
   if (row & 1) {
     item->setStyleClass(ngrt4n::severityCssClass(-1));
   }
-  return std::move(item);
+  return item;
 }
 
 

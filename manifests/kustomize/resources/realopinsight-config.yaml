@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: realopinsight-config
+data:
+  REALOPINSIGHT_DATA_DIR: "/data"
+  REALOPINSIGHT_DB_NAME: "realopinsight"
+  REALOPINSIGHT_DB_PASSWORD: "dbsecret"
+  REALOPINSIGHT_DB_SERVER_ADDR: "127.0.0.1"
+  REALOPINSIGHT_DB_SERVER_PORT: "5432"
+  REALOPINSIGHT_DB_TYPE: "0"
+  REALOPINSIGHT_DB_USER: "dbuser"
+  REALOPINSIGHT_ROOT_DIR: "/app"  

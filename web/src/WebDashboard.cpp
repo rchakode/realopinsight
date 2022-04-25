@@ -152,7 +152,7 @@ std::unique_ptr<Wt::WWidget> WebDashboard::createEventFeedTpl(const NodeT& node)
   page->bindString("platform", vname);
   page->bindString("timestamp", ngrt4n::wTimeToNow(node.check.last_state_change));
 
-  return std::move(page);
+  return page;
 }
 
 

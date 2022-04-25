@@ -330,7 +330,7 @@ int Parser::computeCoordinates(void)
       }
     } else if (splitedLine[0] == "edge") {
       // multiInsert because a node can have several childs
-      m_cdata->edges.insertMulti(splitedLine[1], splitedLine[2]);
+      m_cdata->edges.insert(splitedLine[1], splitedLine[2]);
     } else if (splitedLine[0] == "stop") {
       break;
     }
