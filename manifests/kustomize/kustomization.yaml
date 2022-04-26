@@ -11,4 +11,4 @@ resources:
 images:
   - name: realopinsight
     newName: rchakode/realopinsight
-    newTag: 22.04.0
+    newTag: 22.04.1
