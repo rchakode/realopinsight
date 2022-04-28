@@ -39,12 +39,10 @@ Key features:
 > Default credentials: username => `admin`, password => `password` (should be changed).
 
 # License
-RealOpInsight is licensed under the terms of [GPLv3 License](LICENSE), mainly due to copyleft contamination by third-party software to which it's bound (e.g. [Qt](https://www.qt.io/), [Wt](https://www.webtoolkit.eu/wt)).
+RealOpInsight is licensed under the terms of [GPLv3 License](LICENSE), mainly due to copyleft contamination by third-party software to which it's bound ([Qt](https://www.qt.io/), [Wt](https://www.webtoolkit.eu/wt)).
 
 
 # Contributions
 Contributions in any forms are welcomed (feedback, code, documentation, etc).
 
-RealOpInsight is developed using C++14 and is bound the [Qt](https://www.qt.io/) and [Wt](https://www.webtoolkit.eu/wt) frameworks. 
-Having fundamentals to develop software in C++11 or higher is required. 
-It may be helpful, but not required, to have experience building software with Qt and Wt.
+The core of RealOpInsight is based on C++14, it leverages features from [Qt](https://www.qt.io/) and [Wt](https://www.webtoolkit.eu/wt) frameworks. 
