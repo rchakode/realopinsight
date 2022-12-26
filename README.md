@@ -4,7 +4,6 @@
 
 ![GPL v3 License](https://img.shields.io/github/license/rchakode/realopinsight.svg?label=License&style=for-the-badge)
 [![Calendar Versioning](https://img.shields.io/badge/calver-YY.MM.MICRO-bb8fce.svg?style=for-the-badge)](http://calver.org)
-[![GitHub Actions Status](<https://img.shields.io/github/workflow/status/rchakode/realopinsight/CI?logo=GitHub&style=for-the-badge>)](https://github.com/rchakode/realopinsight/actions)
 ![Docker pulls](https://img.shields.io/docker/pulls/rchakode/realopinsight.svg?label=Docker%20Pulls&style=for-the-badge)
 
 ---
