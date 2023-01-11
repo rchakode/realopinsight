@@ -20,11 +20,11 @@ ENV REALOPINSIGHT_DATA_DIR /data
 WORKDIR /app
 COPY --from=builder /app/dist .
 RUN apt update && \
-    apt install -y libsqlite3-0 graphviz sudo && \
+    apt install --no-install-recommends -y libsqlite3-0 graphviz sudo && \
     (id ${APP_USER} || useradd ${APP_USER} -u $APP_USER_UID) && \
     echo "${APP_USER} ALL=NOPASSWD: ALL" > /etc/sudoers.d/user && \
     mkdir -p /app/www/run /data && \
-    chown -R ${APP_USER}:${APP_USER} /app /data
+    chown -R ${APP_USER}:${APP_USER} /app /data && rm -rf /var/lib/apt/lists/*;
 VOLUME ["/data"]
 USER ${APP_USER}
 ENTRYPOINT ["/app/container-entrypoint.sh"]
