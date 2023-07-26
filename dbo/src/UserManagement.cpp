@@ -113,9 +113,9 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   }
 }
 
-void UserFormModel::setWritable(bool writtable)
+void UserFormModel::setWritable(bool writable)
 {
-  bool readonly = ! writtable;
+  bool readonly = ! writable;
   setReadOnly(PasswordConfirmationField, readonly);
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
@@ -295,17 +295,17 @@ void UserFormView::reset(void)
   updateView(m_modelRef);
 }
 
-void UserFormView::setWritable(bool writtable)
+void UserFormView::setWritable(bool writable)
 {
-  m_modelRef->setWritable(writtable);
+  m_modelRef->setWritable(writable);
   updateView(m_modelRef);
 }
 
-void UserFormView::resetValidationState(bool writtable)
+void UserFormView::resetValidationState(bool writable)
 {
   m_modelRef->reset();
   m_modelRef->setData(m_user);
-  setWritable(writtable);
+  setWritable(writable);
 }
 
 void UserFormView::process(void)

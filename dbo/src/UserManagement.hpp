@@ -82,7 +82,7 @@ public:
   static constexpr Wt::WFormModel::Field OperationsProfileTilesPerRow = "dashboard-tilesperrow";
 
   UserFormModel(const DboUserT* user, bool changePassword, bool userForm);
-  void setWritable(bool writtable);
+  void setWritable(bool writable);
   void setData(const DboUserT & user);
 
 private:
@@ -111,8 +111,8 @@ public:
   Wt::Signal<std::string, std::string, std::string>& changePasswordTriggered(void) {return m_changePasswordTriggered;}
   Wt::Signal<Wt::WMouseEvent>& closeTriggered(void) {return m_close;}
   void reset(void);
-  void setWritable(bool writtable);
-  void resetValidationState(bool writtable);
+  void setWritable(bool writable);
+  void resetValidationState(bool writable);
 
 private:
   DboUserT m_user;
