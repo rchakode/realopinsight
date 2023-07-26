@@ -38,10 +38,10 @@ namespace Wt {
 class DispatchThread;
 
 /*! \class WQApplication WQApplication WQApplication
- *  \brief An application class that provides interopability between
+ *  \brief An application class that provides interoperability between
  *         Wt and Qt.
  *
- * This class provides interopability between the Wt's multi threading
+ * This class provides interoperability between the Wt's multi threading
  * model and Qt's threading requirements for QObject. This is needed
  * because Qt's object model, which defines a hierarchy of QObjects,
  * requires that every QObject in the hierarchy is created from within
