@@ -329,7 +329,7 @@ int Parser::computeCoordinates(void)
         max_text_h = qMax(max_text_h, node->text_h);
       }
     } else if (splitedLine[0] == "edge") {
-      // multiInsert because a node can have several childs
+      // multiInsert because a node can have several children
       m_cdata->edges.insert(splitedLine[1], splitedLine[2]);
     } else if (splitedLine[0] == "stop") {
       break;
