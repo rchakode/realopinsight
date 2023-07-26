@@ -212,7 +212,7 @@ std::pair<QStringList, int> K8sHelper::parseNamespaces(const QByteArray& data)
 
 
 std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_data,
-                                                           const QString& in_macthNamespace,
+                                                           const QString& in_matchNamespace,
                                                            QMap<QString, QMap<QString, QString>>& out_selectorMaps,
                                                            NodeListT& out_bpnodes)
 {
@@ -238,7 +238,7 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
     auto&& k8sNamespace = metaData["namespace"].toString();
 
     // escape service if not matches the given namespac
-    if (k8sNamespace != in_macthNamespace) {
+    if (k8sNamespace != in_matchNamespace) {
       continue;
     }
 

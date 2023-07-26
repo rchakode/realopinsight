@@ -44,7 +44,7 @@ public:
   std::pair<QStringList, int> parseNamespaces(const QByteArray& data);
 
   std::pair<QString, int> parseNamespacedServices(const QByteArray& in_data,
-                                                  const QString& in_macthNamespace,
+                                                  const QString& in_matchNamespace,
                                                   QMap<QString, QMap<QString, QString>>& out_selectorMaps,
                                                   NodeListT& out_bpnodes);
 
