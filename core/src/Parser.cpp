@@ -54,7 +54,7 @@ Parser::~Parser()
 
 int Parser::processRenderingData(void)
 {
-  fixupVisilityAndDependenciesGraph();
+  fixupVisibilityAndDependenciesGraph();
   saveCoordinatesFile();
   return computeCoordinates();
 }
@@ -198,7 +198,7 @@ QString Parser::escapeId4Graphviz(const QString& id)
 
 
 
-void Parser::fixupVisilityAndDependenciesGraph(void)
+void Parser::fixupVisibilityAndDependenciesGraph(void)
 {
   m_dotContent = "\n";
 
