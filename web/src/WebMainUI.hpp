@@ -87,7 +87,7 @@ public:
   void enable(void) {
     m_mainWidgetRef->enable();
   }
-  void disbale(void) {
+  void disable(void) {
     m_mainWidgetRef->disable();
   }
   void handleRefresh(void);
