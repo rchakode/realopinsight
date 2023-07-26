@@ -207,7 +207,7 @@
 	    <max-memory-request-size>1024</max-memory-request-size>
 	</connector-isapi>
 
-        <!-- Javascript debug options
+        <!-- JavaScript debug options
 
 	     Values:
 	     - true: JavaScript errors are not caught but the browser
