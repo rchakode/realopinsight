@@ -82,7 +82,7 @@ const IconMapT NodeIcons = {
     {"Database Server", "images/db-server.png"},
     {"Process", "images/process.png"},
     {"Logfile", "images/log.png"},
-    {"Network Bandwith", "images/network-usage.png"},
+    {"Network Bandwidth", "images/network-usage.png"},
     {"CPU", "images/cpu.png"},
     {"CPU Load", "images/performance-level.png"},
     {"Memory", "images/memory.png"},
