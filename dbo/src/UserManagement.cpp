@@ -63,7 +63,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   addField(UsernameField);
   addField(PasswordField);
   addField(CurrentPasswordField);
-  addField(PasswordConfimationField);
+  addField(PasswordConfirmationField);
   addField(FirstNameField);
   addField(LastNameField);
   addField(EmailField);
@@ -74,7 +74,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
 
   setValidator(UsernameField, createNameValidator());;
   setValidator(PasswordField, createPasswordValidator());
-  setValidator(PasswordConfimationField, std::make_unique<ConfirmPasswordValidator>(this, PasswordField));
+  setValidator(PasswordConfirmationField, std::make_unique<ConfirmPasswordValidator>(this, PasswordField));
   setValidator(FirstNameField, createNameValidator());
   setValidator(FirstNameField, createNameValidator());
   setValidator(LastNameField, createNameValidator());
@@ -91,7 +91,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   if (changePassword) {
     setVisible(CurrentPasswordField, true);
     setVisible(PasswordField, true);
-    setVisible(PasswordConfimationField, true);
+    setVisible(PasswordConfirmationField, true);
     setVisible(UsernameField, false);
     setVisible(FirstNameField, false);
     setVisible(LastNameField, false);
@@ -105,7 +105,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
     if (user) {
       setData(*user);
       setVisible(PasswordField, false);
-      setVisible(PasswordConfimationField, false);
+      setVisible(PasswordConfirmationField, false);
       setWritable(false);
     } else {
       setVisible(RegistrationDateField, false);
@@ -116,7 +116,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
 void UserFormModel::setWritable(bool writtable)
 {
   bool readonly = ! writtable;
-  setReadOnly(PasswordConfimationField, readonly);
+  setReadOnly(PasswordConfirmationField, readonly);
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
   setReadOnly(EmailField, readonly);
@@ -184,7 +184,7 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   setFormWidget(UserFormModel::UsernameField, std::make_unique<Wt::WLineEdit>());
   setFormWidget(UserFormModel::CurrentPasswordField, std::move(createPaswordField()));
   setFormWidget(UserFormModel::PasswordField, std::move(createPaswordField()));
-  setFormWidget(UserFormModel::PasswordConfimationField, std::move(createPaswordField()));
+  setFormWidget(UserFormModel::PasswordConfirmationField, std::move(createPaswordField()));
   setFormWidget(UserFormModel::FirstNameField, std::make_unique<Wt::WLineEdit>());
 
   auto lastNameField = std::make_unique<Wt::WLineEdit>();

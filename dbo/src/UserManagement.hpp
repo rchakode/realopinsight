@@ -72,7 +72,7 @@ public:
   static constexpr Wt::WFormModel::Field UsernameField = "user-name";
   static constexpr Wt::WFormModel::Field CurrentPasswordField = "current-password";
   static constexpr Wt::WFormModel::Field PasswordField = "password";
-  static constexpr Wt::WFormModel::Field PasswordConfimationField = "confirm-password";
+  static constexpr Wt::WFormModel::Field PasswordConfirmationField = "confirm-password";
   static constexpr Wt::WFormModel::Field FirstNameField = "first-name";
   static constexpr Wt::WFormModel::Field LastNameField = "last-name";
   static constexpr Wt::WFormModel::Field EmailField = "email";
