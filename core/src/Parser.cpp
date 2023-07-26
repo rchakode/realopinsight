@@ -282,9 +282,9 @@ int Parser::computeCoordinates(void)
   }
 
   //start parsing
-  QTextStream coodFileStream(& qfile);
+  QTextStream coordFileStream(& qfile);
   QString line;
-  if(static_cast<void>(line = coodFileStream.readLine(0)), line.isNull()) {
+  if(static_cast<void>(line = coordFileStream.readLine(0)), line.isNull()) {
     m_lastErrorMsg = QObject::tr("Failed to read file: %1").arg(m_plainFile);
     return ngrt4n::RcGenericFailure;
   }
@@ -309,7 +309,7 @@ int Parser::computeCoordinates(void)
   int x_index = 2;
   int y_index = 3;
 
-  while (static_cast<void>(line = coodFileStream.readLine(0)), ! line.isNull()) {
+  while (static_cast<void>(line = coordFileStream.readLine(0)), ! line.isNull()) {
     splitedLine = line.split (regexSep);
     if (splitedLine[0] == "node") {
       NodeListT::Iterator node;
