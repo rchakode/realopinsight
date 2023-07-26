@@ -466,7 +466,7 @@ void WebMainUI::disableAdminFeatures(void)
 {
   wApp->doJavaScript("$('#userMenuSection').hide();"
                      "$('#viewMenuBlock').hide();"
-                     "$('#menu-database-settingss').hide();"
+                     "$('#menu-database-settings').hide();"
                      "$('#menu-auth-settings').hide();"
                      "$('#menu-notification-settings').hide();"
                      "$('#menu-license-activation').hide();");
