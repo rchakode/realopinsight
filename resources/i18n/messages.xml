@@ -539,7 +539,7 @@
       <span id="auth-setting-save-button">${auth-settings-save-button}</span>
     </div>
 
-</div> <!-- class="form-hoizontal" -->
+</div> <!-- class="form-horizontal" -->
 </message>
 
 
@@ -597,7 +597,7 @@
       <span id="add-as-source-settings-button">${add-as-source-button}</span>
       <span id="delete-source-settings-button">${delete-button}</span>
     </div>
-</div> <!-- class="form-hoizontal" -->
+</div> <!-- class="form-horizontal" -->
 </message>
 
 
@@ -725,7 +725,7 @@
     <div class="form-actions">
       <span id="notification-setting-save-button">${notification-settings-save-button}</span>
     </div>
-</div> <!-- class="form-hoizontal" -->
+</div> <!-- class="form-horizontal" -->
 </message>
 
 
