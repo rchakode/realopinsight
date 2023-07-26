@@ -218,7 +218,7 @@ void WebDataSourceSettings::applySourceChanges(int index)
 
   updateSourceDataModel(index);
   m_sourceSelectionFieldRef->setCurrentIndex(findFormSourceIndex(index));
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings udpated"));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings updated"));
 }
 
 
