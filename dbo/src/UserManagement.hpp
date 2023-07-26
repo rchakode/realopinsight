@@ -68,7 +68,7 @@ private:
 class UserFormModel : public Wt::WFormModel
 {
 public:
-  static constexpr Wt::WFormModel::Field InfoBoxField = "infox-box";
+  static constexpr Wt::WFormModel::Field InfoBoxField = "info-box";
   static constexpr Wt::WFormModel::Field UsernameField = "user-name";
   static constexpr Wt::WFormModel::Field CurrentPasswordField = "current-password";
   static constexpr Wt::WFormModel::Field PasswordField = "password";
