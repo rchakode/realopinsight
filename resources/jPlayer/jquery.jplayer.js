@@ -1573,7 +1573,7 @@
 			var ct = 0, cpa = 0, sp = 0, cpr = 0;
 
 			// Fixes the duration bug in iOS, where the durationchange event occurs when media.duration is not always correct.
-			// Fixes the initial duration bug in BB OS7, where the media.duration is infinity and displays as NaN:NaN due to Date() using inifity.
+			// Fixes the initial duration bug in BB OS7, where the media.duration is infinity and displays as NaN:NaN due to Date() using infinity.
 			if(isFinite(media.duration)) {
 				this.status.duration = media.duration;
 			}
