@@ -14,7 +14,7 @@ public:
   
 private Q_SLOTS:
   void testCase1();
-  void testBadRecvingDataType();
+  void testBadReceivingDataType();
   void testCaseService();
   void testBadHostBadPort();
   void testLoadHostData();
@@ -40,7 +40,7 @@ void LsHelperTest::testCase1()
   mkhelper.disconnectFromService();
 }
 
-void LsHelperTest::testBadRecvingDataType()
+void LsHelperTest::testBadReceivingDataType()
 {
   QVERIFY(true == mkhelper.connectToService());
   mkhelper.clearData();
