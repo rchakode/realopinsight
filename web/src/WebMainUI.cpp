@@ -350,7 +350,7 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
   }
 
   if (currentThumbailIndex > 0) {
-    startDashbaordUpdate();
+    startDashboardUpdate();
   }
 
   if (currentThumbailIndex != static_cast<int>(listOfUserViews.size())) {
@@ -877,7 +877,7 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
 }
 
 
-void WebMainUI::startDashbaordUpdate(void)
+void WebMainUI::startDashboardUpdate(void)
 {
   auto newTimer(new Wt::WTimer());
   newTimer->setInterval(std::chrono::milliseconds(2000));

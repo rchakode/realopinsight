@@ -195,7 +195,7 @@ private:
   void scaleMap(double factor);
   void selectItem4Preview(void);
   void setInternalPath(const std::string& path);
-  void startDashbaordUpdate(void);
+  void startDashboardUpdate(void);
   void disableAdminFeatures(void);
   void setupMenus(void);
   void saveViewInfoIntoDatabase(const CoreDataT& cdata, const QString& path);
