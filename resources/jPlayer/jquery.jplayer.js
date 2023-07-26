@@ -1212,7 +1212,7 @@
 			// MJP: The background change remains. Would need to store the original to restore it correctly.
 			// MJP: The jPlayer element's size change remains.
 
-			// Clear the media to reset the GUI and stop any downloads. Streams on some browsers had persited. (Chrome)
+			// Clear the media to reset the GUI and stop any downloads. Streams on some browsers had persisted. (Chrome)
 			this.clearMedia();
 			// Remove the size/sizeFull cssClass from the cssSelectorAncestor
 			this._removeUiClass();
