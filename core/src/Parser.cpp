@@ -113,7 +113,7 @@ std::pair<int, QString> Parser::parse(const QString& viewFile)
     if (node.sev_crule == CalcRules::WeightedAverageWithThresholds) {
       QString thdata = xmlNode.firstChildElement("Thresholds").text().trimmed();
       node.thresholdLimits = ThresholdHelper::dataToList(thdata);
-      std::sort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessthanFnt());
+      std::sort(node.thresholdLimits.begin(), node.thresholdLimits.end(), ThresholdLessThanFnt());
     }
 
     node.check.status = -1;

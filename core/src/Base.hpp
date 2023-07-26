@@ -282,7 +282,7 @@ struct ThresholdT {
   int sev_out;
 };
 
-struct ThresholdLessthanFnt {
+struct ThresholdLessThanFnt {
   bool operator () (const ThresholdT& th1, const ThresholdT& th2)
   {
     if (th1.sev_out < th2.sev_out)
