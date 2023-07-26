@@ -313,7 +313,7 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
   }
 
   // Generate view cards
-  int currentThumbailIndex = 0;
+  int currentThumbnailIndex = 0;
   int cardPerRow = m_dbSession->boardCardsPerRow();
   std::string failuresCount = "";
   for (const auto& sv : listOfUserViews) {
@@ -336,8 +336,8 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
     thumbnail->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, thumbnailTitle));
     m_thumbnailComments[thumbnailTitle] = thumbnail->bindNew<Wt::WLabel>("thumb-problem-details", "");
     m_thumbnails.insert(thumbnailTitle, thumbnail.get());
-    thumbnailsLayout->addWidget(std::move(thumbnail), currentThumbailIndex / cardPerRow, currentThumbailIndex % cardPerRow);
-    ++currentThumbailIndex;
+    thumbnailsLayout->addWidget(std::move(thumbnail), currentThumbnailIndex / cardPerRow, currentThumbnailIndex % cardPerRow);
+    ++currentThumbnailIndex;
   }
 
   if (m_dbSession->displayOnlyTiles()) {
@@ -349,11 +349,11 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
     doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
   }
 
-  if (currentThumbailIndex > 0) {
+  if (currentThumbnailIndex > 0) {
     startDashboardUpdate();
   }
 
-  if (currentThumbailIndex != static_cast<int>(listOfUserViews.size())) {
+  if (currentThumbnailIndex != static_cast<int>(listOfUserViews.size())) {
     showMessage(ngrt4n::OperationFailed, QObject::tr("Failed to load views => %1. Check details in logs").arg(failuresCount.c_str()).toStdString());
   }
   auto thumbnails = std::make_unique<Wt::WContainerWidget>();
