@@ -40,7 +40,7 @@ ingress:
   hosts:
     - host: realopinsight.local
       paths: []
-# uncomment the following lines and ajust the values to enable TLS
+# uncomment the following lines and adjust the values to enable TLS
   # tls:
   #  - secretName: realopinsight-tls
   #    hosts:
