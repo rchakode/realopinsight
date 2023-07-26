@@ -136,7 +136,7 @@ private:
   void handleCancelClick(Wt::WMouseEvent ev);
   void handleChangePasswordClick(const std::string& login, const std::string& currentPass,const std::string& newPass);
   std::unique_ptr<Wt::WComboBox> createUserRoleField(void);
-  std::unique_ptr<Wt::WLineEdit> createPaswordField(void);
+  std::unique_ptr<Wt::WLineEdit> createPasswordField(void);
   void createChangePasswordDialog(void);
   std::unique_ptr<Wt::WComboBox> createDashboardDisplayModeField(void);
   std::unique_ptr<Wt::WSpinBox> createDashboardTilesPerRowField(void);

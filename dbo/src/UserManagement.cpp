@@ -182,9 +182,9 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
   setFormWidget(UserFormModel::UsernameField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::CurrentPasswordField, std::move(createPaswordField()));
-  setFormWidget(UserFormModel::PasswordField, std::move(createPaswordField()));
-  setFormWidget(UserFormModel::PasswordConfirmationField, std::move(createPaswordField()));
+  setFormWidget(UserFormModel::CurrentPasswordField, std::move(createPasswordField()));
+  setFormWidget(UserFormModel::PasswordField, std::move(createPasswordField()));
+  setFormWidget(UserFormModel::PasswordConfirmationField, std::move(createPasswordField()));
   setFormWidget(UserFormModel::FirstNameField, std::make_unique<Wt::WLineEdit>());
 
   auto lastNameField = std::make_unique<Wt::WLineEdit>();
@@ -383,7 +383,7 @@ std::unique_ptr<Wt::WComboBox> UserFormView::createUserRoleField(void)
 }
 
 
-std::unique_ptr<Wt::WLineEdit> UserFormView::createPaswordField(void)
+std::unique_ptr<Wt::WLineEdit> UserFormView::createPasswordField(void)
 {
   auto field = std::make_unique<Wt::WLineEdit>();
   field->setEchoMode(Wt::EchoMode::Password);
