@@ -119,7 +119,7 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(void)
     }
   }
 
-  // make request and conncet to the processing handlers
+  // make request and connect to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(req);
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
@@ -162,7 +162,7 @@ std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const QString& 
     }
   }
 
-  // make request and conncet to the processing handlers
+  // make request and connect to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(req);
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
