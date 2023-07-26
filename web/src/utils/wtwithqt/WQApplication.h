@@ -103,7 +103,7 @@ protected:
    *         QThread context.
    *
    * Reimplement this method to construct your Wt widget and Qt object
-   * hierarchy within the context of the dedicatd QThread.
+   * hierarchy within the context of the dedicated QThread.
    *
    * This method is called from within the library after your
    * application is created.
