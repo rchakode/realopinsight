@@ -31,7 +31,7 @@ private:
   int m_port;
   bool m_connected;
   QString m_lastError;
-  QEventLoop m_eventSynchonizer;
+  QEventLoop m_eventSynchronizer;
   QMap<int, QxtMailMessage> m_spool;
 
   void addEvents(void);

@@ -24,7 +24,7 @@ int MailSender::send(const QString& sender,
 {
   if (! m_connected) {
     connectToHost(m_host, m_port);
-    if (m_eventSynchonizer.exec() != 0)
+    if (m_eventSynchronizer.exec() != 0)
       return -1;
   }
 
@@ -44,7 +44,7 @@ int MailSender::send(const QString& sender,
 
   int messageId = QxtSmtp::send(message);
   m_spool.insert(messageId, message);
-  int exitCode = m_eventSynchonizer.exec();
+  int exitCode = m_eventSynchronizer.exec();
 
   return exitCode;
 }
@@ -53,14 +53,14 @@ int MailSender::send(const QString& sender,
 void MailSender::handleConnected(void)
 {
   m_connected = true;
-  m_eventSynchonizer.exit(0);
+  m_eventSynchronizer.exit(0);
 }
 
 void MailSender::handleConnectionFailed(const QByteArray& msg)
 {
   m_connected = false;
   m_lastError = tr("SMTP connection failed: %1").arg(QString(msg));
-  m_eventSynchonizer.exit(-1);
+  m_eventSynchronizer.exit(-1);
 }
 
 void MailSender::handleMailFailed(int mailID, int errorCode, const QByteArray& msg)
@@ -70,7 +70,7 @@ void MailSender::handleMailFailed(int mailID, int errorCode, const QByteArray& m
                    ).arg(QString::number(errorCode),
                          msg,
                          QString::number(mailID));
-  m_eventSynchonizer.exit(-1);
+  m_eventSynchronizer.exit(-1);
 }
 
 void MailSender::handleSenderRejected(int mailID, const QString& address, const QByteArray & msg)
@@ -79,7 +79,7 @@ void MailSender::handleSenderRejected(int mailID, const QString& address, const 
   m_lastError = tr("SMTP rejected mail sender."
                    " Message: %1. Address: %2."
                    ).arg(QString(msg), address);
-  m_eventSynchonizer.exit(-1);
+  m_eventSynchronizer.exit(-1);
 }
 
 void MailSender::handleMailSent(int mailID)
@@ -88,7 +88,7 @@ void MailSender::handleMailSent(int mailID)
                    ).arg(m_spool[mailID].recipients().join(","));
 
   m_spool.remove(mailID);
-  m_eventSynchonizer.exit(0);
+  m_eventSynchronizer.exit(0);
 }
 
 

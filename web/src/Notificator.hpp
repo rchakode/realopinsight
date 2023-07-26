@@ -44,6 +44,6 @@ public:
 private:
   std::unique_ptr<MailSender> m_mailSender;
   WebBaseSettings m_preferences;
-  QEventLoop m_eventSynchonizer;
+  QEventLoop m_eventSynchronizer;
 };
 #endif // NOTIFICATOR_H
