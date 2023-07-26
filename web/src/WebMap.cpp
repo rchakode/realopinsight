@@ -69,7 +69,7 @@ WebMap::WebMap(CoreDataT* cdata)
 
 WebMap::~WebMap()
 {
-  removeThumdImage();
+  removeThumbImage();
 }
 
 void WebMap::setPreferredMethod(void)
@@ -285,7 +285,7 @@ void WebMap::applyVisibilityToChild(const NodeT& node, qint8 mask)
 }
 
 
-void WebMap::removeThumdImage(void)
+void WebMap::removeThumbImage(void)
 {
   QFile file(m_thumbURL.c_str());
   file.remove();
