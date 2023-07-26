@@ -135,7 +135,7 @@
                want to change this value if you would like to support
                reentrant event loops, where you block one event loop
                using WDialog::exec() or related static
-               methods. Everytime you enter such an event loop, one
+               methods. Every time you enter such an event loop, one
                thread is blocked, and therefore the total number of
                sessions that reliably can do this is limited to the
                number of thread you have (minus one to unblock).
@@ -169,7 +169,7 @@
                You may want to change this value if you would like to
                support more reentrant event loops, where you block one
                event loop using WDialog::exec() or related static
-               methods. Everytime you enter such an event loop, one
+               methods. Every time you enter such an event loop, one
                thread is blocked, and therefore the total number of
                sessions that reliably can do this is limited to the
                number of thread you have (minus one to unblock).
