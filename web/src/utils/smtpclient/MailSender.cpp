@@ -84,7 +84,7 @@ void MailSender::handleSenderRejected(int mailID, const QString& address, const 
 
 void MailSender::handleMailSent(int mailID)
 {
-  m_lastError = tr("Email successfuly sent to %1"
+  m_lastError = tr("Email successfully sent to %1"
                    ).arg(m_spool[mailID].recipients().join(","));
 
   m_spool.remove(mailID);
