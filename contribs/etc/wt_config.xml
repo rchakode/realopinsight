@@ -336,7 +336,7 @@
 
 	<!-- Whether inline CSS is allowed.
 
-           Some Wt widgets will insert CSS rules in the the inline
+           Some Wt widgets will insert CSS rules in the inline
            stylesheet when first used. This can be disabled using this
 	   configuration option.
 
