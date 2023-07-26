@@ -290,17 +290,17 @@ int Parser::computeCoordinates(void)
   }
 
   QRegExp regexSep("[ ]+");
-  QStringList splitedLine = line.split (regexSep);
-  if (splitedLine.size() != 4 || splitedLine[0] != "graph") {
+  QStringList splitLine = line.split (regexSep);
+  if (splitLine.size() != 4 || splitLine[0] != "graph") {
     m_lastErrorMsg = QObject::tr("Invalid graphviz entry: %1").arg(line);
     return ngrt4n::RcGenericFailure;
   }
 
   const ScaleFactors SCALE_FACTORS(settings.getGraphLayout());
   m_cdata->graph_mode = static_cast<qint8>(settings.getGraphLayout());
-  auto maxWidthRaw = splitedLine[2].trimmed().toDouble();
+  auto maxWidthRaw = splitLine[2].trimmed().toDouble();
   m_cdata->map_width = maxWidthRaw * SCALE_FACTORS.x() + NEATO_X_TRANSLATION_FACTOR * maxWidthRaw;
-  m_cdata->map_height = splitedLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
+  m_cdata->map_height = splitLine[3].trimmed().toDouble() * SCALE_FACTORS.y();
   m_cdata->min_x = 0;
   m_cdata->min_y = 0;
   double max_text_w = 0;
@@ -310,17 +310,17 @@ int Parser::computeCoordinates(void)
   int y_index = 3;
 
   while (static_cast<void>(line = coordFileStream.readLine(0)), ! line.isNull()) {
-    splitedLine = line.split (regexSep);
-    if (splitedLine[0] == "node") {
+    splitLine = line.split (regexSep);
+    if (splitLine[0] == "node") {
       NodeListT::Iterator node;
-      QString nid = splitedLine[1].trimmed();
+      QString nid = splitLine[1].trimmed();
       if (ngrt4n::findNode(m_cdata, nid, node)) {
-        auto posXRaw = splitedLine[x_index].trimmed().toDouble();
+        auto posXRaw = splitLine[x_index].trimmed().toDouble();
         node->pos_x =  posXRaw * SCALE_FACTORS.x() + NEATO_X_TRANSLATION_FACTOR * posXRaw;
-        node->pos_y = splitedLine[y_index].trimmed().toDouble() * SCALE_FACTORS.y();
+        node->pos_y = splitLine[y_index].trimmed().toDouble() * SCALE_FACTORS.y();
 
-        node->text_w = splitedLine[4].trimmed().toDouble() * SCALE_FACTORS.x();
-        node->text_h = splitedLine[5].trimmed().toDouble() * SCALE_FACTORS.y();
+        node->text_w = splitLine[4].trimmed().toDouble() * SCALE_FACTORS.x();
+        node->text_h = splitLine[5].trimmed().toDouble() * SCALE_FACTORS.y();
 
         m_cdata->min_x = qMin<double>(m_cdata->min_x, node->pos_x);
         m_cdata->min_y = qMin<double>(m_cdata->min_y, node->pos_y);
@@ -328,10 +328,10 @@ int Parser::computeCoordinates(void)
         max_text_w = qMax(max_text_w, node->text_w);
         max_text_h = qMax(max_text_h, node->text_h);
       }
-    } else if (splitedLine[0] == "edge") {
+    } else if (splitLine[0] == "edge") {
       // multiInsert because a node can have several children
-      m_cdata->edges.insert(splitedLine[1], splitedLine[2]);
-    } else if (splitedLine[0] == "stop") {
+      m_cdata->edges.insert(splitLine[1], splitLine[2]);
+    } else if (splitLine[0] == "stop") {
       break;
     }
   }
