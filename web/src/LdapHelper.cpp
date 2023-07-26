@@ -165,7 +165,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
   for (LDAPMessage* currentEntry = ldap_first_entry(m_handler, searchResult);
        currentEntry != nullptr;
        currentEntry = ldap_next_entry(m_handler, currentEntry)) {
-    std::string dn = getObjectDistingisghName(currentEntry);
+    std::string dn = getObjectDistinguishName(currentEntry);
     userMap[dn].insert("dn", dn);
     parseObjectAttr(currentEntry, userMap[dn]);
   }
@@ -177,7 +177,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
 }
 
 
-std::string LdapHelper::getObjectDistingisghName(LDAPMessage* objectData)
+std::string LdapHelper::getObjectDistinguishName(LDAPMessage* objectData)
 {
   char* buffer;
   std::string result = "";
