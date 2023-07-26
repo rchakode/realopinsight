@@ -106,17 +106,17 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   loggedUserMenu->addItem(std::move(loggedUserMenuItem));
   m_navbarRef->addMenu(std::move(loggedUserMenu), Wt::AlignmentFlag::Right);
 
-  auto toobarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
-  toobarActionIcon->clicked().connect(this, &WebMainUI::handleRefresh);
-  m_navbarRef->addWidget(std::move(toobarActionIcon));
+  auto toolbarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
+  toolbarActionIcon->clicked().connect(this, &WebMainUI::handleRefresh);
+  m_navbarRef->addWidget(std::move(toolbarActionIcon));
 
-  toobarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-plus", "Zoom the console map in");
-  toobarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
-  m_navbarRef->addWidget(std::move(toobarActionIcon));
+  toolbarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-plus", "Zoom the console map in");
+  toolbarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
+  m_navbarRef->addWidget(std::move(toolbarActionIcon));
 
-  toobarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-minus","Zoom the console map out");
-  toobarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
-  m_navbarRef->addWidget(std::move(toobarActionIcon));
+  toolbarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-minus","Zoom the console map out");
+  toolbarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
+  m_navbarRef->addWidget(std::move(toolbarActionIcon));
 
   // problems icons
   if (! m_dbSession->isLoggedAdmin()) {
