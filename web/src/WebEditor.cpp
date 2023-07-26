@@ -873,20 +873,20 @@ void WebEditor::importNagiosBpi(const std::string& srcId, const std::string& bpi
       break;
     }
 
-    QString groudId = fields[1];
+    QString groupId = fields[1];
 
-    NodeListT::Iterator currentGroupSrv = cdata.bpnodes.find(groudId);
+    NodeListT::Iterator currentGroupSrv = cdata.bpnodes.find(groupId);
     if (currentGroupSrv == cdata.bpnodes.end()) {
       NodeT groupSrv;
-      groupSrv.id = groudId;
-      groupSrv.name = groudId;
+      groupSrv.id = groupId;
+      groupSrv.name = groupId;
       groupSrv.type = NodeType::BusinessService;
       groupSrv.parents.clear();
       groupSrv.sev_prule = PropRules::Unchanged;
       groupSrv.sev_crule = CalcRules::Worst;
       groupSrv.weight = ngrt4n::WEIGHT_UNIT;
       groupSrv.icon = ngrt4n::DEFAULT_ICON;
-      currentGroupSrv = cdata.bpnodes.insert(groudId, groupSrv);
+      currentGroupSrv = cdata.bpnodes.insert(groupId, groupSrv);
     }
 
     currentGroupSrv->sev_crule = CalcRules::Worst;
