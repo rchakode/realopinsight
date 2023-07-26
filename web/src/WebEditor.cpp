@@ -103,7 +103,7 @@ WebEditor::WebEditor(void)
   auto importNagiosBpiBtn = std::make_unique<Wt::WImage>(Wt::WLink("images/built-in/import-nagios_32x32.png"));
   importNagiosBpiBtn->setToolTip(Q_TR("Import Nagios BPI"));
   importNagiosBpiBtn->clicked().connect(this, &WebEditor::handleImportNagiosBpiButton);
-  m_editionPaneRef->bindWidget("import-nabios-bpi", std::move(importNagiosBpiBtn));
+  m_editionPaneRef->bindWidget("import-nagios-bpi", std::move(importNagiosBpiBtn));
 
   // name field
   m_nameFieldRef = m_editionPaneRef->bindNew<Wt::WLineEdit>("name-field");

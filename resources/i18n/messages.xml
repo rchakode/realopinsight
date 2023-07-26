@@ -649,7 +649,7 @@
       <span id="open-service-view">${open-service-view}</span>
       <span id="import-native-config">${import-native-config}</span>
       <span id="import-zabbix-it-service">${import-zabbix-it-service}</span>
-      <span id="import-nabios-bpi">${import-nabios-bpi}</span>
+      <span id="import-nagios-bpi">${import-nagios-bpi}</span>
     </div>
   </fieldset>
 
