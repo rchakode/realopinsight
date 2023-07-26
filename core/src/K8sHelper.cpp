@@ -450,7 +450,7 @@ std::tuple<int,  std::string, std::string> K8sHelper::extractStateInfo(const QJs
 
   // default state is "waiting"
   // See Kubernetes documentation: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core
-  return std::make_tuple(ngrt4n::K8sPending, "", QObject::tr("container is wating").toStdString());
+  return std::make_tuple(ngrt4n::K8sPending, "", QObject::tr("container is waiting").toStdString());
 }
 
 
