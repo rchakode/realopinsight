@@ -865,7 +865,7 @@
 
 			this.options.volume = this._limitValue(this.options.volume, 0, 1); // Limit volume value's bounds.
 
-			// Create the formats array, with prority based on the order of the supplied formats string
+			// Create the formats array, with priority based on the order of the supplied formats string
 			$.each(this.options.supplied.toLowerCase().split(","), function(index1, value1) {
 				var format = value1.replace(/^\s+|\s+$/g, ""); //trim
 				if(self.format[format]) { // Check format is valid.
@@ -882,7 +882,7 @@
 				}
 			});
 
-			// Create the solutions array, with prority based on the order of the solution string
+			// Create the solutions array, with priority based on the order of the solution string
 			$.each(this.options.solution.toLowerCase().split(","), function(index1, value1) {
 				var solution = value1.replace(/^\s+|\s+$/g, ""); //trim
 				if(self.solution[solution]) { // Check solution is valid.
