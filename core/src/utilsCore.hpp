@@ -164,7 +164,7 @@ bool findNode(const NodeListT &nodes, const QString &nodeId, NodeListT::const_it
 
 void setCheckOnError(int status, const QString &msg, CheckT &invalidCheck);
 
-StringPairT splitDataPointInfo(const QString &info); /* return <[sourcei:]hostaddr, checkid> */
+StringPairT splitDataPointInfo(const QString &info); /* return <[source:]hostaddr, checkid> */
 
 StringPairT splitSourceDataPointInfo(const QString &info); /* return <source, hostaddr> */
 
