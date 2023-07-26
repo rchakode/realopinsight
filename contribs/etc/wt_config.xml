@@ -445,7 +445,7 @@
 
             <!-- resourcesURL property
 
-	       The URL at which the resources/ folder is deploeyd that
+	       The URL at which the resources/ folder is deployed that
 	       comes distributed with Wt and contains auxiliary files
 	       used to primarily for styles and themes.
 
