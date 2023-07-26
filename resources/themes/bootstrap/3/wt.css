@@ -104,7 +104,7 @@
 }
 
 /*
- * Fix submens in popup menus in navbar
+ * Fix submenus in popup menus in navbar
  */
 
 .navbar .nav > li > .dropdown-menu.submenu:before {
