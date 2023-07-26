@@ -97,7 +97,7 @@ bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::stri
   }
 
   if (! m_handler) {
-    m_lastError = QObject::tr("Unitialized handler");
+    m_lastError = QObject::tr("Uninitialized handler");
     return false;
   }
 
@@ -132,7 +132,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
                           LdapUserMapT& userMap)
 {
   if (! m_handler) {
-    m_lastError = QObject::tr("LDAP: Unitialized handler");
+    m_lastError = QObject::tr("LDAP: Uninitialized handler");
     return -1;
   }
 
