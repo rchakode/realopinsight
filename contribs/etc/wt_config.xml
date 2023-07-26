@@ -116,7 +116,7 @@
 	       will be started for every shared process, or for every session
 	       which has ?debug appended to the command line.
 
-	       The variable is slighly misnamed. Not only a path can be set,
+	       The variable is slightly misnamed. Not only a path can be set,
 	       but also options, like for example:
 
                  /usr/bin/valgrind - -leak-check=full
@@ -281,7 +281,7 @@
 	   how quickly they are generated.
 
 	   In rare cases, the scheme may result in unwanted behaviour,
-	   because the client-side is allowed to be slighly out of
+	   because the client-side is allowed to be slightly out of
 	   sync at the time an event is recorded with the server-side
 	   (and more so on high-latency links). The drastic
 	   alternative is to discard events while a response is
