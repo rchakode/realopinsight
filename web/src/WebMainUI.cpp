@@ -506,9 +506,9 @@ void WebMainUI::handleRefresh(void)
     currentBoard->updateAllNodesStatus();
     currentBoard->updateMap();
     NodeT currentRootNode = currentBoard->rootNode();
-    int overvallSeverity = qMin(currentRootNode.sev, static_cast<int>(ngrt4n::Unknown));
-    if (overvallSeverity != ngrt4n::Normal) {
-      ++appStates[overvallSeverity];
+    int overallSeverity = qMin(currentRootNode.sev, static_cast<int>(ngrt4n::Unknown));
+    if (overallSeverity != ngrt4n::Normal) {
+      ++appStates[overallSeverity];
       if (m_notificationManager) {
         m_notificationManager->updateServiceData(currentRootNode);
       }
