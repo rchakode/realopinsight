@@ -147,7 +147,7 @@ void DashboardBase::signalUpdateProcessing(const SourceT& src)
 {
   QString monitorName = MonitorT::toString(src.mon_type);
   if (src.mon_type == MonitorT::Nagios) {
-    Q_EMIT updateMessageChanged(QObject::tr("quering %1/%2 => %3:%4...").arg(monitorName, src.id, src.ls_addr, QString::number(src.ls_port)).toStdString());
+    Q_EMIT updateMessageChanged(QObject::tr("querying %1/%2 => %3:%4...").arg(monitorName, src.id, src.ls_addr, QString::number(src.ls_port)).toStdString());
   } else {
     Q_EMIT updateMessageChanged(QObject::tr("querying %1/%2 => %3)...").arg(monitorName, src.id, src.mon_url).toStdString());
   }
