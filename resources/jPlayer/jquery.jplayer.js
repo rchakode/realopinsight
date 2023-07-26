@@ -596,7 +596,7 @@
 			keyEnabled: false, // Enables keyboard controls.
 			audioFullScreen: false, // Enables keyboard controls to enter full screen with audio media.
 			keyBindings: { // The key control object, defining the key codes and the functions to execute.
-				// The parameter, f = $.jPlayer.focus, will be checked truethy before attempting to call any of these functions.
+				// The parameter, f = $.jPlayer.focus, will be checked truthy before attempting to call any of these functions.
 				// Properties may be added to this object, in key/fn pairs, to enable other key controls. EG, for the playlist add-on.
 				play: {
 					key: 80, // p
