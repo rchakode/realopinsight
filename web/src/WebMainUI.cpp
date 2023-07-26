@@ -208,7 +208,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("All Users"));
     linkPtr->clicked().connect(this, &WebMainUI::handleManageBuiltinUsers);
     m_menuLinks.insert(MenuBuiltInUsers, linkPtr.get());
-    m_settingsPageRef->bindWidget("menu-builin-users", std::move(linkPtr));
+    m_settingsPageRef->bindWidget("menu-builtin-users", std::move(linkPtr));
 
     // ldap user menu
     auto ldapUserManager = std::make_unique<LdapUserManager>(m_dbSession);

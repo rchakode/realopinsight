@@ -41,7 +41,7 @@
             <div class="accordion-inner">
               <ul class="nav">
                 <li> ${menu-new-user}</li>
-                <li> ${menu-builin-users}</li>
+                <li> ${menu-builtin-users}</li>
                 <li> ${menu-ldap-users}</li>
               </ul>
             </div>
