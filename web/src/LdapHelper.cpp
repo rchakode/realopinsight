@@ -90,7 +90,7 @@ void LdapHelper::setSslSettings(void)
 
 bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::string& password)
 {
-  // Intialize a connection handler
+  // Initialize a connection handler
   if (! ldap_is_ldap_url(m_serverUri.c_str()) ) {
     m_lastError = QObject::tr("Invalid LDAP URL: %1").arg(m_serverUri.c_str());
     return false;

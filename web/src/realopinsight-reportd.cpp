@@ -87,9 +87,9 @@ void runCollector(int period)
       auto& promStatusMinor = promMetrics.Add({{"scope", view.name}, {"status", "minor"}});
       auto& promStatusNormal = promMetrics.Add({{"scope", view.name}, {"status", "normal"}});
 
-      auto initilizeOut = collector.initialize(view.path.c_str());
-      if (initilizeOut.first != ngrt4n::RcSuccess) {
-        REPORTD_LOG("error", QObject::tr("%1: %2").arg(view.name.c_str(), initilizeOut.second).toStdString());
+      auto initializeOut = collector.initialize(view.path.c_str());
+      if (initializeOut.first != ngrt4n::RcSuccess) {
+        REPORTD_LOG("error", QObject::tr("%1: %2").arg(view.name.c_str(), initializeOut.second).toStdString());
         promStatusOverall.Set(ngrt4n::Unknown);
         promStatusCritical.Set(-1);
         promStatusUnknown.Set(-1);
