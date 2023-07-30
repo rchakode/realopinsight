@@ -72,7 +72,7 @@ public:
   Wt::Auth::AuthService& auth() {
     return m_basicAuthService;
   }
-  Wt::Auth::PasswordService* passwordAuthentificator(void) {
+  Wt::Auth::PasswordService* passwordAuthenticator(void) {
     return m_passAuthService;
   }
   Wt::Auth::Login& wtAuthLogin(void) {

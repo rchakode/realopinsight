@@ -106,17 +106,17 @@ WebMainUI::WebMainUI(AuthManager* authManager)
   loggedUserMenu->addItem(std::move(loggedUserMenuItem));
   m_navbarRef->addMenu(std::move(loggedUserMenu), Wt::AlignmentFlag::Right);
 
-  auto toobarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
-  toobarActionIcon->clicked().connect(this, &WebMainUI::handleRefresh);
-  m_navbarRef->addWidget(std::move(toobarActionIcon));
+  auto toolbarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-refresh", "Refresh the console map");
+  toolbarActionIcon->clicked().connect(this, &WebMainUI::handleRefresh);
+  m_navbarRef->addWidget(std::move(toolbarActionIcon));
 
-  toobarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-plus", "Zoom the console map in");
-  toobarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
-  m_navbarRef->addWidget(std::move(toobarActionIcon));
+  toolbarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-plus", "Zoom the console map in");
+  toolbarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALIN_FACTOR));
+  m_navbarRef->addWidget(std::move(toolbarActionIcon));
 
-  toobarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-minus","Zoom the console map out");
-  toobarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
-  m_navbarRef->addWidget(std::move(toobarActionIcon));
+  toolbarActionIcon = ngrt4n::createFontAwesomeTextButton("fa fa-search-minus","Zoom the console map out");
+  toolbarActionIcon->clicked().connect(std::bind(&WebMainUI::scaleMap, this, ngrt4n::SCALOUT_FACTOR));
+  m_navbarRef->addWidget(std::move(toolbarActionIcon));
 
   // problems icons
   if (! m_dbSession->isLoggedAdmin()) {
@@ -208,7 +208,7 @@ WebMainUI::WebMainUI(AuthManager* authManager)
     linkPtr = std::make_unique<Wt::WAnchor>("#", Q_TR("All Users"));
     linkPtr->clicked().connect(this, &WebMainUI::handleManageBuiltinUsers);
     m_menuLinks.insert(MenuBuiltInUsers, linkPtr.get());
-    m_settingsPageRef->bindWidget("menu-builin-users", std::move(linkPtr));
+    m_settingsPageRef->bindWidget("menu-builtin-users", std::move(linkPtr));
 
     // ldap user menu
     auto ldapUserManager = std::make_unique<LdapUserManager>(m_dbSession);
@@ -313,7 +313,7 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
   }
 
   // Generate view cards
-  int currentThumbailIndex = 0;
+  int currentThumbnailIndex = 0;
   int cardPerRow = m_dbSession->boardCardsPerRow();
   std::string failuresCount = "";
   for (const auto& sv : listOfUserViews) {
@@ -336,8 +336,8 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
     thumbnail->clicked().connect(std::bind(&WebMainUI::handleDashboardSelected, this, thumbnailTitle));
     m_thumbnailComments[thumbnailTitle] = thumbnail->bindNew<Wt::WLabel>("thumb-problem-details", "");
     m_thumbnails.insert(thumbnailTitle, thumbnail.get());
-    thumbnailsLayout->addWidget(std::move(thumbnail), currentThumbailIndex / cardPerRow, currentThumbailIndex % cardPerRow);
-    ++currentThumbailIndex;
+    thumbnailsLayout->addWidget(std::move(thumbnail), currentThumbnailIndex / cardPerRow, currentThumbnailIndex % cardPerRow);
+    ++currentThumbnailIndex;
   }
 
   if (m_dbSession->displayOnlyTiles()) {
@@ -349,11 +349,11 @@ Wt::WTemplate* WebMainUI::buildExecutiveViewPage(void)
     doJavaScript("$('#ngrt4n-side-pane').removeClass().addClass('col-sm-4');");
   }
 
-  if (currentThumbailIndex > 0) {
-    startDashbaordUpdate();
+  if (currentThumbnailIndex > 0) {
+    startDashboardUpdate();
   }
 
-  if (currentThumbailIndex != static_cast<int>(listOfUserViews.size())) {
+  if (currentThumbnailIndex != static_cast<int>(listOfUserViews.size())) {
     showMessage(ngrt4n::OperationFailed, QObject::tr("Failed to load views => %1. Check details in logs").arg(failuresCount.c_str()).toStdString());
   }
   auto thumbnails = std::make_unique<Wt::WContainerWidget>();
@@ -466,7 +466,7 @@ void WebMainUI::disableAdminFeatures(void)
 {
   wApp->doJavaScript("$('#userMenuSection').hide();"
                      "$('#viewMenuBlock').hide();"
-                     "$('#menu-database-settingss').hide();"
+                     "$('#menu-database-settings').hide();"
                      "$('#menu-auth-settings').hide();"
                      "$('#menu-notification-settings').hide();"
                      "$('#menu-license-activation').hide();");
@@ -506,9 +506,9 @@ void WebMainUI::handleRefresh(void)
     currentBoard->updateAllNodesStatus();
     currentBoard->updateMap();
     NodeT currentRootNode = currentBoard->rootNode();
-    int overvallSeverity = qMin(currentRootNode.sev, static_cast<int>(ngrt4n::Unknown));
-    if (overvallSeverity != ngrt4n::Normal) {
-      ++appStates[overvallSeverity];
+    int overallSeverity = qMin(currentRootNode.sev, static_cast<int>(ngrt4n::Unknown));
+    if (overallSeverity != ngrt4n::Normal) {
+      ++appStates[overallSeverity];
       if (m_notificationManager) {
         m_notificationManager->updateServiceData(currentRootNode);
       }
@@ -877,7 +877,7 @@ bool WebMainUI::createDirectory(const std::string& path, bool cleanContent)
 }
 
 
-void WebMainUI::startDashbaordUpdate(void)
+void WebMainUI::startDashboardUpdate(void)
 {
   auto newTimer(new Wt::WTimer());
   newTimer->setInterval(std::chrono::milliseconds(2000));

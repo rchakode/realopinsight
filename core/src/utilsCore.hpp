@@ -82,7 +82,7 @@ const IconMapT NodeIcons = {
     {"Database Server", "images/db-server.png"},
     {"Process", "images/process.png"},
     {"Logfile", "images/log.png"},
-    {"Network Bandwith", "images/network-usage.png"},
+    {"Network Bandwidth", "images/network-usage.png"},
     {"CPU", "images/cpu.png"},
     {"CPU Load", "images/performance-level.png"},
     {"Memory", "images/memory.png"},
@@ -164,7 +164,7 @@ bool findNode(const NodeListT &nodes, const QString &nodeId, NodeListT::const_it
 
 void setCheckOnError(int status, const QString &msg, CheckT &invalidCheck);
 
-StringPairT splitDataPointInfo(const QString &info); /* return <[sourcei:]hostaddr, checkid> */
+StringPairT splitDataPointInfo(const QString &info); /* return <[source:]hostaddr, checkid> */
 
 StringPairT splitSourceDataPointInfo(const QString &info); /* return <source, hostaddr> */
 

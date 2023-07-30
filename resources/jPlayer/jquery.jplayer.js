@@ -596,7 +596,7 @@
 			keyEnabled: false, // Enables keyboard controls.
 			audioFullScreen: false, // Enables keyboard controls to enter full screen with audio media.
 			keyBindings: { // The key control object, defining the key codes and the functions to execute.
-				// The parameter, f = $.jPlayer.focus, will be checked truethy before attempting to call any of these functions.
+				// The parameter, f = $.jPlayer.focus, will be checked truthy before attempting to call any of these functions.
 				// Properties may be added to this object, in key/fn pairs, to enable other key controls. EG, for the playlist add-on.
 				play: {
 					key: 80, // p
@@ -699,7 +699,7 @@
 			playbackRate: 1, // Warning - Now both an option and a status property
 			ended: 0
 
-/*		Persistant status properties created dynamically at _init():
+/*		Persistent status properties created dynamically at _init():
 			width
 			height
 			cssClass
@@ -865,7 +865,7 @@
 
 			this.options.volume = this._limitValue(this.options.volume, 0, 1); // Limit volume value's bounds.
 
-			// Create the formats array, with prority based on the order of the supplied formats string
+			// Create the formats array, with priority based on the order of the supplied formats string
 			$.each(this.options.supplied.toLowerCase().split(","), function(index1, value1) {
 				var format = value1.replace(/^\s+|\s+$/g, ""); //trim
 				if(self.format[format]) { // Check format is valid.
@@ -882,7 +882,7 @@
 				}
 			});
 
-			// Create the solutions array, with prority based on the order of the solution string
+			// Create the solutions array, with priority based on the order of the solution string
 			$.each(this.options.solution.toLowerCase().split(","), function(index1, value1) {
 				var solution = value1.replace(/^\s+|\s+$/g, ""); //trim
 				if(self.solution[solution]) { // Check solution is valid.
@@ -1212,7 +1212,7 @@
 			// MJP: The background change remains. Would need to store the original to restore it correctly.
 			// MJP: The jPlayer element's size change remains.
 
-			// Clear the media to reset the GUI and stop any downloads. Streams on some browsers had persited. (Chrome)
+			// Clear the media to reset the GUI and stop any downloads. Streams on some browsers had persisted. (Chrome)
 			this.clearMedia();
 			// Remove the size/sizeFull cssClass from the cssSelectorAncestor
 			this._removeUiClass();
@@ -1573,7 +1573,7 @@
 			var ct = 0, cpa = 0, sp = 0, cpr = 0;
 
 			// Fixes the duration bug in iOS, where the durationchange event occurs when media.duration is not always correct.
-			// Fixes the initial duration bug in BB OS7, where the media.duration is infinity and displays as NaN:NaN due to Date() using inifity.
+			// Fixes the initial duration bug in BB OS7, where the media.duration is infinity and displays as NaN:NaN due to Date() using infinity.
 			if(isFinite(media.duration)) {
 				this.status.duration = media.duration;
 			}
@@ -3162,7 +3162,7 @@
 		},
 		_aurora_playHead: function(percent) {
 			if(this.aurora.player.duration > 0) {
-				// The seek() sould be in milliseconds, but the only codec that works with seek (aac.js) uses seconds.
+				// The seek() should be in milliseconds, but the only codec that works with seek (aac.js) uses seconds.
 				this.aurora.player.seek(percent * this.aurora.player.duration / 100); // Using seconds
 			}
 				

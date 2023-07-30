@@ -38,24 +38,24 @@ QString ngrt4n::getAbsolutePath(const QString &_path)
 
 qint8 ngrt4n::severityFromProbeStatus(const int &monitorType, const int &statusValue)
 {
-  qint8 criticity = ngrt4n::Unknown;
+  qint8 criticality = ngrt4n::Unknown;
   if (monitorType == MonitorT::Nagios)
   {
     switch (statusValue)
     {
     case ngrt4n::NagiosOk:
-      criticity = ngrt4n::Normal;
+      criticality = ngrt4n::Normal;
       break;
     case ngrt4n::NagiosWarning:
-      criticity = ngrt4n::Major;
+      criticality = ngrt4n::Major;
       break;
     case ngrt4n::NagiosCritical:
-      criticity = ngrt4n::Critical;
+      criticality = ngrt4n::Critical;
       break;
     default:
       break;
     }
-    return static_cast<ngrt4n::SeverityT>(criticity);
+    return static_cast<ngrt4n::SeverityT>(criticality);
   }
 
   if (monitorType == MonitorT::Zabbix)
@@ -64,22 +64,22 @@ qint8 ngrt4n::severityFromProbeStatus(const int &monitorType, const int &statusV
     {
     case ngrt4n::ZabbixClear:
     case ngrt4n::ZabbixInfo:
-      criticity = ngrt4n::Normal;
+      criticality = ngrt4n::Normal;
       break;
     case ngrt4n::ZabbixWarn:
-      criticity = ngrt4n::Minor;
+      criticality = ngrt4n::Minor;
       break;
     case ngrt4n::ZabbixAverage:
-      criticity = ngrt4n::Major;
+      criticality = ngrt4n::Major;
       break;
     case ngrt4n::ZabbixHigh:
     case ngrt4n::ZabbixDisaster:
-      criticity = ngrt4n::Critical;
+      criticality = ngrt4n::Critical;
       break;
     default:
       break;
     }
-    return static_cast<ngrt4n::SeverityT>(criticity);
+    return static_cast<ngrt4n::SeverityT>(criticality);
   }
   
   if (monitorType == MonitorT::Kubernetes)
@@ -88,17 +88,17 @@ qint8 ngrt4n::severityFromProbeStatus(const int &monitorType, const int &statusV
     {
     case ngrt4n::K8sRunning:
     case ngrt4n::K8sSucceeded:
-      criticity = ngrt4n::Normal;
+      criticality = ngrt4n::Normal;
       break;
     case ngrt4n::K8sFailed:
-      criticity = ngrt4n::Critical;
+      criticality = ngrt4n::Critical;
       break;
     case ngrt4n::K8sPending:
     default:
-      criticity = ngrt4n::Unknown;
+      criticality = ngrt4n::Unknown;
       break;
     }
-    return static_cast<ngrt4n::SeverityT>(criticity);
+    return static_cast<ngrt4n::SeverityT>(criticality);
   }
 
   return ngrt4n::Unknown;

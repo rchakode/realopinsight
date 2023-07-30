@@ -119,7 +119,7 @@ std::pair<QStringList, int> K8sHelper::listNamespaces(void)
     }
   }
 
-  // make request and conncet to the processing handlers
+  // make request and connect to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(req);
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
@@ -162,7 +162,7 @@ std::pair<QByteArray, int> K8sHelper::requestNamespacedItemsData(const QString& 
     }
   }
 
-  // make request and conncet to the processing handlers
+  // make request and connect to the processing handlers
   QNetworkReply* reply = QNetworkAccessManager::get(req);
   connect(reply, SIGNAL(finished()), &m_eventLoop, SLOT(quit()));
   connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(exitEventLoop(QNetworkReply::NetworkError)));
@@ -212,7 +212,7 @@ std::pair<QStringList, int> K8sHelper::parseNamespaces(const QByteArray& data)
 
 
 std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_data,
-                                                           const QString& in_macthNamespace,
+                                                           const QString& in_matchNamespace,
                                                            QMap<QString, QMap<QString, QString>>& out_selectorMaps,
                                                            NodeListT& out_bpnodes)
 {
@@ -237,8 +237,8 @@ std::pair<QString, int> K8sHelper::parseNamespacedServices(const QByteArray& in_
     auto&& metaData = serviceData["metadata"].toObject();
     auto&& k8sNamespace = metaData["namespace"].toString();
 
-    // escape service if not matches the given namespac
-    if (k8sNamespace != in_macthNamespace) {
+    // escape service if not matches the given namespace
+    if (k8sNamespace != in_matchNamespace) {
       continue;
     }
 
@@ -450,7 +450,7 @@ std::tuple<int,  std::string, std::string> K8sHelper::extractStateInfo(const QJs
 
   // default state is "waiting"
   // See Kubernetes documentation: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core
-  return std::make_tuple(ngrt4n::K8sPending, "", QObject::tr("container is wating").toStdString());
+  return std::make_tuple(ngrt4n::K8sPending, "", QObject::tr("container is waiting").toStdString());
 }
 
 

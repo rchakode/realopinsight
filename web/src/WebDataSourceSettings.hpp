@@ -84,7 +84,7 @@ private:
   int findFormSourceIndex(int sid);
   void updateSourceDataModel(int sid);
   void handleSourceBoxChanged(void);
-  void updateComponentsVisibiliy(int monitorTypeCurrentIndex);
+  void updateComponentsVisibility(int monitorTypeCurrentIndex);
   void handleShowAuthStringChanged(void);
   void saveSourceInDatabase(const SourceT& sinfo);
   SourceT getSourceInfoByIndex(int sourceIndex);

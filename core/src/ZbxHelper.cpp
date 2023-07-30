@@ -276,7 +276,7 @@ int ZbxHelper::processGetApiVersionReply(void)
 
 int ZbxHelper::processTriggerData(ChecksT &checks)
 {
-  // check weird reponse
+  // check weird response
   qint32 tid = m_jsonData["id"].toInt();
 
   if (tid != GetTriggersByHostOrGroup && tid != GetTriggersByHostOrGroupV18 && tid != GetTriggersByIds)

@@ -28,7 +28,7 @@ helm upgrade --namespace monitoring --install realopinsight manifests/helm/realo
 ```
 
 ## In-cluster access to service
-On success, the deployment does create a Kubernetes **ClusterIP** service named `realopinsiht`.
+On success, the deployment does create a Kubernetes **ClusterIP** service named `realopinsight`.
 
 This service exposes the RealOpInsight's web interface (port `80`) as well as its Prometheus exporter (port `4584`).
 

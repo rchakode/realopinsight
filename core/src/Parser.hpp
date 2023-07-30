@@ -63,7 +63,7 @@ class Parser : public QObject
     DbSession* m_dbSession;
 
 
-    void fixupVisilityAndDependenciesGraph(void);
+    void fixupVisibilityAndDependenciesGraph(void);
     void saveCoordinatesFile(void);
     void insertITServiceNode(NodeT& node);
     std::pair<int, QString> loadDynamicViewByGroup(QDomNodeList& inXmlDomNodes, CoreDataT& outCData);

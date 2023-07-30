@@ -78,7 +78,7 @@ private:
   void handleContainedSizeChanged(double mapW, double mapH, double winW, double winH);
   void expandCollapse(const QString& nodeId);
   void applyVisibilityToChild(const NodeT& node, qint8 mask);
-  void removeThumdImage(void);
+  void removeThumbImage(void);
   QString toBase64RootNodeName(void);
 };
 

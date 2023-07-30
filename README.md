@@ -28,8 +28,8 @@ Key features:
 ![](./images/banners/screenshots.png)
 
 # Getting Started
-  * [Deployment on Kubernetes](./docs/deployement-on-kubernetes.md)
-  * [Deployment on Docker](./docs/deployement-on-deployment-on-docker.md)
+  * [Deployment on Kubernetes](./docs/deployment-on-kubernetes.md)
+  * [Deployment on Docker](./docs/deployment-on-docker.md)
   * [Integration with Kubernetes](https://realopinsight.com/docs/quickstart-kubernetes-dashboard/)
   * [Integration with Zabbix](https://realopinsight.com/docs/quickstart-zabbix-dashboard/)
   * [Integration with Nagios and alike](https://realopinsight.com/docs/quickstart-nagios-icinga-centreon-dashboard/)

@@ -47,7 +47,7 @@ AuthManager::AuthManager(DbSession* dbSession)
   auto authProxyModel = std::make_unique<AuthModelProxy>(m_dbSession);
   authProxyModel->loginFailed().connect(this, &AuthManager::handleLoginFailed);
   authProxyModel->setVisible(Wt::Auth::AuthModel::RememberMeField, false);
-  authProxyModel->addPasswordAuth(m_dbSession->passwordAuthentificator());
+  authProxyModel->addPasswordAuth(m_dbSession->passwordAuthenticator());
   setModel(std::move(authProxyModel));
   setRegistrationEnabled(false);
   m_dbSession->wtAuthLogin().changed().connect(this, &AuthManager::handleAuthorization);

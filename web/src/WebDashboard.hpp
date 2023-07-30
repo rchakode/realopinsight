@@ -108,7 +108,7 @@ private:
   std::string m_eventContainerId;
 
   std::unique_ptr<Wt::WWidget> createEventFeedTpl(const NodeT& node);
-  void hanleRenderingAreaSizeChanged(double mapWidth, double mapHeight, double windowWidth, double windowHeight) {}
+  void handleRenderingAreaSizeChanged(double mapWidth, double mapHeight, double windowWidth, double windowHeight) {}
 };
 
 

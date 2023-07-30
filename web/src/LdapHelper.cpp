@@ -90,14 +90,14 @@ void LdapHelper::setSslSettings(void)
 
 bool LdapHelper::loginWithDistinguishName(const std::string& dn, const std::string& password)
 {
-  // Intialize a connection handler
+  // Initialize a connection handler
   if (! ldap_is_ldap_url(m_serverUri.c_str()) ) {
     m_lastError = QObject::tr("Invalid LDAP URL: %1").arg(m_serverUri.c_str());
     return false;
   }
 
   if (! m_handler) {
-    m_lastError = QObject::tr("Unitialized handler");
+    m_lastError = QObject::tr("Uninitialized handler");
     return false;
   }
 
@@ -132,7 +132,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
                           LdapUserMapT& userMap)
 {
   if (! m_handler) {
-    m_lastError = QObject::tr("LDAP: Unitialized handler");
+    m_lastError = QObject::tr("LDAP: Uninitialized handler");
     return -1;
   }
 
@@ -165,7 +165,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
   for (LDAPMessage* currentEntry = ldap_first_entry(m_handler, searchResult);
        currentEntry != nullptr;
        currentEntry = ldap_next_entry(m_handler, currentEntry)) {
-    std::string dn = getObjectDistingisghName(currentEntry);
+    std::string dn = getObjectDistinguishName(currentEntry);
     userMap[dn].insert("dn", dn);
     parseObjectAttr(currentEntry, userMap[dn]);
   }
@@ -177,7 +177,7 @@ int LdapHelper::listUsers(const std::string& searchBase,
 }
 
 
-std::string LdapHelper::getObjectDistingisghName(LDAPMessage* objectData)
+std::string LdapHelper::getObjectDistinguishName(LDAPMessage* objectData)
 {
   char* buffer;
   std::string result = "";

@@ -63,7 +63,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   addField(UsernameField);
   addField(PasswordField);
   addField(CurrentPasswordField);
-  addField(PasswordConfimationField);
+  addField(PasswordConfirmationField);
   addField(FirstNameField);
   addField(LastNameField);
   addField(EmailField);
@@ -74,7 +74,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
 
   setValidator(UsernameField, createNameValidator());;
   setValidator(PasswordField, createPasswordValidator());
-  setValidator(PasswordConfimationField, std::make_unique<ConfirmPasswordValidator>(this, PasswordField));
+  setValidator(PasswordConfirmationField, std::make_unique<ConfirmPasswordValidator>(this, PasswordField));
   setValidator(FirstNameField, createNameValidator());
   setValidator(FirstNameField, createNameValidator());
   setValidator(LastNameField, createNameValidator());
@@ -91,7 +91,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   if (changePassword) {
     setVisible(CurrentPasswordField, true);
     setVisible(PasswordField, true);
-    setVisible(PasswordConfimationField, true);
+    setVisible(PasswordConfirmationField, true);
     setVisible(UsernameField, false);
     setVisible(FirstNameField, false);
     setVisible(LastNameField, false);
@@ -105,7 +105,7 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
     if (user) {
       setData(*user);
       setVisible(PasswordField, false);
-      setVisible(PasswordConfimationField, false);
+      setVisible(PasswordConfirmationField, false);
       setWritable(false);
     } else {
       setVisible(RegistrationDateField, false);
@@ -113,10 +113,10 @@ UserFormModel::UserFormModel(const DboUserT* user, bool changePassword, bool use
   }
 }
 
-void UserFormModel::setWritable(bool writtable)
+void UserFormModel::setWritable(bool writable)
 {
-  bool readonly = ! writtable;
-  setReadOnly(PasswordConfimationField, readonly);
+  bool readonly = ! writable;
+  setReadOnly(PasswordConfirmationField, readonly);
   setReadOnly(FirstNameField, readonly);
   setReadOnly(LastNameField, readonly);
   setReadOnly(EmailField, readonly);
@@ -182,9 +182,9 @@ UserFormView::UserFormView(const DboUserT* user, bool changePasswordTriggered, b
   setTemplateText(tr("userForm-template"));
   addFunction("id", &WTemplate::Functions::id);
   setFormWidget(UserFormModel::UsernameField, std::make_unique<Wt::WLineEdit>());
-  setFormWidget(UserFormModel::CurrentPasswordField, std::move(createPaswordField()));
-  setFormWidget(UserFormModel::PasswordField, std::move(createPaswordField()));
-  setFormWidget(UserFormModel::PasswordConfimationField, std::move(createPaswordField()));
+  setFormWidget(UserFormModel::CurrentPasswordField, std::move(createPasswordField()));
+  setFormWidget(UserFormModel::PasswordField, std::move(createPasswordField()));
+  setFormWidget(UserFormModel::PasswordConfirmationField, std::move(createPasswordField()));
   setFormWidget(UserFormModel::FirstNameField, std::make_unique<Wt::WLineEdit>());
 
   auto lastNameField = std::make_unique<Wt::WLineEdit>();
@@ -295,17 +295,17 @@ void UserFormView::reset(void)
   updateView(m_modelRef);
 }
 
-void UserFormView::setWritable(bool writtable)
+void UserFormView::setWritable(bool writable)
 {
-  m_modelRef->setWritable(writtable);
+  m_modelRef->setWritable(writable);
   updateView(m_modelRef);
 }
 
-void UserFormView::resetValidationState(bool writtable)
+void UserFormView::resetValidationState(bool writable)
 {
   m_modelRef->reset();
   m_modelRef->setData(m_user);
-  setWritable(writtable);
+  setWritable(writable);
 }
 
 void UserFormView::process(void)
@@ -383,7 +383,7 @@ std::unique_ptr<Wt::WComboBox> UserFormView::createUserRoleField(void)
 }
 
 
-std::unique_ptr<Wt::WLineEdit> UserFormView::createPaswordField(void)
+std::unique_ptr<Wt::WLineEdit> UserFormView::createPasswordField(void)
 {
   auto field = std::make_unique<Wt::WLineEdit>();
   field->setEchoMode(Wt::EchoMode::Password);

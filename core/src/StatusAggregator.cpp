@@ -57,7 +57,7 @@ void StatusAggregator::addSeverity(int value, double weight)
 void StatusAggregator::addThresholdLimit(QVector<ThresholdT>& thresholdsLimits, const ThresholdT& th)
 {
   thresholdsLimits.push_back(th);
-  std::sort(thresholdsLimits.begin(), thresholdsLimits.end(), ThresholdLessthanFnt());
+  std::sort(thresholdsLimits.begin(), thresholdsLimits.end(), ThresholdLessThanFnt());
 }
 
 

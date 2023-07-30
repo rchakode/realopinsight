@@ -90,7 +90,7 @@ void WebPlatformStatusRaw::updateData(const ListofPlatformStatusT& data)
 
   setXSeriesColumn(0);
 
-  const QMap<int, int> SerieSeverities = {
+  const QMap<int, int> SeriesSeverities = {
     {0, ngrt4n::Unset},
     {1, ngrt4n::Unset},
     {2, ngrt4n::Normal},
@@ -103,13 +103,13 @@ void WebPlatformStatusRaw::updateData(const ListofPlatformStatusT& data)
   };
 
   for (int i = 8; i >= 2; --i) {
-    auto serie = std::make_unique<Wt::Chart::WDataSeries>(i, Wt::Chart::SeriesType::Line);
-    Wt::WColor color = ngrt4n::severityWColor(SerieSeverities[i]);
-    serie->setPen(color);
-    serie->setBrush(color);
-    serie->setStacked(true);
-    serie->setFillRange(Wt::Chart::FillRangeType::MinimumValue);
-    addSeries(std::move(serie));
+    auto series = std::make_unique<Wt::Chart::WDataSeries>(i, Wt::Chart::SeriesType::Line);
+    Wt::WColor color = ngrt4n::severityWColor(SeriesSeverities[i]);
+    series->setPen(color);
+    series->setBrush(color);
+    series->setStacked(true);
+    series->setFillRange(Wt::Chart::FillRangeType::MinimumValue);
+    addSeries(std::move(series));
   }
   resize(900, 300);
   setPanEnabled(true);

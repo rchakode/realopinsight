@@ -98,7 +98,7 @@ void WebNotificationSettings::saveChanges(void)
     settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_SERVER_PORT, m_smtpPortFieldRef->text().toUTF8().c_str());
     settings.setKeyValue(SettingFactory::NOTIF_MAIL_SMTP_USE_SSL, QString::number(int(m_smtpUseSslFieldRef->checkState())));
   }
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings udpated"));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings updated"));
 }
 
 

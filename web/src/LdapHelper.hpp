@@ -65,7 +65,7 @@ private:
   int setupHandler(void);
   void cleanupHandler(void);
   void setSslSettings(void);
-  std::string getObjectDistingisghName(LDAPMessage* objectData);
+  std::string getObjectDistinguishName(LDAPMessage* objectData);
   void parseObjectAttr(LDAPMessage* objectData, LdapUserAttrsT& userInfo);
 };
 

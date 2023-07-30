@@ -724,7 +724,7 @@ int DbSession::listStatusHistory(PlatformMappedStatusHistoryT& statusHistory, co
   return count;
 }
 
-int DbSession::getLastPlatformStatus(PlatformStatusT &platfotmStatus, const std::string &view)
+int DbSession::getLastPlatformStatus(PlatformStatusT &platformStatus, const std::string &view)
 {
   int count = -1;
   dbo::Transaction transaction(*this);
@@ -743,7 +743,7 @@ int DbSession::getLastPlatformStatus(PlatformStatusT &platfotmStatus, const std:
 
     if (queryResults.size() == 1) {
       count = 0;
-      platfotmStatus = queryResults.begin()->modify()->data();
+      platformStatus = queryResults.begin()->modify()->data();
     }
   }
   catch (const dbo::Exception &ex)

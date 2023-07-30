@@ -62,7 +62,7 @@ WebDataSourceSettings::WebDataSourceSettings()
   m_monitorTypeFieldRef = bindNew<Wt::WComboBox>("monitor-type");
   m_monitorTypeFieldRef->addItem(Q_TR("-- Select a type --"));
   for (const auto& srcid: ngrt4n::MonitorSourceTypes) { m_monitorTypeFieldRef->addItem(srcid.toStdString()); }
-  m_monitorTypeFieldRef->activated().connect(this, &WebDataSourceSettings::updateComponentsVisibiliy);
+  m_monitorTypeFieldRef->activated().connect(this, &WebDataSourceSettings::updateComponentsVisibility);
 
   m_monitorUrlFieldRef = bindNew<Wt::WLineEdit>("monitor-url");
   m_monitorUrlFieldRef->setValidator(std::make_unique<UriValidator>("http", false, this));
@@ -218,7 +218,7 @@ void WebDataSourceSettings::applySourceChanges(int index)
 
   updateSourceDataModel(index);
   m_sourceSelectionFieldRef->setCurrentIndex(findFormSourceIndex(index));
-  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings udpated"));
+  m_operationCompleted.emit(ngrt4n::OperationSucceeded, Q_TR("settings updated"));
 }
 
 
@@ -333,7 +333,7 @@ void WebDataSourceSettings::fillInFormGivenSourceId(int sid)
   m_dontVerifyCertificateFieldRef->setCheckState(sourceLoaded.second.verify_ssl_peer? Wt::CheckState::Unchecked : Wt::CheckState::Checked);
   m_updateIntervalFieldRef->setValue(updateInterval());
 
-  updateComponentsVisibiliy(m_monitorTypeFieldRef->currentIndex());
+  updateComponentsVisibility(m_monitorTypeFieldRef->currentIndex());
 
   m_sourceSelectionFieldRef->setCurrentIndex(sid);
 }
@@ -398,7 +398,7 @@ void WebDataSourceSettings::handleSourceBoxChanged(void)
 }
 
 
-void WebDataSourceSettings::updateComponentsVisibiliy(int monitorTypeCurrentIndex)
+void WebDataSourceSettings::updateComponentsVisibility(int monitorTypeCurrentIndex)
 {
   const auto monitorType = QString::fromStdString(m_monitorTypeFieldRef->itemText(monitorTypeCurrentIndex).toUTF8());
 

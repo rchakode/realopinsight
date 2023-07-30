@@ -32,7 +32,7 @@
 /*!
  * \class QxtMailAttachment
  * \inmodule QxtNetwork
- * \brief The QxtMailAttachment class represents an attachement to a QxtMailMessage
+ * \brief The QxtMailAttachment class represents an attachment to a QxtMailMessage
  */
 
 

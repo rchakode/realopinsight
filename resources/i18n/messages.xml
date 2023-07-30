@@ -41,7 +41,7 @@
             <div class="accordion-inner">
               <ul class="nav">
                 <li> ${menu-new-user}</li>
-                <li> ${menu-builin-users}</li>
+                <li> ${menu-builtin-users}</li>
                 <li> ${menu-ldap-users}</li>
               </ul>
             </div>
@@ -539,7 +539,7 @@
       <span id="auth-setting-save-button">${auth-settings-save-button}</span>
     </div>
 
-</div> <!-- class="form-hoizontal" -->
+</div> <!-- class="form-horizontal" -->
 </message>
 
 
@@ -597,7 +597,7 @@
       <span id="add-as-source-settings-button">${add-as-source-button}</span>
       <span id="delete-source-settings-button">${delete-button}</span>
     </div>
-</div> <!-- class="form-hoizontal" -->
+</div> <!-- class="form-horizontal" -->
 </message>
 
 
@@ -649,7 +649,7 @@
       <span id="open-service-view">${open-service-view}</span>
       <span id="import-native-config">${import-native-config}</span>
       <span id="import-zabbix-it-service">${import-zabbix-it-service}</span>
-      <span id="import-nabios-bpi">${import-nabios-bpi}</span>
+      <span id="import-nagios-bpi">${import-nagios-bpi}</span>
     </div>
   </fieldset>
 
@@ -725,7 +725,7 @@
     <div class="form-actions">
       <span id="notification-setting-save-button">${notification-settings-save-button}</span>
     </div>
-</div> <!-- class="form-hoizontal" -->
+</div> <!-- class="form-horizontal" -->
 </message>
 
 
