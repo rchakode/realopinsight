@@ -14,7 +14,7 @@
 - [Contributions](#contributions)
 
 # Overview
-RealOpInsight leverages probes status from Kubernetes®, Zabbix® and/or Nagios® to feature upon that application-specific high-level visualization to track the availability of applications over time. 
+RealOpInsight gathers pods and checks status from Kubernetes®, Zabbix® and Nagios® to enable upon them application-specific high-level visualization that helps track the availability of applications over time. 
 
 Key features:
 
