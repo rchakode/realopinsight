@@ -25,11 +25,9 @@ jobs:
         REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
       run: |
         echo "setting build version"
-        RELEASE_VERSION="$(date +%F)-$(git rev-parse --short HEAD)"
+        export RELEASE_VERSION="$(date +%F)-$(git rev-parse --short HEAD)"
         VERSION_FILE=realopinsight.pro
-        VERSION_LINE=$(grep -n '^PACKAGE_VERSION=' $VERSION_FILE | cut -f1 -d:)
-        VERSION_ORIG=$(grep '^PACKAGE_VERSION=' $VERSION_FILE | cut -d= -f2)
-        sed -i "${VERSION_LINE}s/${VERSION_ORIG}/${RELEASE_VERSION}/" $VERSION_FILE
+        perl -pi -e 's/^(PACKAGE_VERSION=).*/$1$ENV{RELEASE_VERSION}/' $VERSION_FILE
         cat $VERSION_FILE
 
         echo "building container image => ${IMAGE_BASENAME}:${RELEASE_VERSION}"
