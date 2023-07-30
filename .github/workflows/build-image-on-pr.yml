@@ -18,11 +18,9 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Build and push Docker image
+    - name: Build Docker image
       env:
         IMAGE_BASENAME: rchakode/realopinsight
-        REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
-        REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
       run: |
         echo "setting build version"
         export RELEASE_VERSION="$(date +%F)-$(git rev-parse --short HEAD)"
@@ -33,5 +31,12 @@ jobs:
         echo "building container image => ${IMAGE_BASENAME}:${RELEASE_VERSION}"
         IMAGE_TAGGED_NAME=${IMAGE_BASENAME}:${RELEASE_VERSION}
         docker build -t ${IMAGE_TAGGED_NAME} .
+        echo "IMAGE_TAGGED_NAME=$IMAGE_TAGGED_NAME" >> "$GITHUB_ENV"
+
+    - name: Push Docker image
+      env:
+        REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+        REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+      run: |
         docker login --username ${REGISTRY_USERNAME} --password ${REGISTRY_PASSWORD}
         docker push $IMAGE_TAGGED_NAME
