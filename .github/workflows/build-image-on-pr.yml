@@ -34,6 +34,7 @@ jobs:
         echo "IMAGE_TAGGED_NAME=$IMAGE_TAGGED_NAME" >> "$GITHUB_ENV"
 
     - name: Push Docker image
+      if: github.event.pull_request.head.repo.full_name == github.repository
       env:
         REGISTRY_USERNAME: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
         REGISTRY_PASSWORD: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
