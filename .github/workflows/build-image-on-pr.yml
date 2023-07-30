@@ -6,6 +6,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: read
+
     concurrency:
       group: image-pr-${{ github.event.pull_request.number }}
 
