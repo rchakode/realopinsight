@@ -6,6 +6,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: read
+
     concurrency:
       group: image-${{ github.ref }}
 
