@@ -7,9 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    concurrency:
+      group: ci-${{ github.ref }}
+
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+
     - name: Build and push Docker image
       run: |
         echo "building code"
