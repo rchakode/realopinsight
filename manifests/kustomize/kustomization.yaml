@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
+  - resources/namespace.yaml
   - resources/realopinsight-config.yaml
   - resources/realopinsight-rbac.yaml
   - resources/realopinsight-app.yaml
