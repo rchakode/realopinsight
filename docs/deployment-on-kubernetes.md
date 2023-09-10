@@ -16,14 +16,16 @@ The manifests are configured to achieve the deployment in the namespace `monitor
 
 Use the below command to trigger the deployment.
 
-```
+```shell
 kubectl -n monitoring apply -k ./manifests/kustomize
+
+# Open http://localhost:4583/ui in your browser (default credentials : admin/password).
 ```
 
 ## Deployment with Helm
 Assuming you have a Linux terminal with Helm3 installed and able to access a KUBECONFIG file to deploy resources on Kubernetes, the following command shall install an instance in the `monitoring` namespace. **The namespace must exist**, it can be changed to another value.
 
-```
+```shell
 helm upgrade --namespace monitoring --install realopinsight manifests/helm/realopinsight/
 ```
 
@@ -40,8 +42,8 @@ Their in-cluster URLs are the following:
 ## Remote access to the service
 As a developer or for debugging purposes, you can enable port forwarding for local access as follows.
 
-```
-kubectl port-forward --namespace monitoring service/realopinsight-ui 4583:80
+```shell
+kubectl port-forward --namespace monitoring service/realopinsight 4583:80
 ```
 
 For production access, typically for operations monitoring, you must have to consider the Ingress policies defined in your organization. Contact your IT staff for additional information.

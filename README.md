@@ -40,9 +40,9 @@ git clone --depth 1 https://github.com/rchakode/realopinsight.git && \
 Check the web interface
 
 ```shell
-kubectl port-forward --namespace monitoring service/realopinsight-ui 4583:80
+kubectl port-forward --namespace monitoring service/realopinsight 4583:80
 
-# Then open http://localhost:4583 in your browser.
+# Open http://localhost:4583/ui in your browser (default credentials : admin/password).
 ```
 
 Available _in-cluster_ service endpoints (can be exposed to the external world via an Ingress Controller):
