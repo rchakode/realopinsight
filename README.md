@@ -27,7 +27,31 @@ Key features:
 
 ![](./images/banners/screenshots.png)
 
-# Getting Started
+
+# Quick start on Kubernetes
+The following sequence installs RealOpInsight in the namespace `monitoring`. The namespace is created if not yet the case. 
+
+
+```bash
+git clone --depth 1 https://github.com/rchakode/realopinsight.git && \
+  kubectl -n monitoring apply -k ./realopinsight/manifests/kustomize
+```
+
+Check the web interface
+
+```shell
+kubectl port-forward --namespace monitoring service/realopinsight-ui 4583:80
+
+# Then open http://localhost:4583 in your browser.
+```
+
+Available _in-cluster_ service endpoints (can be exposed to the external world via an Ingress Controller):
+
+* Web UI: http://realopinsight.monitoring/ui.
+* Prometheus metrics: http://realopinsight.monitoring:4583/metrics.
+
+
+# Documentation
   * [Deployment on Kubernetes](./docs/deployment-on-kubernetes.md)
   * [Deployment on Docker](./docs/deployment-on-docker.md)
   * [Integration with Kubernetes](https://realopinsight.com/docs/quickstart-kubernetes-dashboard/)
